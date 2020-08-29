@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import HomeScreen from "../HomeScreen/HomeScreen";
 import React from 'react'
 import ChooseRaceScreen from "../CharacterCreation/ChooseRaceScreen";
-import ConfirmRaceScreen from "../CharacterCreation/ConfirmRaceScreen";
+import ConfirmRaceScreen from "../CharacterCreation/ConfirmRaceScreen/ConfirmRaceScreen";
 
 const Stack = createStackNavigator();
 

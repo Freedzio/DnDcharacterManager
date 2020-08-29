@@ -14,6 +14,7 @@ export interface Race {
     language_desc: string,
     language_options: ChoosingOptions
     traits: Array<JustUrl>,
+    trait_options: ChoosingOptions,
     subraces: Array<JustUrl>
     url: string
 }
@@ -48,4 +49,13 @@ export interface Proficiency {
         type: string
         name: string
     }>
+}
+
+export interface Results {
+    count: number,
+    results: Array<JustUrl>
+}
+
+export interface NamedJustUrl extends JustUrl {
+    name: string
 }
