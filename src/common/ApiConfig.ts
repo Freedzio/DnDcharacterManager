@@ -1,4 +1,4 @@
-const base = 'https://www.dnd5eapi.co/api/';
+const base = 'https://www.dnd5eapi.co/api';
 
 export const ApiConfig = {
     races: `${base}/races`,
