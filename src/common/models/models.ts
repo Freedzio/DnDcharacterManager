@@ -7,9 +7,10 @@ export interface Race {
     age: string,
     size: string,
     size_description: string,
-    starting_proficiences: Array<JustUrl>,
+    starting_proficiencies: Array<JustUrl>,
     starting_proficiency_options: ChoosingOptions,
     ability_bonuses: Array<AbilitySimple>,
+    ability_bonus_options: ChoosingOptions,
     languages: Array<JustUrl>,
     language_desc: string,
     language_options: ChoosingOptions
@@ -21,7 +22,8 @@ export interface Race {
 
 export interface JustUrl {
     name: string,
-    url: string
+    url: string,
+    bonus?: number
 }
 
 export interface AbilitySimple {

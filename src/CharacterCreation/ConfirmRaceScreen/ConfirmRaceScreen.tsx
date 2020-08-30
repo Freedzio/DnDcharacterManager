@@ -3,17 +3,22 @@ import { ApiConfig } from '../../common/ApiConfig';
 import { Container, Content, H1, Text, View, Card, CardItem, Body, Row, Col, List, ListItem } from 'native-base';
 import { StyleSheet } from 'react-native';
 import LoadingContainer from '../../common/LoadingContainer';
-import { Race, AbilitySimple, JustUrl, ChoosingOptions } from '../../common/models/models';
+import { Race, AbilitySimple, JustUrl } from '../../common/models/models';
 import Section from './Section';
+import apiWrapper from '../../common/functions/apiWrapper';
+import { Picker } from '@react-native-community/picker';
+import { drakes } from './draconicAncestry';
+
+const tileHeight = 80;
 
 function Tile({ property, amount }: Tile) {
     return (
-        <Card style={{ padding: 10, height: 60 }}>
-            <View style={{ flex: 1, justifyContent: 'space-around' }}>
-                <Text style={{ flex: 1, textAlign: "center" }}>
+        <Card style={{ padding: 10, height: tileHeight }}>
+            <View style={{ flex: 1, justifyContent: "space-around" }}>
+                <Text style={{ textAlign: "center" }}>
                     {property}
                 </Text>
-                <Text style={{ flex: 1, fontWeight: "bold", textAlign: "center" }}>
+                <Text style={{ fontWeight: "bold", textAlign: "center" }}>
                     {amount}
                 </Text>
             </View>
@@ -21,21 +26,20 @@ function Tile({ property, amount }: Tile) {
     )
 }
 
-
-
 export default function ConfirmRaceScreen({ navigation, route }: any) {
     const [raceData, setRaceData] = useState<Race>();
     const [ready, setReady] = useState(false);
-    const [language, setLanguage] = useState('choose')
+    const [language, setLanguage] = useState<string>('choose');
+    const [drake, setDrake] = useState<string>('choose');
+    const [proficiency, setProficiency] = useState<string>('choose');
+    const [abilityBonus, setAbilityBonus] = useState<string>('')
 
     const raceId = route.params.raceId;
 
     async function getRaceData() {
-        const response = await fetch(ApiConfig.race(raceId));
-        const data = await response.json();
-
+        const data = await apiWrapper(`${ApiConfig.race(raceId)}`);
         return data
-    }
+    };
 
     useEffect(() => {
         getRaceData()
@@ -60,6 +64,31 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                                     </Col>
                                 )
                         }
+                        {
+                            raceData?.ability_bonus_options &&
+                            <Col>
+                                <Card style={{ height: tileHeight }}>
+                                    <View style={{ flex: 1, justifyContent: "space-between" }}>
+                                        <View>
+
+                                            <Picker style={{ width: '100%' }} selectedValue={abilityBonus} onValueChange={v => setAbilityBonus(v as string)}>
+                                                <Picker.Item value='' label='------' />
+                                                {
+                                                    raceData?.ability_bonus_options.from.map((ability: JustUrl, index: number) =>
+                                                        <Picker.Item key={index} value={ability.name} label={ability.name} />
+                                                    )}
+                                            </Picker>
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+
+                                            <Text style={{ fontWeight: "bold", textAlign: "center" }}>
+                                                {abilityBonus !== '' && '+' + raceData.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </Card>
+                            </Col>
+                        }
                         <Col>
                             <Tile property={'Speed'} amount={raceData?.speed} />
                         </Col>
@@ -76,6 +105,10 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                         description={raceData?.age}
                     />
                     <Section
+                        title='Size'
+                        description={raceData?.size_description}
+                    />
+                    <Section
                         title='Languages'
                         description={raceData?.language_desc}
                         selectedVal={language}
@@ -86,7 +119,18 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                         <Section
                             title='Traits'
                             listedData={raceData?.traits}
-                            options={raceData?.trait_options}
+                            dragonborn
+                            setterCallback={setDrake}
+                            selectedVal={drake}
+                        />
+                    }
+                    {raceData?.starting_proficiencies.length !== 0 &&
+                        <Section
+                            title='Proficiencies'
+                            listedData={raceData?.starting_proficiencies}
+                            options={raceData?.starting_proficiency_options}
+                            setterCallback={setProficiency}
+                            selectedVal={proficiency}
                         />
                     }
                 </LoadingContainer>

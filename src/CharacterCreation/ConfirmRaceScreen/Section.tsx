@@ -1,26 +1,35 @@
-import { Card, CardItem, View, Text, List, ListItem, Body } from "native-base";
+import { Card, CardItem, Text, List, ListItem, Body, Row } from "native-base";
 import React, { useState } from "react";
 import { JustUrl, ChoosingOptions } from "../../common/models/models";
 import { baseForDescriptionSake } from "../../common/ApiConfig";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import LoadingContainer from "../../common/LoadingContainer";
 import { Picker } from '@react-native-community/picker'
+import apiWrapper from "../../common/functions/apiWrapper";
+import { View } from "react-native";
+import { Drake, drakes } from "./draconicAncestry";
 
-export default function Section({ title, description, listedData, options, selectedVal, setterCallback, baseResourceUrl }: Section) {
+export default function Section({ title, description, listedData, options, dragonborn, selectedVal, setterCallback }: Section) {
     const [selectedIndex, setSelectedIndex] = useState<number | null>();
-    const [itemDescription, setItemDescription] = useState<string>('')
+    const [itemDescription, setItemDescription] = useState<Array<string>>([])
 
     async function getItemData(item: JustUrl) {
-        const response = await fetch(`${baseForDescriptionSake}${item.url}`);
-        const data = await response.json();
-        return data
+        const data = await apiWrapper(`${baseForDescriptionSake}${item.url}`);
+        return data;
+    }
+
+    function resolveDescription(itemData: ItemData) {
+        if (itemData.desc) return itemData.desc;
+        if (itemData.type === 'Weapons') return ['On attack rolls, add your proficiency bonus'];
+        return ['']
     }
 
     async function onItemPress(item: JustUrl, index: number) {
-        setItemDescription('');
+        setItemDescription([]);
         setSelectedIndex(index === selectedIndex ? null : index);
         const itemData = await getItemData(item);
-        setItemDescription(await itemData.desc[0]);
+        const desc = resolveDescription(await itemData)
+        setItemDescription(await desc);
     }
 
     return (
@@ -54,9 +63,15 @@ export default function Section({ title, description, listedData, options, selec
                                             {
                                                 showDescription &&
                                                 <View>
-                                                    <LoadingContainer ready={itemDescription !== ''}>
+                                                    <LoadingContainer ready={itemDescription !== []}>
                                                         <Text>
-                                                            {itemDescription}
+                                                            {
+                                                                itemDescription.map((desc: string, index: number) =>
+                                                                    <Text>
+                                                                        {desc}
+                                                                    </Text>
+                                                                )
+                                                            }
                                                         </Text>
                                                     </LoadingContainer>
                                                 </View>
@@ -76,7 +91,7 @@ export default function Section({ title, description, listedData, options, selec
                                 style={{ width: 200 }}
                                 onValueChange={(v: any) => setterCallback(v as string)}
                             >
-                                <Picker.Item label="--Choose language--" value='choose' />
+                                <Picker.Item label={`--Choose ${title.toLowerCase()}--`} value='choose' />
                                 {
                                     options.from.map((item: JustUrl, index: number) =>
                                         <Picker.Item label={item.name} value={item.name} key={index} />
@@ -84,10 +99,30 @@ export default function Section({ title, description, listedData, options, selec
                                 }
                             </Picker>
                         </View>
+
+                    }
+                    {
+                        dragonborn &&
+                        <View style={{ marginTop: 20 }}>
+                            <Text style={{ fontWeight: "bold" }}>Choose draconic ancestry</Text>
+                            <Picker
+                                style={{ width: 300 }}
+                                selectedValue={selectedVal}
+                                onValueChange={v => setterCallback(v as string)}
+                            >
+                                {
+                                    drakes.map((drake: Drake, index: number) =>
+                                        <Picker.Item
+                                            value={drake.dragon}
+                                            label={`${drake.dragon} dragon, ${drake.damageType} damage, ${drake.breathWeapon}`} />
+                                    )
+                                }
+                            </Picker>
+                        </View>
                     }
                 </Body>
             </CardItem>
-        </Card>
+        </Card >
     )
 }
 
@@ -98,5 +133,13 @@ interface Section {
     options?: ChoosingOptions,
     selectedVal?: string,
     setterCallback?: any,
-    baseResourceUrl?: string
+    baseResourceUrl?: string,
+    dragonborn?: boolean
+}
+
+interface ItemData {
+    index: string,
+    type: string,
+    name: string,
+    desc?: Array<string>
 }

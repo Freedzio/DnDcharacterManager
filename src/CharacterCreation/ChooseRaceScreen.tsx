@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../common/ApiConfig';
-import { Card, Text, Container, Content, CardItem, Body, List, ListItem } from 'native-base'
+import { Card, Text, Container, Content, CardItem, Body, List, ListItem, View } from 'native-base'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { CONFIRM_RACE_SCREEN } from '../common/constants/routeNames';
 import LoadingContainer from '../common/LoadingContainer';
@@ -34,7 +34,8 @@ export default function ChooseRaceScreen({ navigation }: any) {
 
             setSubraces(await getSubraces(race));
 
-        } else navigation.navigate(CONFIRM_RACE_SCREEN, { raceId: race })
+        } else
+            navigation.navigate(CONFIRM_RACE_SCREEN, { raceId: race })
     }
 
     async function checkForSubraces(race: string) {
@@ -53,35 +54,40 @@ export default function ChooseRaceScreen({ navigation }: any) {
         <Container>
             <Content>
                 <LoadingContainer ready={races.length !== 0}>
-                    {
-                        races.map((item, index) =>
-                            <TouchableOpacity key={index} onPress={() => onRacePress(item.toLowerCase(), index)}>
-                                <Card>
-                                    <CardItem>
-                                        <Body>
-                                            <Text>
-                                                {item}
-                                            </Text>
+                    <List>
+                        {
+                            races.map((item, index) => {
+                                const selected = index === selectedRaceIndex
+                                return (
+                                    <>
+                                        <TouchableOpacity key={index} onPress={() => onRacePress(item.toLowerCase(), index)}>
+                                            <ListItem selected={selected}>
+                                                <Body>
+                                                    <Text style={{ fontWeight: selected ? 'bold' : 'normal' }}>
+                                                        {item}
+                                                    </Text>
+                                                </Body>
+                                            </ListItem>
+                                        </TouchableOpacity>
+                                        <View style={{ marginHorizontal: 30 }}>
                                             <List>
                                                 {
-                                                    subraces.map((subrace: NamedJustUrl, index2: number) => {
-                                                        const showSubraces = index === selectedRaceIndex
-                                                        return (showSubraces &&
+                                                    subraces.map((subrace: NamedJustUrl, index2: number) => selected &&
+                                                        <TouchableOpacity onPress={() => navigation.navigate(CONFIRM_RACE_SCREEN, { raceId: item.toLowerCase() })}>
                                                             <ListItem key={index2}>
                                                                 <Text>
                                                                     {subrace.name}
                                                                 </Text>
                                                             </ListItem>
-                                                        )
-                                                    })
-                                                }
+                                                        </TouchableOpacity>
+                                                    )}
                                             </List>
-                                        </Body>
-                                    </CardItem>
-                                </Card>
-                            </TouchableOpacity>
-                        )
-                    }
+                                        </View>
+                                    </>
+                                )
+                            })
+                        }
+                    </List>
                 </LoadingContainer>
             </Content>
         </Container>
