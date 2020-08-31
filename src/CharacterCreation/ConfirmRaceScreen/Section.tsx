@@ -1,37 +1,11 @@
-import { Card, CardItem, Text, List, ListItem, Body, Row } from "native-base";
+import { Card, CardItem, Text, List, ListItem, Body, Row, Accordion } from "native-base";
 import React, { useState } from "react";
 import { JustUrl, ChoosingOptions } from "../../common/models/models";
-import { baseForDescriptionSake } from "../../common/ApiConfig";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import LoadingContainer from "../../common/LoadingContainer";
 import { Picker } from '@react-native-community/picker'
-import apiWrapper from "../../common/functions/apiWrapper";
 import { View } from "react-native";
 import { Drake, drakes } from "./draconicAncestry";
 
 export default function Section({ title, description, listedData, options, dragonborn, selectedVal, setterCallback }: Section) {
-    const [selectedIndex, setSelectedIndex] = useState<number | null>();
-    const [itemDescription, setItemDescription] = useState<Array<string>>([])
-
-    async function getItemData(item: JustUrl) {
-        const data = await apiWrapper(`${baseForDescriptionSake}${item.url}`);
-        return data;
-    }
-
-    function resolveDescription(itemData: ItemData) {
-        if (itemData.desc) return itemData.desc;
-        if (itemData.type === 'Weapons') return ['On attack rolls, add your proficiency bonus'];
-        return ['']
-    }
-
-    async function onItemPress(item: JustUrl, index: number) {
-        setItemDescription([]);
-        setSelectedIndex(index === selectedIndex ? null : index);
-        const itemData = await getItemData(item);
-        const desc = resolveDescription(await itemData)
-        setItemDescription(await desc);
-    }
-
     return (
         <Card>
             <CardItem>
@@ -46,42 +20,12 @@ export default function Section({ title, description, listedData, options, drago
                             {description}
                         </Text>
                     </View>
-                    <View>
-                        <List>
-                            {
-                                listedData?.map((item: any, index: number) => {
-                                    const showDescription = index === selectedIndex
-                                    return (
-                                        <>
-                                            <TouchableOpacity key={index} onPress={() => onItemPress(item, index)}>
-                                                <ListItem key={index}>
-                                                    <Text style={{ fontWeight: showDescription ? 'bold' : 'normal' }}>
-                                                        {item.name}
-                                                    </Text>
-                                                </ListItem>
-                                            </TouchableOpacity>
-                                            {
-                                                showDescription &&
-                                                <View>
-                                                    <LoadingContainer ready={itemDescription !== []}>
-                                                        <Text>
-                                                            {
-                                                                itemDescription.map((desc: string, index: number) =>
-                                                                    <Text>
-                                                                        {desc}
-                                                                    </Text>
-                                                                )
-                                                            }
-                                                        </Text>
-                                                    </LoadingContainer>
-                                                </View>
-                                            }
-                                        </>
-                                    )
-                                }
-                                )}
-                        </List>
-                    </View>
+                    {
+                        listedData &&
+                        <View>
+                            <Accordion dataArray={listedData} style={{width: 350}} />
+                        </View>
+                    }
                     {
                         options && setterCallback &&
                         <View style={{ marginTop: 20 }}>
@@ -129,7 +73,7 @@ export default function Section({ title, description, listedData, options, drago
 interface Section {
     title: string,
     description?: string,
-    listedData?: Array<JustUrl>,
+    listedData?: Array<{ title: string, content: string }>,
     options?: ChoosingOptions,
     selectedVal?: string,
     setterCallback?: any,
@@ -137,9 +81,9 @@ interface Section {
     dragonborn?: boolean
 }
 
-interface ItemData {
+export interface ItemData {
     index: string,
-    type: string,
+    type?: string,
     name: string,
     desc?: Array<string>
 }

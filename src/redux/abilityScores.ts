@@ -1,4 +1,5 @@
 import { ActionProps } from "./store";
+import { AbilityScores } from "../common/models/models";
 
 export const SET_ALL_ABILITY_SCORES = 'SET_ALL_ABILITY_SCORES';
 export const RESET_ABILITY_SCORES = 'RESET_ABILITY_SCORES';
@@ -23,13 +24,14 @@ export function setAbilityScore(payload: Partial<AbilityScores>) {
         payload: payload
     }
 }
-const initialState = {
-    STR: 0,
-    DEX: 0,
-    CON: 0,
-    WIS: 0,
-    INT: 0,
-    CHA: 0
+
+const initialState: AbilityScores = {
+    'STR': 0,
+    'DEX': 0,
+    'CON': 0,
+    'WIS': 0,
+    'INT': 0,
+    'CHA': 0
 }
 
 export default function abilityScoresReducer(state = initialState, action: ActionProps) {
@@ -39,9 +41,15 @@ export default function abilityScoresReducer(state = initialState, action: Actio
 
         case SET_ABILITY_SCORE:
             var newState = { ...state }
-            newState = {
-                ...newState,
-                ...action.payload
+            const keys = Object.keys(action.payload)
+
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const temp = state[key];
+                newState = {
+                    ...newState,
+                    [keys[i]]: temp + action.payload[key]
+                }
             }
 
             return { ...newState }

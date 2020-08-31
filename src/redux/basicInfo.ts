@@ -53,7 +53,7 @@ export default function basicInfoReducer(state = initalState, action: ActionProp
 
 export interface BasicInfo {
     speed: number,
-    alignment: string,
-    age: number,
+    alignment?: string,
+    age?: number,
     size: string
 }

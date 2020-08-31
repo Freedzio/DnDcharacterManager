@@ -3,11 +3,13 @@ import { ApiConfig } from '../../common/ApiConfig';
 import { Container, Content, H1, Text, View, Card, CardItem, Body, Row, Col, List, ListItem } from 'native-base';
 import { StyleSheet } from 'react-native';
 import LoadingContainer from '../../common/LoadingContainer';
-import { Race, AbilitySimple, JustUrl } from '../../common/models/models';
+import { Race, AbilitySimple, JustUrl, Proficiency, Trait } from '../../common/models/models';
 import Section from './Section';
 import apiWrapper from '../../common/functions/apiWrapper';
 import { Picker } from '@react-native-community/picker';
-import { drakes } from './draconicAncestry';
+import { useSelector } from 'react-redux';
+import { StoreProps } from '../../redux/store';
+import resolveDescription from '../../common/functions/resolveDescription';
 
 const tileHeight = 80;
 
@@ -27,7 +29,7 @@ function Tile({ property, amount }: Tile) {
 }
 
 export default function ConfirmRaceScreen({ navigation, route }: any) {
-    const [raceData, setRaceData] = useState<Race>();
+    const [tempRaceData, setTempRaceData] = useState<Race>();
     const [ready, setReady] = useState(false);
     const [language, setLanguage] = useState<string>('choose');
     const [drake, setDrake] = useState<string>('choose');
@@ -36,6 +38,29 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
 
     const raceId = route.params.raceId;
 
+    const race = useSelector((store: StoreProps) => store.race);
+    const abilityBonuses = useSelector((store: StoreProps) => store.abilityScores);
+    const basicInfo = useSelector((store: StoreProps) => store.basicInfo);
+    const traits = useSelector((store: StoreProps) => mapForAccordionSake(store.traits));
+    const proficiencies = useSelector((store: StoreProps) => mapForAccordionSake(store.proficiencies))
+
+    function mapForAccordionSake(items: { [index: string]: Proficiency | Trait }) {
+        const keys = Object.keys(items)
+
+        let arr: Array<{ title: string, content: string }> = [];
+
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i]
+            const obj = {
+                title: items[key].name,
+                content: resolveDescription(items[key]).join(' ')
+            }
+            arr.push(obj)
+        }
+
+        return arr
+    }
+
     async function getRaceData() {
         const data = await apiWrapper(`${ApiConfig.race(raceId)}`);
         return data
@@ -43,7 +68,7 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
 
     useEffect(() => {
         getRaceData()
-            .then(data => setRaceData(data)).then(() => setReady(true))
+            .then(data => setTempRaceData(data)).then(() => setReady(true))
     }, [])
 
     return (
@@ -51,21 +76,21 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
             <Content padder>
                 <LoadingContainer ready={ready}>
                     <Text style={styles.header}>YOU CHOSE</Text>
-                    <Text style={styles.subHeader}>{raceData?.name}</Text>
+                    <Text style={styles.subHeader}>{race}</Text>
                     <Row>
                         {
-                            raceData?.index === 'human' ?
+                            race.toLowerCase() === 'human' ?
                                 <Col>
                                     <Tile property="All" amount="+1" />
                                 </Col>
-                                : raceData?.ability_bonuses.map((ability: AbilitySimple, index: number) =>
-                                    <Col key={ability.name}>
-                                        <Tile property={ability.name} amount={`+${ability.bonus}`} />
+                                : Object.keys(abilityBonuses).filter((ability: string) => abilityBonuses[ability] !== 0).map((ability: string, index: number) =>
+                                    <Col key={ability}>
+                                        <Tile property={ability} amount={`+${abilityBonuses[ability]}`} />
                                     </Col>
                                 )
                         }
                         {
-                            raceData?.ability_bonus_options &&
+                            tempRaceData?.ability_bonus_options &&
                             <Col>
                                 <Card style={{ height: tileHeight }}>
                                     <View style={{ flex: 1, justifyContent: "space-between" }}>
@@ -74,15 +99,14 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                                             <Picker style={{ width: '100%' }} selectedValue={abilityBonus} onValueChange={v => setAbilityBonus(v as string)}>
                                                 <Picker.Item value='' label='------' />
                                                 {
-                                                    raceData?.ability_bonus_options.from.map((ability: JustUrl, index: number) =>
+                                                    tempRaceData?.ability_bonus_options.from.map((ability: JustUrl, index: number) =>
                                                         <Picker.Item key={index} value={ability.name} label={ability.name} />
                                                     )}
                                             </Picker>
                                         </View>
                                         <View style={{ flex: 1 }}>
-
                                             <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-                                                {abilityBonus !== '' && '+' + raceData.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus}
+                                                {abilityBonus !== '' && '+' + tempRaceData.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus}
                                             </Text>
                                         </View>
                                     </View>
@@ -90,45 +114,45 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                             </Col>
                         }
                         <Col>
-                            <Tile property={'Speed'} amount={raceData?.speed} />
+                            <Tile property={'Speed'} amount={basicInfo.speed} />
                         </Col>
                         <Col>
-                            <Tile property="Size" amount={raceData?.size} />
+                            <Tile property="Size" amount={basicInfo.size} />
                         </Col>
                     </Row>
                     <Section
                         title='Alignment'
-                        description={raceData?.alignment}
+                        description={tempRaceData?.alignment}
                     />
                     <Section
                         title='Age'
-                        description={raceData?.age}
+                        description={tempRaceData?.age}
                     />
                     <Section
                         title='Size'
-                        description={raceData?.size_description}
+                        description={tempRaceData?.size_description}
                     />
                     <Section
                         title='Languages'
-                        description={raceData?.language_desc}
+                        description={tempRaceData?.language_desc}
                         selectedVal={language}
                         setterCallback={setLanguage}
-                        options={raceData?.language_options}
+                        options={tempRaceData?.language_options}
                     />
-                    {raceData?.traits.length !== 0 &&
+                    {tempRaceData?.traits.length !== 0 &&
                         <Section
                             title='Traits'
-                            listedData={raceData?.traits}
-                            dragonborn
+                            listedData={traits}
+                            dragonborn={tempRaceData?.name === 'Dragonborn'}
                             setterCallback={setDrake}
                             selectedVal={drake}
                         />
                     }
-                    {raceData?.starting_proficiencies.length !== 0 &&
+                    {tempRaceData?.starting_proficiencies.length !== 0 &&
                         <Section
                             title='Proficiencies'
-                            listedData={raceData?.starting_proficiencies}
-                            options={raceData?.starting_proficiency_options}
+                            listedData={proficiencies}
+                            options={tempRaceData?.starting_proficiency_options}
                             setterCallback={setProficiency}
                             selectedVal={proficiency}
                         />

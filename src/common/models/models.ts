@@ -4,7 +4,7 @@ export interface Race {
     name: string,
     speed: number,
     alignment: string,
-    age: number,
+    age: string,
     size: string,
     size_description: string,
     starting_proficiencies: Array<JustUrl>,
@@ -20,10 +20,22 @@ export interface Race {
     url: string
 }
 
+export interface Subrace {
+    index: string,
+    name: string,
+    race: JustUrl,
+    ability_bonuses: Array<AbilitySimple>
+    starting_proficiencies: Array<JustUrl>
+    languages: Array<any>
+    racial_traits: Array<JustUrl>
+    desc: string
+}
+
 export interface JustUrl {
     name: string,
     url: string,
-    bonus?: number
+    bonus?: number,
+    index?: string
 }
 
 export interface AbilitySimple {
@@ -58,10 +70,6 @@ export interface Results {
     results: Array<JustUrl>
 }
 
-export interface NamedJustUrl extends JustUrl {
-    name: string
-}
-
 export interface Trait {
     index: string,
     name: string,
@@ -69,10 +77,7 @@ export interface Trait {
 }
 
 export interface AbilityScores {
-    STR: number,
-    DEX: number,
-    CON: number,
-    WIS: number,
-    INT: number,
-    CHA: number
+    [key: string]: number    
 }
+
+export interface AbilityBonuses extends AbilityScores {}
