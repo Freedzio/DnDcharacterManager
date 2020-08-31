@@ -21,7 +21,10 @@ const initialState: string[] = [];
 export default function languagesReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
         case SET_LANGUAGES:
-            return action.payload
+            let newState = [...state];
+            newState.concat(action.payload)
+
+            return [...newState]
 
         case RESET_LANGUGAGES:
             return initialState

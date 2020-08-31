@@ -4,12 +4,14 @@ import { JustUrl, ChoosingOptions } from "../../common/models/models";
 import { Picker } from '@react-native-community/picker'
 import { View } from "react-native";
 import { Drake, drakes } from "./draconicAncestry";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Section({ title, description, listedData, options, dragonborn, selectedVal, setterCallback }: Section) {
     return (
         <Card>
             <CardItem>
-                <Body>
+                <SafeAreaView>
+
                     <View>
                         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                             {title}
@@ -23,7 +25,7 @@ export default function Section({ title, description, listedData, options, drago
                     {
                         listedData &&
                         <View>
-                            <Accordion dataArray={listedData} style={{width: 350}} />
+                            <Accordion dataArray={listedData} style={{ width: 350 }} />
                         </View>
                     }
                     {
@@ -50,7 +52,7 @@ export default function Section({ title, description, listedData, options, drago
                         <View style={{ marginTop: 20 }}>
                             <Text style={{ fontWeight: "bold" }}>Choose draconic ancestry</Text>
                             <Picker
-                                style={{ width: 300 }}
+                                style={{ width: 360 }}
                                 selectedValue={selectedVal}
                                 onValueChange={v => setterCallback(v as string)}
                             >
@@ -64,7 +66,7 @@ export default function Section({ title, description, listedData, options, drago
                             </Picker>
                         </View>
                     }
-                </Body>
+                </SafeAreaView>
             </CardItem>
         </Card >
     )

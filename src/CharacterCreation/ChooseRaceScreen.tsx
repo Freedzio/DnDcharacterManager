@@ -17,6 +17,8 @@ import { ApiConfig } from '../common/ApiConfig';
 import { useDispatch } from 'react-redux';
 import { setRace } from '../redux/class';
 import _ from 'lodash'
+import mapProficiencies from '../common/functions/mapProficiencies';
+import mapTraits from '../common/functions/mapTraits';
 
 export default function ChooseRaceScreen({ navigation }: any) {
     const [races, setRaces] = useState<Array<string>>([]);
@@ -108,29 +110,7 @@ export default function ChooseRaceScreen({ navigation }: any) {
             speed: raceData.speed,
             size: raceData.size
         });
-    }
-
-    async function mapProficiencies(proficiencies: Array<JustUrl>) {
-        let arr: Array<Proficiency> = [];
-
-        for (let i = 0; i < proficiencies.length; i++) {
-            const data = await apiWrapper(ApiConfig.proficiency(proficiencies[i].url.replace('/api/proficiencies', '')))
-            arr.push(data)
-        }
-
-        return arr
-    }
-
-    async function mapTraits(traits: Array<JustUrl>) {
-        let arr: Array<Trait> = [];
-
-        for (let i = 0; i < traits.length; i++) {
-            const data = await apiWrapper(ApiConfig.trait(traits[i].url.replace('/api/traits/', '')))
-            arr.push(data)
-        }
-
-        return arr
-    }
+    }    
 
     function mapLanguages(languages: Array<any>) {
         return Array.from(languages).reduce((arr: Array<any>, language: JustUrl) => {

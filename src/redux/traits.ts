@@ -5,6 +5,7 @@ import mapArrayToObject from "../common/functions/mapArrayToObject";
 export const ADD_TRAITS = 'ADD_TRAITS';
 export const RESET_TRAITS = 'RESET_TRAITS';
 export const DELETE_TRAITS = 'DELETE_PRPOFICIENCIES';
+export const HANDLE_DRACONIC = 'HANDLE_DRACONIC';
 
 export function addTraits(payload: Array<Trait>) {
     return {
@@ -22,6 +23,13 @@ export function resetTraits() {
 export function deleteTraits(payload: Array<string>) {
     return {
         type: DELETE_TRAITS,
+        payload: payload
+    }
+}
+
+export function handleDraconic(payload: string) {
+    return {
+        type: HANDLE_DRACONIC,
         payload: payload
     }
 }
@@ -52,6 +60,17 @@ export default function traitssReducer(state = initialState, action: ActionProps
 
         case RESET_TRAITS:
             return initialState
+
+        case HANDLE_DRACONIC:
+            var newState = { ...state }
+            newState = {
+                ...newState,
+                ['breath-weapon']: {
+                    ...newState['breath-weapon'],
+                    name: action.payload
+                }
+            }
+            return newState
 
         default:
             return state
