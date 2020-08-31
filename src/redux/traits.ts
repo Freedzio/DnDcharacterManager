@@ -1,36 +1,36 @@
-import { Proficiency } from "../common/models/models";
+import { Trait } from "../common/models/models";
 import { ActionProps } from "./store";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 
-export const ADD_PROFICIENCIES = 'ADD_PROFICIENCIES';
-export const RESET_PROFICIENCIES = 'RESET_PROFICIENCIES';
-export const DELETE_PROFICIENCIES = 'DELETE_PRPOFICIENCIES';
+export const ADD_TRAITS = 'ADD_TRAITS';
+export const RESET_TRAITS = 'RESET_TRAITS';
+export const DELETE_TRAITS = 'DELETE_PRPOFICIENCIES';
 
-export function addProficiencies(payload: Array<Proficiency>) {
+export function addTraits(payload: Array<Trait>) {
     return {
-        type: ADD_PROFICIENCIES,
+        type: ADD_TRAITS,
         payload: payload
     }
 }
 
-export function resetProficiencies() {
+export function resetTraits() {
     return {
-        type: RESET_PROFICIENCIES
+        type: RESET_TRAITS
     }
 }
 
-export function deleteProficiencies(payload: Array<string>) {
+export function deleteTraits(payload: Array<string>) {
     return {
-        type: DELETE_PROFICIENCIES,
+        type: DELETE_TRAITS,
         payload: payload
     }
 }
 
-const initialState: { [index: string]: Proficiency } = {};
+const initialState: { [index: string]: Trait } = {};
 
-export default function proficienciesReducer(state = initialState, action: ActionProps) {
+export default function traitssReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
-        case ADD_PROFICIENCIES:
+        case ADD_TRAITS:
             var newState = { ...state };
             const incomingData = mapArrayToObject(action.payload)
 
@@ -43,14 +43,14 @@ export default function proficienciesReducer(state = initialState, action: Actio
                 ...newState
             }
 
-        case DELETE_PROFICIENCIES:
+        case DELETE_TRAITS:
             var newState = { ...state }
 
             for (let i = 0; i < action.payload.length; i++) {
                 delete newState[action.payload[i]]
             }
 
-        case RESET_PROFICIENCIES:
+        case RESET_TRAITS:
             return initialState
 
         default:
