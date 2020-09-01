@@ -10,5 +10,7 @@ export const ApiConfig = {
     traits: `${base}/traits`,
     trait: (trait: string) => `${base}/traits/${trait}`,
     proficiencies: `${base}/proficiencies`,
-    proficiency: (proficiency: string) => `${base}/proficiencies/${proficiency}`
+    proficiency: (proficiency: string) => `${base}/proficiencies/${proficiency}`,
+    classes: `${base}/classes`,
+    class: (charClass: string) => `${base}/classes/${charClass}`
 }

@@ -1,6 +1,6 @@
 import { JustUrl, Proficiency } from "../models/models";
 import apiWrapper from "./apiWrapper";
-import { ApiConfig } from "../ApiConfig";
+import { ApiConfig } from "../constants/ApiConfig";
 
 export default async function mapProficiencies(proficiencies: Array<JustUrl>) {
     let arr: Array<Proficiency> = [];

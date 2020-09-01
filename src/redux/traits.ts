@@ -1,6 +1,7 @@
 import { Trait } from "../common/models/models";
 import { ActionProps } from "./store";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
+import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const ADD_TRAITS = 'ADD_TRAITS';
 export const RESET_TRAITS = 'RESET_TRAITS';
@@ -36,8 +37,11 @@ export function handleDraconic(payload: string) {
 
 const initialState: { [index: string]: Trait } = {};
 
-export default function traitssReducer(state = initialState, action: ActionProps) {
+export default function traitsReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
+        case APPLY_SNAPSHOT:
+            return action.payload.traits
+
         case ADD_TRAITS:
             var newState = { ...state };
             const incomingData = mapArrayToObject(action.payload)
@@ -67,7 +71,7 @@ export default function traitssReducer(state = initialState, action: ActionProps
                 ...newState,
                 ['breath-weapon']: {
                     ...newState['breath-weapon'],
-                    name: action.payload
+                    name: `Breath Weapon ${action.payload}`
                 }
             }
             return newState

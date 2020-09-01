@@ -1,4 +1,5 @@
 import { act } from "react-test-renderer";
+import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const SET_RACE = 'SET_RACE';
 export const RESET_RACE = 'RESET_RACE';
@@ -20,6 +21,9 @@ const initialState = '';
 
 export default function raceReducer(state = initialState, action: any) {
     switch (action.type) {
+        case APPLY_SNAPSHOT:
+            return action.payload.class
+
         case SET_RACE:
             return action.payload;
 

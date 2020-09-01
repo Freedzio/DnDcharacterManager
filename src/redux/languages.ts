@@ -1,4 +1,5 @@
 import { ActionProps } from "./store";
+import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const SET_LANGUAGES = 'SET_LANGUAGES';
 export const RESET_LANGUGAGES = 'RESET_LANGUAGES';
@@ -20,11 +21,14 @@ const initialState: string[] = [];
 
 export default function languagesReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
+        case APPLY_SNAPSHOT:
+            return action.payload.languages;
+
         case SET_LANGUAGES:
             let newState = [...state];
-            newState.concat(action.payload)
+            const newerState = newState.concat(action.payload)
 
-            return [...newState]
+            return [...newerState]
 
         case RESET_LANGUGAGES:
             return initialState

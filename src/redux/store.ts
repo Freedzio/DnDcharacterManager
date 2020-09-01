@@ -1,14 +1,15 @@
-import { createStore, combineReducers} from 'redux';
+import { AbilityScores, Proficiency, Trait } from '../common/models/models';
+import basicInfoReducer, { BasicInfo } from './basicInfo';
+import { createStore, combineReducers } from 'redux';
+import proficienciesReducer from './proficiencies';
+import abilityScoresReducer from './abilityScores';
 import reactotron from '../../ReactotronConfig';
+import languagesReducer from './languages';
+import snapshotReducer from './snapshot';
+import traitsReducer from './traits';
 import raceReducer from './class';
 import classReducer from './race';
 import nameReducer from './name';
-import abilityScoresReducer from './abilityScores';
-import basicInfoReducer, { BasicInfo } from './basicInfo';
-import languagesReducer from './languages';
-import proficienciesReducer from './proficiencies';
-import traitssReducer from './traits';
-import { AbilityScores, Proficiency, Trait } from '../common/models/models';
 
 const rootReducer = combineReducers({
     race: raceReducer,
@@ -18,7 +19,8 @@ const rootReducer = combineReducers({
     basicInfo: basicInfoReducer,
     languages: languagesReducer,
     proficiencies: proficienciesReducer,
-    traits: traitssReducer
+    traits: traitsReducer,
+    snapshot: snapshotReducer
 })
 
 const store = createStore(rootReducer, reactotron.createEnhancer());
@@ -37,7 +39,8 @@ export interface StoreProps {
     },
     traits: {
         [index: string]: Trait
-    }
+    },
+    snapshot: StoreProps
 }
 
 export interface ActionProps {

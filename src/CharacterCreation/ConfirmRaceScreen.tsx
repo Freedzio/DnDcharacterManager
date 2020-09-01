@@ -1,22 +1,26 @@
 import { Container, Content, H1, Text, View, Card, CardItem, Body, Row, Col, List, ListItem, Button } from 'native-base';
-import { Race, AbilitySimple, JustUrl, Proficiency, Trait, AbilityScores } from '../../common/models/models';
-import resolveDescription from '../../common/functions/resolveDescription';
-import LoadingContainer from '../../common/LoadingContainer';
-import { addProficiencies } from '../../redux/proficiencies';
-import { setAbilityScore } from '../../redux/abilityScores';
-import apiWrapper from '../../common/functions/apiWrapper';
+import { Race, AbilitySimple, JustUrl, Proficiency, Trait, AbilityScores } from '../common/models/models';
+import resolveDescription from '../common/functions/resolveDescription';
+import LoadingContainer from '../common/components/LoadingContainer';
+import { addProficiencies } from '../redux/proficiencies';
+import { setAbilityScore } from '../redux/abilityScores';
+import apiWrapper from '../common/functions/apiWrapper';
 import { Picker } from '@react-native-community/picker';
 import { useSelector, useDispatch } from 'react-redux';
-import { setLanguages } from '../../redux/languages';
+import { setLanguages } from '../redux/languages';
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
-import { StoreProps } from '../../redux/store';
-import { addTraits, handleDraconic } from '../../redux/traits';
+import { ApiConfig } from '../common/constants/ApiConfig';
+import { StoreProps } from '../redux/store';
+import { addTraits, handleDraconic } from '../redux/traits';
 import { StyleSheet } from 'react-native';
 import Section from './Section';
-import mapTraits from '../../common/functions/mapTraits';
-import mapProficiencies from '../../common/functions/mapProficiencies';
-import { CHOOSE_CLASS_SCREEN } from '../../common/constants/routeNames';
+import mapTraits from '../common/functions/mapTraits';
+import mapProficiencies from '../common/functions/mapProficiencies';
+import { CHOOSE_CLASS_SCREEN } from '../common/constants/routeNames';
+import { header } from '../common/styles/styles';
+import ScreenHeader from '../common/components/ScreenHeader';
+import { drakes, Drake } from './draconicAncestry';
+import { applySnapshot } from '../redux/snapshot';
 
 const tileHeight = 80;
 
@@ -38,7 +42,7 @@ function Tile({ property, amount }: Tile) {
 
 export default function ConfirmRaceScreen({ navigation, route }: any) {
     const [ready, setReady] = useState(false);
-    const [drake, setDrake] = useState<string>('choose');
+    const [drake, setDrake] = useState<string>(drakes[0].dragon);
     const [tempRaceData, setTempRaceData] = useState<Race>()
     const [language, setLanguage] = useState<string>('choose');
     const [abilityBonus, setAbilityBonus] = useState<string>('');
@@ -50,9 +54,11 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
     const traits = useSelector((store: StoreProps) => mapForAccordionSake(store.traits));
     const abilityBonuses = useSelector((store: StoreProps) => store.abilityScores);
     const basicInfo = useSelector((store: StoreProps) => store.basicInfo);
+    const snapshot = useSelector((store: StoreProps) => store.snapshot)
     const race = useSelector((store: StoreProps) => store.race);
 
     const dispatch = useDispatch();
+    const dispatchSnapshot = () => dispatch(applySnapshot(snapshot))
     const dispatchTrait = (traits: Array<Trait>) => dispatch(addTraits(traits));
     const dispatchHandleDraconic = (title: string) => dispatch(handleDraconic(title));
     const dispatchLanguages = (languages: Array<string>) => dispatch(setLanguages(languages));
@@ -85,12 +91,17 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
         if (language !== 'choose') dispatchLanguages([language])
         if (abilityBonus !== '') dispatchAbilityBonuses({ langugage: tempRaceData?.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus })
         if (proficiency !== 'choose') dispatchProficiencies(await mapProficiencies(tempRaceData?.starting_proficiency_options.from.filter(item => item.name === proficiency) as JustUrl[]))
-        if (drake !== 'choose') dispatchHandleDraconic(drake);
+        if (drake !== 'choose') dispatchHandleDraconic(Object.values(drakes.filter(item => item.dragon === drake)[0]).join(', '))
 
         navigation.navigate(CHOOSE_CLASS_SCREEN)
     }
 
-
+    useEffect(() => {
+        navigation.addListener('beforeRemove', (e: any) => {
+            //e.preventDefault();
+            dispatchSnapshot();
+        })
+    }, [])
 
     useEffect(() => {
         getRaceData()
@@ -101,8 +112,7 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
         <Container>
             <Content padder>
                 <LoadingContainer ready={ready}>
-                    <Text style={styles.header}>YOU CHOSE</Text>
-                    <Text style={styles.subHeader}>{race}</Text>
+                    <ScreenHeader title='YOU CHOSE' subtitle={race} />
                     <Row>
                         {
                             race.toLowerCase() === 'human' ?
@@ -193,18 +203,6 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
         </Container>
     )
 }
-
-const styles = StyleSheet.create({
-    header: {
-        textAlign: "center",
-        fontSize: 48,
-        fontWeight: "bold"
-    },
-    subHeader: {
-        fontSize: 36,
-        textAlign: "center"
-    }
-})
 
 interface Tile {
     property?: string,

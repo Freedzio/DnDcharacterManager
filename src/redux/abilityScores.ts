@@ -1,5 +1,6 @@
 import { ActionProps } from "./store";
 import { AbilityScores } from "../common/models/models";
+import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const SET_ALL_ABILITY_SCORES = 'SET_ALL_ABILITY_SCORES';
 export const RESET_ABILITY_SCORES = 'RESET_ABILITY_SCORES';
@@ -36,6 +37,9 @@ const initialState: AbilityScores = {
 
 export default function abilityScoresReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
+        case APPLY_SNAPSHOT:
+            return action.payload.abilityScores
+        
         case SET_ALL_ABILITY_SCORES:
             return action.payload
 

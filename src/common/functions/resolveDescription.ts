@@ -1,4 +1,4 @@
-import { ItemData } from "../../CharacterCreation/ConfirmRaceScreen/Section";
+import { ItemData } from "../../CharacterCreation/Section";
 
 export default function resolveDescription(itemData: ItemData) {
     if (itemData.desc) return itemData.desc;

@@ -1,6 +1,6 @@
 import { Card, CardItem, Text, List, ListItem, Body, Row, Accordion } from "native-base";
 import React, { useState } from "react";
-import { JustUrl, ChoosingOptions } from "../../common/models/models";
+import { JustUrl, ChoosingOptions } from "../common/models/models";
 import { Picker } from '@react-native-community/picker'
 import { View } from "react-native";
 import { Drake, drakes } from "./draconicAncestry";

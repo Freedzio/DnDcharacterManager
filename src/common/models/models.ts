@@ -20,6 +20,19 @@ export interface Race {
     url: string
 }
 
+export interface CharacterClass {
+    index: string,
+    name: string,
+    hit_die: number,
+    proficiency_choices: ChoosingOptions,
+    proficiencies: Array<JustUrl>,
+    saving_throws: Array<JustUrl>
+    starting_equpiment: JustUrl,
+    class_levels: JustUrl,
+    subclasses: Array<JustUrl>
+    url: string
+}
+
 export interface Subrace {
     index: string,
     name: string,

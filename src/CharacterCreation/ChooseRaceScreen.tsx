@@ -1,5 +1,5 @@
 import { JustUrl, Race, Proficiency, Trait, AbilityScores, Subrace } from '../common/models/models';
-import { Card, Text, Container, Content, CardItem, Body, List, ListItem, View } from 'native-base'
+import { Card, Text, Container, Content, CardItem, Body, List, ListItem, View, H1 } from 'native-base'
 import { addProficiencies, resetProficiencies } from '../redux/proficiencies';
 import { setAbilityScore, resetAbilityScores } from '../redux/abilityScores';
 import { CONFIRM_RACE_SCREEN } from '../common/constants/routeNames';
@@ -7,23 +7,28 @@ import getArrayOfNames from '../common/functions/getArrayOfNames';
 import React, { useState, useEffect, useCallback } from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { BasicInfo, setBasicInfo } from '../redux/basicInfo';
-import LoadingContainer from '../common/LoadingContainer';
+import LoadingContainer from '../common/components/LoadingContainer';
 import { useFocusEffect } from '@react-navigation/native';
 import { addTraits, resetTraits } from '../redux/traits';
 import apiWrapper from '../common/functions/apiWrapper';
 import { setDescription } from '../redux/description';
 import { setLanguages } from '../redux/languages';
-import { ApiConfig } from '../common/ApiConfig';
-import { useDispatch } from 'react-redux';
+import { ApiConfig } from '../common/constants/ApiConfig';
+import { useDispatch, useSelector } from 'react-redux';
 import { setRace } from '../redux/class';
 import _ from 'lodash'
 import mapProficiencies from '../common/functions/mapProficiencies';
 import mapTraits from '../common/functions/mapTraits';
+import ScreenHeader from '../common/components/ScreenHeader';
+import { StoreProps } from '../redux/store';
+import { takeSnapshot } from '../redux/snapshot';
 
 export default function ChooseRaceScreen({ navigation }: any) {
     const [races, setRaces] = useState<Array<string>>([]);
     const [subraces, setSubraces] = useState<Array<JustUrl>>([]);
     const [selectedRaceIndex, setSelectedRaceIndex] = useState<number | null>();
+
+    const store = useSelector((store:StoreProps) => store)
 
     //setters
     const dispatchAbilityScores = (abilityScores: Partial<AbilityScores>) => dispatch(setAbilityScore(abilityScores));
@@ -33,6 +38,7 @@ export default function ChooseRaceScreen({ navigation }: any) {
     const dispatchBasicInfo = (basicInfo: BasicInfo) => dispatch(setBasicInfo(basicInfo));
     const dispatchTraits = (traits: Array<Trait>) => dispatch(addTraits(traits));
     const dispatchRace = (race: string) => dispatch(setRace(race));
+    const dispatchTakeSnapshot = (store: StoreProps) => dispatch(takeSnapshot(store));
     const dispatch = useDispatch();
 
     //resetters
@@ -110,7 +116,7 @@ export default function ChooseRaceScreen({ navigation }: any) {
             speed: raceData.speed,
             size: raceData.size
         });
-    }    
+    }
 
     function mapLanguages(languages: Array<any>) {
         return Array.from(languages).reduce((arr: Array<any>, language: JustUrl) => {
@@ -137,13 +143,13 @@ export default function ChooseRaceScreen({ navigation }: any) {
     }
 
     useEffect(() => {
+        dispatchTakeSnapshot(store);
         getRaces()
             .then(data => setRaces(getArrayOfNames(data)));
     }, []);
 
     useFocusEffect(
-        useCallback(() => {
-            resetStore();
+        useCallback(() => {           
             setSelectedRaceIndex(null)
         }, [])
     )
@@ -151,6 +157,7 @@ export default function ChooseRaceScreen({ navigation }: any) {
     return (
         <Container>
             <Content>
+                <ScreenHeader title='CHOOSE RACE' />
                 <LoadingContainer ready={races.length !== 0}>
                     <List>
                         {
@@ -158,7 +165,7 @@ export default function ChooseRaceScreen({ navigation }: any) {
                                 const selected = index === selectedRaceIndex
                                 return (
                                     <>
-                                        <TouchableOpacity key={index} onPress={() => onRacePress(race.toLowerCase(), index)}>
+                                        <TouchableOpacity key={race} onPress={() => onRacePress(race.toLowerCase(), index)}>
                                             <ListItem selected={selected}>
                                                 <Body>
                                                     <Text style={{ fontWeight: selected ? 'bold' : 'normal' }}>
@@ -170,9 +177,9 @@ export default function ChooseRaceScreen({ navigation }: any) {
                                         <View style={{ marginHorizontal: 30 }}>
                                             <List>
                                                 {
-                                                    subraces.map((subrace: JustUrl, index2: number) => selected &&
-                                                        <TouchableOpacity onPress={() => onSubracePress(subrace.index as string)}>
-                                                            <ListItem key={index2}>
+                                                    subraces.map((subrace: JustUrl) => selected &&
+                                                        <TouchableOpacity key={subrace.name} onPress={() => onSubracePress(subrace.index as string)}>
+                                                            <ListItem>
                                                                 <Text>
                                                                     {subrace.name}
                                                                 </Text>

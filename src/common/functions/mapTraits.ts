@@ -1,6 +1,6 @@
 import { Trait, JustUrl } from "../models/models";
 import apiWrapper from "./apiWrapper";
-import { ApiConfig } from "../ApiConfig";
+import { ApiConfig } from "../constants/ApiConfig";
 
 export default async function mapTraits(traits: Array<JustUrl>) {
     let arr: Array<Trait> = [];

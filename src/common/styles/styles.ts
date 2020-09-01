@@ -1,5 +1,14 @@
 import { StyleSheet } from "react-native";
 
-const style = StyleSheet.create({
-    
+export const header = StyleSheet.create({
+    main: {
+        textAlign: "center",
+        fontSize: 48,
+        fontWeight: "bold"
+    },
+    sub: {
+        fontSize: 36,
+        textAlign: "center"
+    }
 })
+
