@@ -6,7 +6,7 @@ export default async function mapProficiencies(proficiencies: Array<JustUrl>) {
     let arr: Array<Proficiency> = [];
 
     for (let i = 0; i < proficiencies.length; i++) {
-        const data = await apiWrapper(ApiConfig.proficiency(proficiencies[i].url.replace('/api/proficiencies', '')))
+        const data = await apiWrapper(ApiConfig.proficiency(proficiencies[i].url.replace('/api/proficiencies/', '')))
         arr.push(data)
     }
 

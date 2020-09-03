@@ -12,5 +12,8 @@ export const ApiConfig = {
     proficiencies: `${base}/proficiencies`,
     proficiency: (proficiency: string) => `${base}/proficiencies/${proficiency}`,
     classes: `${base}/classes`,
-    class: (charClass: string) => `${base}/classes/${charClass}`
+    class: (charClass: string) => `${base}/classes/${charClass}`,
+    spellcasting: `${base}/spellcasting`,
+    spellcastingClass: (className: string) => `${base}/spellcasting/${className}`,
+    startingEquipment: (className: string) => `${base}/starting-equipment/${className}`
 }

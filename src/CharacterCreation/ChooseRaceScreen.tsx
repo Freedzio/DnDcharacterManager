@@ -15,46 +15,34 @@ import { setDescription } from '../redux/description';
 import { setLanguages } from '../redux/languages';
 import { ApiConfig } from '../common/constants/ApiConfig';
 import { useDispatch, useSelector } from 'react-redux';
-import { setRace } from '../redux/class';
+import { setRace } from '../redux/race';
 import _ from 'lodash'
 import mapProficiencies from '../common/functions/mapProficiencies';
 import mapTraits from '../common/functions/mapTraits';
 import ScreenHeader from '../common/components/ScreenHeader';
 import { StoreProps } from '../redux/store';
 import { takeSnapshot } from '../redux/snapshot';
+import { setLoading } from '../redux/loading';
 
 export default function ChooseRaceScreen({ navigation }: any) {
     const [races, setRaces] = useState<Array<string>>([]);
     const [subraces, setSubraces] = useState<Array<JustUrl>>([]);
     const [selectedRaceIndex, setSelectedRaceIndex] = useState<number | null>();
+    const [selectedRace, setSelectedRace] = useState<string>('')
 
-    const store = useSelector((store:StoreProps) => store)
+    const store = useSelector((store: StoreProps) => store);
+    const loading = useSelector((store: StoreProps) => store.loading);
 
-    //setters
     const dispatchAbilityScores = (abilityScores: Partial<AbilityScores>) => dispatch(setAbilityScore(abilityScores));
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
     const dispatchDescription = (description: string) => dispatch(setDescription(description));
     const dispatchLanguages = (languages: Array<string>) => dispatch(setLanguages(languages));
     const dispatchBasicInfo = (basicInfo: BasicInfo) => dispatch(setBasicInfo(basicInfo));
     const dispatchTraits = (traits: Array<Trait>) => dispatch(addTraits(traits));
+    const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
+    const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
     const dispatchRace = (race: string) => dispatch(setRace(race));
-    const dispatchTakeSnapshot = (store: StoreProps) => dispatch(takeSnapshot(store));
     const dispatch = useDispatch();
-
-    //resetters
-    const resetTraitsStore = () => dispatch(resetTraits());
-    const resetProficienciesStore = () => dispatch(resetProficiencies());
-    const resetAbilityScoresStore = () => dispatch(resetAbilityScores());
-
-    function resetStore() {
-        //  if we don't call it,
-        //  going back and forth the screens will cause the store 
-        //  to have millions entries
-
-        resetProficienciesStore();
-        resetAbilityScoresStore();
-        resetTraitsStore();
-    }
 
     async function getRaces() {
         return await apiWrapper(ApiConfig.races)
@@ -75,27 +63,31 @@ export default function ChooseRaceScreen({ navigation }: any) {
     }
 
     async function onRacePress(race: string, index: number) {
-        const raceData = await getRaceData(race);
-        injectRaceData(await raceData);
+        dispatchRace(race);
+        dispatchLoading(true);
+        setSelectedRace(race);
+        getRaceData(race).then(data => injectRaceData(data))
 
         const areSubraces = await checkForSubraces(race);
+
+        dispatchTakeSnapshot();
 
         if (areSubraces) {
             setSubraces([])
             setSelectedRaceIndex(index)
-
             setSubraces(await getSubraces(race));
+            dispatchLoading(false)
 
-        } else navigation.navigate(CONFIRM_RACE_SCREEN, { raceId: race })
+        } else {
+            navigation.navigate(CONFIRM_RACE_SCREEN)
+        }
     }
 
     async function onSubracePress(subrace: string) {
-        const data: Subrace = await getSubraceData(subrace);
-        injectSubraceData(await data);
+        dispatchLoading(true);
+        getSubraceData(subrace).then(data => injectSubraceData(data));
 
-        const parentRace = data.race.name.toLowerCase();
-
-        navigation.navigate(CONFIRM_RACE_SCREEN, { raceId: parentRace })
+        navigation.navigate(CONFIRM_RACE_SCREEN)
     }
 
     async function injectSubraceData(subraceData: Subrace) {
@@ -130,7 +122,9 @@ export default function ChooseRaceScreen({ navigation }: any) {
         return bonusesArr.reduce((obj: Object, ability: JustUrl) => {
             return obj = {
                 ...obj,
-                [ability.name as string]: ability.bonus
+                [ability.name as string]: {
+                    score: ability.bonus
+                }
             }
         }, {});
     }
@@ -143,13 +137,12 @@ export default function ChooseRaceScreen({ navigation }: any) {
     }
 
     useEffect(() => {
-        dispatchTakeSnapshot(store);
         getRaces()
-            .then(data => setRaces(getArrayOfNames(data)));
+            .then(data => setRaces(getArrayOfNames(data.results))).then(() => dispatchLoading(false))
     }, []);
 
     useFocusEffect(
-        useCallback(() => {           
+        useCallback(() => {
             setSelectedRaceIndex(null)
         }, [])
     )
@@ -158,7 +151,7 @@ export default function ChooseRaceScreen({ navigation }: any) {
         <Container>
             <Content>
                 <ScreenHeader title='CHOOSE RACE' />
-                <LoadingContainer ready={races.length !== 0}>
+                <LoadingContainer ready={!loading}>
                     <List>
                         {
                             races.map((race, index) => {

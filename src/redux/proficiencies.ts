@@ -32,9 +32,7 @@ const initialState: { [index: string]: Proficiency } = {};
 export default function proficienciesReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
         case APPLY_SNAPSHOT:
-            const prevState = action.payload.proficiencies
-            console.log(prevState)
-            return prevState
+            return action.payload.proficiencies
 
         case ADD_PROFICIENCIES:
             var newState = { ...state };

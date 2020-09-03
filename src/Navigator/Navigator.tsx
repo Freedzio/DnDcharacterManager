@@ -1,11 +1,13 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { HOME_SCREEN, CHOOSE_RACE_SCREEN, CONFIRM_RACE_SCREEN, CHOOSE_CLASS_SCREEN } from "../common/constants/routeNames";
+import { HOME_SCREEN, CHOOSE_RACE_SCREEN, CONFIRM_RACE_SCREEN, CHOOSE_CLASS_SCREEN, CONFIRM_CLASS_SCREEN } from "../common/constants/routeNames";
 import { createStackNavigator } from "@react-navigation/stack"
 import HomeScreen from "../HomeScreen/HomeScreen";
 import React from 'react'
 import ChooseRaceScreen from "../CharacterCreation/ChooseRaceScreen";
 import ConfirmRaceScreen from "../CharacterCreation/ConfirmRaceScreen";
 import ChooseClassScreen from "../CharacterCreation/ChooseClassScreen";
+import ConfirmClassScreen from "../CharacterCreation/ConfirmClassScreen";
+
 
 const Stack = createStackNavigator();
 
@@ -17,6 +19,7 @@ export default function Navigator() {
         <Stack.Screen name={CHOOSE_RACE_SCREEN} component={ChooseRaceScreen} />
         <Stack.Screen name={CONFIRM_RACE_SCREEN} component={ConfirmRaceScreen} />
         <Stack.Screen name={CHOOSE_CLASS_SCREEN} component={ChooseClassScreen} />
+        <Stack.Screen name={CONFIRM_CLASS_SCREEN} component={ConfirmClassScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

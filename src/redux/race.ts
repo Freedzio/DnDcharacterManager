@@ -1,32 +1,33 @@
+import { act } from "react-test-renderer";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
-export const SET_CLASS = 'SET_CLASS';
-export const RESET_CLASS = 'RESET_CLASS';
+export const SET_RACE = 'SET_RACE';
+export const RESET_RACE = 'RESET_RACE';
 
-export function setClass(characterClass: string) {
+export function setRace(race: string) {
     return {
-        type: SET_CLASS,
-        payload: characterClass
+        type: SET_RACE,
+        payload: race
     }
 };
 
 export function resetRace() {
     return {
-        action: RESET_CLASS
+        action: RESET_RACE
     }
 };
 
 const initialState = '';
 
-export default function classReducer(state = initialState, action: any) {
+export default function raceReducer(state = initialState, action: any) {
     switch (action.type) {
         case APPLY_SNAPSHOT:
-            return action.payload.class
+            return action.payload.race
 
-        case SET_CLASS:
+        case SET_RACE:
             return action.payload;
 
-        case RESET_CLASS:
+        case RESET_RACE:
             return initialState;
 
         default:

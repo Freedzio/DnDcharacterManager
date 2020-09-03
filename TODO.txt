@@ -1,2 +1,3 @@
 fancy loading screens
 
+lodash - camel cases

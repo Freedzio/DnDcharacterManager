@@ -11,7 +11,6 @@ export default function Section({ title, description, listedData, options, drago
         <Card>
             <CardItem>
                 <SafeAreaView>
-
                     <View>
                         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                             {title}

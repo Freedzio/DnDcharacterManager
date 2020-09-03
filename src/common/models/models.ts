@@ -24,13 +24,14 @@ export interface CharacterClass {
     index: string,
     name: string,
     hit_die: number,
-    proficiency_choices: ChoosingOptions,
+    proficiency_choices: Array<ChoosingOptions>,
     proficiencies: Array<JustUrl>,
     saving_throws: Array<JustUrl>
     starting_equpiment: JustUrl,
     class_levels: JustUrl,
     subclasses: Array<JustUrl>
-    url: string
+    url: string,
+    spellcasting: JustUrl
 }
 
 export interface Subrace {
@@ -69,7 +70,7 @@ export interface Proficiency {
     type: string,
     name: string
     classes: Array<JustUrl>
-    races: [],
+    races: Array<JustUrl>,
     url: string,
     references: Array<{
         url: string
@@ -86,11 +87,51 @@ export interface Results {
 export interface Trait {
     index: string,
     name: string,
-    desc: Array<string>
+    desc: Array<string>,
+    races: Array<JustUrl>
 }
 
 export interface AbilityScores {
-    [key: string]: number    
+    [key: string]: {
+        score: number
+        proficiency: boolean
+    }
+
 }
 
-export interface AbilityBonuses extends AbilityScores {}
+export interface Spellcasting {
+    index: string,
+    class: JustUrl,
+    level: number,
+    spellcasting_ability: JustUrl,
+    info: Array<{
+        name: string,
+        desc: Array<string>
+    }>
+    url: string
+}
+
+export interface EquipmentEntrySimple {
+    equipment: {
+        index: string,
+        name: string,
+        url: string,
+    },
+    quantity: number
+}
+
+export interface StartingEquipment {
+    index: string,
+    class: JustUrl,
+    url: string,
+    starting_equipment: Array<EquipmentEntrySimple>
+    starting_equipment_options: Array<EquipmentEntrySimple>
+}
+
+export interface ChooseEquipmentOptions {
+    choose: number,
+    type: string,
+    from: Array<EquipmentEntrySimple>
+}
+
+export interface AbilityBonuses extends AbilityScores { }

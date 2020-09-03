@@ -12,7 +12,6 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../common/constants/ApiConfig';
 import { StoreProps } from '../redux/store';
 import { addTraits, handleDraconic } from '../redux/traits';
-import { StyleSheet } from 'react-native';
 import Section from './Section';
 import mapTraits from '../common/functions/mapTraits';
 import mapProficiencies from '../common/functions/mapProficiencies';
@@ -20,76 +19,57 @@ import { CHOOSE_CLASS_SCREEN } from '../common/constants/routeNames';
 import { header } from '../common/styles/styles';
 import ScreenHeader from '../common/components/ScreenHeader';
 import { drakes, Drake } from './draconicAncestry';
-import { applySnapshot } from '../redux/snapshot';
-
-const tileHeight = 80;
-
-function Tile({ property, amount }: Tile) {
-    return (
-        <Card style={{ padding: 10, height: tileHeight }}>
-            <View style={{ flex: 1, justifyContent: "space-around" }}>
-                <Text style={{ textAlign: "center" }}>
-                    {property}
-                </Text>
-                <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-                    {amount}
-                </Text>
-            </View>
-
-        </Card>
-    )
-}
+import { applySnapshot, takeSnapshot } from '../redux/snapshot';
+import Tile, { tileHeight } from './Tile';
+import mapForAccordionSake from '../common/functions/mapForAccordionSake';
+import { loadOptions } from '@babel/core';
+import { setLoading } from '../redux/loading';
 
 export default function ConfirmRaceScreen({ navigation, route }: any) {
-    const [ready, setReady] = useState(false);
     const [drake, setDrake] = useState<string>(drakes[0].dragon);
     const [tempRaceData, setTempRaceData] = useState<Race>()
     const [language, setLanguage] = useState<string>('choose');
     const [abilityBonus, setAbilityBonus] = useState<string>('');
     const [proficiency, setProficiency] = useState<string>('choose');
 
-    const raceId = route.params.raceId;
-
     const proficiencies = useSelector((store: StoreProps) => mapForAccordionSake(store.proficiencies));
     const traits = useSelector((store: StoreProps) => mapForAccordionSake(store.traits));
     const abilityBonuses = useSelector((store: StoreProps) => store.abilityScores);
     const basicInfo = useSelector((store: StoreProps) => store.basicInfo);
-    const snapshot = useSelector((store: StoreProps) => store.snapshot)
+    const snapshot = useSelector((store: StoreProps) => store.snapshot);
+    const loading = useSelector((store: StoreProps) => store.loading);
     const race = useSelector((store: StoreProps) => store.race);
+    const store = useSelector((store: StoreProps) => store);
 
     const dispatch = useDispatch();
-    const dispatchSnapshot = () => dispatch(applySnapshot(snapshot))
+    const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
+    const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
     const dispatchTrait = (traits: Array<Trait>) => dispatch(addTraits(traits));
+    const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
     const dispatchHandleDraconic = (title: string) => dispatch(handleDraconic(title));
     const dispatchLanguages = (languages: Array<string>) => dispatch(setLanguages(languages));
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
     const dispatchAbilityBonuses = (abilityBonuses: Partial<AbilityScores>) => dispatch(setAbilityScore(abilityBonuses));
 
-    function mapForAccordionSake(items: { [index: string]: Proficiency | Trait }) {
-        const keys = Object.keys(items)
-
-        let arr: Array<{ title: string, content: string }> = [];
-
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i]
-            const obj = {
-                title: items[key].name,
-                content: resolveDescription(items[key]).join(' ')
-            }
-            arr.push(obj)
-        }
-
-        return arr
-    }
-
     async function getRaceData() {
-        const data = await apiWrapper(`${ApiConfig.race(raceId)}`);
-        return data
+        return await apiWrapper(`${ApiConfig.race(race.toLowerCase())}`);
     };
 
     async function onNavigatingToNext() {
+        dispatchLoading(true);
+        dispatchTakeSnapshot();
+
         if (language !== 'choose') dispatchLanguages([language])
-        if (abilityBonus !== '') dispatchAbilityBonuses({ langugage: tempRaceData?.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus })
+        if (abilityBonus !== '') {
+            const payload = {
+                [abilityBonus]: {
+                    score: tempRaceData?.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus as number,
+                    proficiency: false
+                }
+            }
+
+            dispatchAbilityBonuses(payload)
+        }
         if (proficiency !== 'choose') dispatchProficiencies(await mapProficiencies(tempRaceData?.starting_proficiency_options.from.filter(item => item.name === proficiency) as JustUrl[]))
         if (drake !== 'choose') dispatchHandleDraconic(Object.values(drakes.filter(item => item.dragon === drake)[0]).join(', '))
 
@@ -98,20 +78,20 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
 
     useEffect(() => {
         navigation.addListener('beforeRemove', (e: any) => {
-            //e.preventDefault();
             dispatchSnapshot();
+            dispatchLoading(false)
         })
     }, [])
 
     useEffect(() => {
         getRaceData()
-            .then(data => setTempRaceData(data)).then(() => setReady(true))
+            .then(data => setTempRaceData(data)).then(() => dispatchLoading(false))
     }, [])
 
     return (
         <Container>
             <Content padder>
-                <LoadingContainer ready={ready}>
+                <LoadingContainer ready={!loading}>
                     <ScreenHeader title='YOU CHOSE' subtitle={race} />
                     <Row>
                         {
@@ -119,9 +99,9 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                                 <Col>
                                     <Tile property="All" amount="+1" />
                                 </Col>
-                                : Object.keys(abilityBonuses).filter((ability: string) => abilityBonuses[ability] !== 0).map((ability: string, index: number) =>
+                                : Object.keys(abilityBonuses).filter((ability: string) => abilityBonuses[ability].score !== 0).map((ability: string, index: number) =>
                                     <Col key={ability}>
-                                        <Tile property={ability} amount={`+${abilityBonuses[ability]}`} />
+                                        <Tile property={ability} amount={`+${abilityBonuses[ability].score}`} />
                                     </Col>
                                 )
                         }
@@ -175,18 +155,18 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                         setterCallback={setLanguage}
                         options={tempRaceData?.language_options}
                     />
-                    {tempRaceData?.traits.length !== 0 &&
+                    {traits?.length !== 0 &&
                         <Section
-                            title='Traits'
+                            title='Racial traits'
                             listedData={traits}
                             dragonborn={tempRaceData?.name === 'Dragonborn'}
                             setterCallback={setDrake}
                             selectedVal={drake}
                         />
                     }
-                    {tempRaceData?.starting_proficiencies.length !== 0 &&
+                    {proficiencies?.length !== 0 &&
                         <Section
-                            title='Proficiencies'
+                            title='Racial proficiencies'
                             listedData={proficiencies}
                             options={tempRaceData?.starting_proficiency_options}
                             setterCallback={setProficiency}
@@ -202,9 +182,4 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
             </Content>
         </Container>
     )
-}
-
-interface Tile {
-    property?: string,
-    amount?: string | number
 }
