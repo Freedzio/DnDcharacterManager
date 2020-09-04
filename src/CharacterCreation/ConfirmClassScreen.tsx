@@ -250,13 +250,17 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           )
         } else if (_.isArray(entry)) {
           let nameArr = [];
-          let picker;
+          let picker = <View />
+
+          let isThereEvenAPicker = false;
           for (let x = 0; x < entry.length; x++) {
             if (entry[x].equipment) {
 
               nameArr.push(`${entry[x].quantity}x ${entry[x].equipment.name}`)
             } else {
               nameArr.push('Choose from the list');
+
+              isThereEvenAPicker = true;
 
               picker = <View>
                 {
