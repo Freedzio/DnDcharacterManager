@@ -3,9 +3,9 @@ import DummyView from '../common/components/DummyView';
 import { useDispatch, useSelector } from 'react-redux';
 import { applySnapshot } from '../redux/snapshot';
 import store, { StoreProps } from '../redux/store';
-import { Container, Content, Row, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
+import { Container, Content, Row, Card, CardItem, Text, View, List, ListItem, Body, Col, Button } from 'native-base';
 import ScreenHeader from '../common/components/ScreenHeader';
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple } from '../common/models/models';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, ChooseEquipmentOptions, ChooseEquipmentFromList, ChooseFromCategory } from '../common/models/models';
 import apiWrapper from '../common/functions/apiWrapper';
 import { ApiConfig } from '../common/constants/ApiConfig';
 import LoadingContainer from '../common/components/LoadingContainer';
@@ -16,6 +16,10 @@ import { Picker } from '@react-native-community/picker';
 import _ from 'lodash'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { setLoading } from '../redux/loading';
+import { Dimensions } from 'react-native';
+import reactotron from 'reactotron-react-native';
+
+const dimensions = Dimensions.get('screen');
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
   const [chosenProficiencies, setChosenProficiencies] = useState<Chooser>({})
@@ -23,7 +27,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const [ready, setReady] = useState<boolean>(false);
   const [spellcasting, setSpellcasting] = useState<Spellcasting>();
   const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>();
-  const [chosenEquipment, setChosenEquipment] = useState()
+  const [chosenEquipment, setChosenEquipment] = useState<Array<Array<EquipmentChooser> & string>>()
 
   const classId = route.params.class
 
@@ -31,8 +35,6 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const snapshot = useSelector((store: StoreProps) => store.snapshot);
   const className = useSelector((store: StoreProps) => store.class);
   const hitDie = useSelector((store: StoreProps) => store.hitDie);
-
-  console.log(chosenProficiencies)
 
   const filteredProficiencies = filterProficiencies(proficiencies);
   const mappedProficiencies = mapForAccordionSake(filteredProficiencies);
@@ -133,15 +135,17 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
     return newArr
   }
 
+
   useEffect(() => {
     navigation.addListener('beforeRemove', () => {
       dispatchLoading(false);
       dispatchSnapshot();
     })
+
+    return () => navigation.removeListener('beforeRemove')
   }, []);
 
   useEffect(() => {
-
     getClassData(classId)
       .then((classData: CharacterClass) => {
         setClassData(classData);
@@ -164,18 +168,173 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
 
         getStartingEquipment(classData.index)
           .then((equipmentData: StartingEquipment) => {
-            setStartingEquipment(equipmentData)
+            setStartingEquipment(equipmentData);
 
+            let rootArr = [];
+            for (let x = 0; x < equipmentData.starting_equipment_options.length; x++) {
+              const set = equipmentData.starting_equipment_options[x];
 
+              if (_.isArray(set.from)) {
+                let arr = []
+                for (let y = 0; y < set.from.length; y++) {
+                  const entry = set.from[y];
+
+                  if (entry.equipment) {
+                    arr.push({
+                      value: entry.equipment.name,
+                      chosen: false
+                    })
+                  } else if (_.isArray(entry)) {
+                    let nameArr = [];
+                    for (let z = 0; z < entry.length; z++) {
+                      if (entry[z].equipment) {
+                        nameArr.push(`${entry[z].quantity}x ${entry[z].equipment.name}`)
+                      } else nameArr.push('choose')
+                    }
+                    arr.push({
+                      value: nameArr,
+                      chosen: false
+                    })
+
+                  } else {
+                    const howMany = entry.equipment_option.choose;
+
+                    let subArr = [];
+
+                    for (let z = 0; z < howMany; z++) {
+                      subArr.push('choose')
+                    };
+
+                    arr.push({
+                      value: subArr,
+                      chosen: false
+                    })
+                  }
+                }
+                rootArr.push(arr)
+              } else rootArr.push('choose')
+
+            }
+            setChosenEquipment(rootArr as Array<Array<EquipmentChooser> & string>)
           })
 
         getSpellcasting(classData)
           .then((spellcastingData: any) => setSpellcasting(spellcastingData))
       })
       .then(() => setReady(true))
+  }, []);
+
+  function onEquipmentPress(rowIndex: number, choiceIndex: number) {
+    let newArr = _.cloneDeep(chosenEquipment);
+
+    newArr[rowIndex][choiceIndex].chosen = true;
+    newArr[rowIndex][choiceIndex === 1 ? 0 : 1].chosen = false;
+
+    setChosenEquipment(newArr)
+  }
 
 
-  }, [])
+  function renderRowOfEquipmentOptions(eqOptions: Array<EquipmentEntrySimple & ChooseEquipmentFromList> & ChooseFromCategory, index: number) {
+    let arr = [];
+    if (_.isArray(eqOptions)) {
+      for (let i = 0; i < eqOptions.length; i++) {
+        const entry = eqOptions[i]
+
+        if (entry.equipment) {
+          arr.push(
+            <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
+              <Button bordered={!chosenEquipment[index][i].chosen} onPress={() => onEquipmentPress(index, i)}>
+                <Text style={{ textAlign: "center" }}>{`${entry.quantity}x ${entry.equipment.name}`}</Text>
+              </Button>
+            </View>
+          )
+        } else if (_.isArray(entry)) {
+          let nameArr = [];
+          let picker;
+          for (let x = 0; x < entry.length; x++) {
+            if (entry[x].equipment) {
+
+              nameArr.push(`${entry[x].quantity}x ${entry[x].equipment.name}`)
+            } else {
+              nameArr.push('Choose from the list');
+
+              picker = <View>
+                {
+                  chosenEquipment[index][i].chosen &&
+                  <Picker selectedValue={chosenEquipment[index][i].value[x]}>
+                    <Picker.Item label='1' value='chosdfose' />
+                    <Picker.Item label='2' value='2' />
+                    <Picker.Item label='3' value='choose' />
+                  </Picker>
+                }
+              </View>
+            }
+          }
+          console.log(chosenEquipment[index][i].value)
+
+          arr.push(
+            <>
+              <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
+                <Button bordered={!chosenEquipment[index][i].chosen} onPress={() => onEquipmentPress(index, i)}>
+                  <Text style={{ textAlign: "center" }}>{nameArr.join(', ')}</Text>
+                </Button>
+              </View>          
+
+                {picker}
+
+            </>
+          )
+
+        } else {
+          const howMany = entry.equipment_option.choose;
+
+          let pickers = [];
+
+          for (let j = 0; j < howMany; j++) {
+            pickers.push(
+              <Picker style={{ width: 360 }}>
+                <Picker.Item label='yadayada' value='' />
+              </Picker>
+            )
+          }
+
+          arr.push(<>
+            <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
+              <Button bordered={!chosenEquipment[index][i].chosen} onPress={() => onEquipmentPress(index, i)}>
+                <Text style={{ textAlign: "center" }}>Choose from list</Text>
+              </Button>
+            </View>
+            {
+              chosenEquipment[index][i].chosen &&
+              <View style={{ paddingLeft: 30 }}>
+                {pickers}
+              </View>
+            }
+          </>
+          )
+        }
+
+        if (i !== eqOptions.length - 1) arr.push(
+          <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
+            <Text style={{ fontSize: 24, fontWeight: "bold", textAlign: "center" }}>OR</Text>
+          </View>
+        )
+      }
+    } else {
+      arr.push(
+        <>
+          <View>
+            <Text>Choose from list</Text>
+            <Picker style={{ width: 360 }}>
+              <Picker.Item label='sdfsdf' value='' />
+            </Picker>
+          </View>
+        </>
+      )
+    }
+
+    return arr
+  }
 
   return (
     <Container>
@@ -202,27 +361,45 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           }
           {
             startingEquipment &&
-            <Card>
-              <CardItem>
-                <Body>
+            <>
+              <Card>
+                <CardItem>
+                  <Body>
+                    <View>
+                      <Text>Starting equipment</Text>
+                    </View>
+                    <View>
+                      <List>
+                        {
+                          startingEquipment.starting_equipment.map((eq: EquipmentEntrySimple, index: number) =>
+                            <ListItem>
+                              <Text>{eq.equipment.name} - {eq.quantity}</Text>
+                            </ListItem>
+                          )
+                        }
+                      </List>
+                    </View>
+                  </Body>
+                </CardItem>
+              </Card>
+              <Card>
+                <CardItem>
+                  <Text style={{ fontSize: 20, marginVertical: 15, marginLeft: 8 }}>
+                    Choose starting equipment
+                  </Text>
+                </CardItem>
+                {
+                  startingEquipment.starting_equipment_options.map((choice: ChooseEquipmentOptions, index: number) =>
 
-                  <View>
-                    <Text>Starting equipment</Text>
-                  </View>
-                  <View>
-                    <List>
-                      {
-                        startingEquipment.starting_equipment.map((eq: EquipmentEntrySimple, index: number) =>
-                          <ListItem>
-                            <Text>{eq.equipment.name} - {eq.quantity}</Text>
-                          </ListItem>
-                        )
-                      }
-                    </List>
-                  </View>
-                </Body>
-              </CardItem>
-            </Card>
+                    <View style={{ width: dimensions.width, marginVertical: 10 }}>
+
+                      {chosenEquipment && renderRowOfEquipmentOptions(choice.from, index)}
+                    </View>
+
+                  )
+                }
+              </Card>
+            </>
           }
 
 
@@ -235,4 +412,9 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
 
 interface Chooser {
   [key: string]: string
+}
+
+interface EquipmentChooser {
+  value: string & Array<string>,
+  chosen: boolean
 }

@@ -125,13 +125,31 @@ export interface StartingEquipment {
     class: JustUrl,
     url: string,
     starting_equipment: Array<EquipmentEntrySimple>
-    starting_equipment_options: Array<EquipmentEntrySimple>
+    starting_equipment_options: Array<ChooseEquipmentOptions>
 }
 
 export interface ChooseEquipmentOptions {
     choose: number,
     type: string,
-    from: Array<EquipmentEntrySimple>
+    from: Array<EquipmentEntrySimple & ChooseEquipmentFromList> & ChooseFromCategory
+}
+
+export interface ChooseFromCategory {
+    choose: number,
+    type: string,
+    from: {
+        equipment_category: JustUrl
+    }
+}
+
+export interface ChooseEquipmentFromList {
+    equipment_option: {
+        choose: number,
+        type: string,
+        from: {
+            equipment_option: JustUrl
+        }
+    }
 }
 
 export interface AbilityBonuses extends AbilityScores { }

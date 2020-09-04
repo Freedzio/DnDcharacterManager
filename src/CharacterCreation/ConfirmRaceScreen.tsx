@@ -79,7 +79,9 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
     useEffect(() => {
         navigation.addListener('beforeRemove', (e: any) => {
             dispatchSnapshot();
-            dispatchLoading(false)
+            dispatchLoading(false);
+
+            return () => navigation.removeListener('beforeRemove')
         })
     }, [])
 
