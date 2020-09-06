@@ -131,7 +131,9 @@ export interface StartingEquipment {
 export interface ChooseEquipmentOptions {
     choose: number,
     type: string,
-    from: Array<EquipmentEntrySimple & ChooseEquipmentFromList> & ChooseFromCategory
+    from: Array<EquipmentEntrySimple & ChooseEquipmentFromList> | {
+        equipment_category: JustUrl
+    }
 }
 
 export interface ChooseFromCategory {
@@ -147,8 +149,8 @@ export interface ChooseEquipmentFromList {
         choose: number,
         type: string,
         from: {
-            equipment_option: JustUrl
-        }
+            equipment_category: JustUrl
+        } & JustUrl
     }
 }
 

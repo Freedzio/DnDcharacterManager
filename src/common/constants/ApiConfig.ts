@@ -15,5 +15,7 @@ export const ApiConfig = {
     class: (charClass: string) => `${base}/classes/${charClass}`,
     spellcasting: `${base}/spellcasting`,
     spellcastingClass: (className: string) => `${base}/spellcasting/${className}`,
-    startingEquipment: (className: string) => `${base}/starting-equipment/${className}`
+    startingEquipment: (className: string) => `${base}/starting-equipment/${className}`,
+    equipmentCategories: `${base}/equipment-categories`,
+    equipmentCategory: (category: string) => `${base}/equipment-categories/${category}`
 }

@@ -17,17 +17,16 @@ import _ from 'lodash'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { setLoading } from '../redux/loading';
 import { Dimensions } from 'react-native';
-import reactotron from 'reactotron-react-native';
+import reactotron from '../../ReactotronConfig';
 
 const dimensions = Dimensions.get('screen');
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
-  const [chosenProficiencies, setChosenProficiencies] = useState<Chooser>({})
+  const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>();
+  const [chosenProficiencies, setChosenProficiencies] = useState<Chooser>({});
+  const [spellcasting, setSpellcasting] = useState<Spellcasting>();
   const [classData, setClassData] = useState<CharacterClass>();
   const [ready, setReady] = useState<boolean>(false);
-  const [spellcasting, setSpellcasting] = useState<Spellcasting>();
-  const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>();
-  const [chosenEquipment, setChosenEquipment] = useState<Array<Array<EquipmentChooser> & string>>()
 
   const classId = route.params.class
 
@@ -135,7 +134,6 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
     return newArr
   }
 
-
   useEffect(() => {
     navigation.addListener('beforeRemove', () => {
       dispatchLoading(false);
@@ -156,7 +154,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
             const a = i.toString();
             const b = j.toString();
             const key = a + b;
-            console.log(key)
+
             obj = {
               ...obj,
               [key as string]: 'choose'
@@ -167,178 +165,13 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
         setChosenProficiencies(obj);
 
         getStartingEquipment(classData.index)
-          .then((equipmentData: StartingEquipment) => {
-            setStartingEquipment(equipmentData);
-
-            let rootArr = [];
-            for (let x = 0; x < equipmentData.starting_equipment_options.length; x++) {
-              const set = equipmentData.starting_equipment_options[x];
-
-              if (_.isArray(set.from)) {
-                let arr = []
-                for (let y = 0; y < set.from.length; y++) {
-                  const entry = set.from[y];
-
-                  if (entry.equipment) {
-                    arr.push({
-                      value: entry.equipment.name,
-                      chosen: false
-                    })
-                  } else if (_.isArray(entry)) {
-                    let nameArr = [];
-                    for (let z = 0; z < entry.length; z++) {
-                      if (entry[z].equipment) {
-                        nameArr.push(`${entry[z].quantity}x ${entry[z].equipment.name}`)
-                      } else nameArr.push('choose')
-                    }
-                    arr.push({
-                      value: nameArr,
-                      chosen: false
-                    })
-
-                  } else {
-                    const howMany = entry.equipment_option.choose;
-
-                    let subArr = [];
-
-                    for (let z = 0; z < howMany; z++) {
-                      subArr.push('choose')
-                    };
-
-                    arr.push({
-                      value: subArr,
-                      chosen: false
-                    })
-                  }
-                }
-                rootArr.push(arr)
-              } else rootArr.push('choose')
-
-            }
-            setChosenEquipment(rootArr as Array<Array<EquipmentChooser> & string>)
-          })
+          .then((equipmentData: StartingEquipment) => setStartingEquipment(equipmentData))
 
         getSpellcasting(classData)
           .then((spellcastingData: any) => setSpellcasting(spellcastingData))
       })
-      .then(() => setReady(true))
+      .then(() => setReady(true));
   }, []);
-
-  function onEquipmentPress(rowIndex: number, choiceIndex: number) {
-    let newArr = _.cloneDeep(chosenEquipment);
-
-    newArr[rowIndex][choiceIndex].chosen = true;
-    newArr[rowIndex][choiceIndex === 1 ? 0 : 1].chosen = false;
-
-    setChosenEquipment(newArr)
-  }
-
-
-  function renderRowOfEquipmentOptions(eqOptions: Array<EquipmentEntrySimple & ChooseEquipmentFromList> & ChooseFromCategory, index: number) {
-    let arr = [];
-    if (_.isArray(eqOptions)) {
-      for (let i = 0; i < eqOptions.length; i++) {
-        const entry = eqOptions[i]
-
-        if (entry.equipment) {
-          arr.push(
-            <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
-              <Button bordered={!chosenEquipment[index][i].chosen} onPress={() => onEquipmentPress(index, i)}>
-                <Text style={{ textAlign: "center" }}>{`${entry.quantity}x ${entry.equipment.name}`}</Text>
-              </Button>
-            </View>
-          )
-        } else if (_.isArray(entry)) {
-          let nameArr = [];
-          let picker = <View />
-
-          let isThereEvenAPicker = false;
-          for (let x = 0; x < entry.length; x++) {
-            if (entry[x].equipment) {
-
-              nameArr.push(`${entry[x].quantity}x ${entry[x].equipment.name}`)
-            } else {
-              nameArr.push('Choose from the list');
-
-              isThereEvenAPicker = true;
-
-              picker = <View>
-                {
-                  chosenEquipment[index][i].chosen &&
-                  <Picker selectedValue={chosenEquipment[index][i].value[x]}>
-                    <Picker.Item label='1' value='chosdfose' />
-                    <Picker.Item label='2' value='2' />
-                    <Picker.Item label='3' value='choose' />
-                  </Picker>
-                }
-              </View>
-            }
-          }
-          console.log(chosenEquipment[index][i].value)
-
-          arr.push(
-            <>
-              <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
-                <Button bordered={!chosenEquipment[index][i].chosen} onPress={() => onEquipmentPress(index, i)}>
-                  <Text style={{ textAlign: "center" }}>{nameArr.join(', ')}</Text>
-                </Button>
-              </View>          
-
-                {picker}
-
-            </>
-          )
-
-        } else {
-          const howMany = entry.equipment_option.choose;
-
-          let pickers = [];
-
-          for (let j = 0; j < howMany; j++) {
-            pickers.push(
-              <Picker style={{ width: 360 }}>
-                <Picker.Item label='yadayada' value='' />
-              </Picker>
-            )
-          }
-
-          arr.push(<>
-            <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
-              <Button bordered={!chosenEquipment[index][i].chosen} onPress={() => onEquipmentPress(index, i)}>
-                <Text style={{ textAlign: "center" }}>Choose from list</Text>
-              </Button>
-            </View>
-            {
-              chosenEquipment[index][i].chosen &&
-              <View style={{ paddingLeft: 30 }}>
-                {pickers}
-              </View>
-            }
-          </>
-          )
-        }
-
-        if (i !== eqOptions.length - 1) arr.push(
-          <View style={{ flexDirection: 'row', justifyContent: "space-around" }}>
-            <Text style={{ fontSize: 24, fontWeight: "bold", textAlign: "center" }}>OR</Text>
-          </View>
-        )
-      }
-    } else {
-      arr.push(
-        <>
-          <View>
-            <Text>Choose from list</Text>
-            <Picker style={{ width: 360 }}>
-              <Picker.Item label='sdfsdf' value='' />
-            </Picker>
-          </View>
-        </>
-      )
-    }
-
-    return arr
-  }
 
   return (
     <Container>
@@ -376,7 +209,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
                       <List>
                         {
                           startingEquipment.starting_equipment.map((eq: EquipmentEntrySimple, index: number) =>
-                            <ListItem>
+                            <ListItem key={index}>
                               <Text>{eq.equipment.name} - {eq.quantity}</Text>
                             </ListItem>
                           )
@@ -392,21 +225,10 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
                     Choose starting equipment
                   </Text>
                 </CardItem>
-                {
-                  startingEquipment.starting_equipment_options.map((choice: ChooseEquipmentOptions, index: number) =>
 
-                    <View style={{ width: dimensions.width, marginVertical: 10 }}>
-
-                      {chosenEquipment && renderRowOfEquipmentOptions(choice.from, index)}
-                    </View>
-
-                  )
-                }
               </Card>
             </>
           }
-
-
         </LoadingContainer>
       </Content>
     </Container>
