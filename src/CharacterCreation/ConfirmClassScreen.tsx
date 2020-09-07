@@ -18,6 +18,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { setLoading } from '../redux/loading';
 import { Dimensions } from 'react-native';
 import reactotron from '../../ReactotronConfig';
+import Barbarian from './StartingEquipmentByClass/Barbarian';
+import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
 
 const dimensions = Dimensions.get('screen');
 
@@ -199,33 +201,36 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           {
             startingEquipment &&
             <>
-              <Card>
-                <CardItem>
-                  <Body>
-                    <View>
-                      <Text>Starting equipment</Text>
-                    </View>
-                    <View>
-                      <List>
-                        {
-                          startingEquipment.starting_equipment.map((eq: EquipmentEntrySimple, index: number) =>
-                            <ListItem key={index}>
-                              <Text>{eq.equipment.name} - {eq.quantity}</Text>
-                            </ListItem>
-                          )
-                        }
-                      </List>
-                    </View>
-                  </Body>
-                </CardItem>
-              </Card>
+              {
+                startingEquipment.starting_equipment &&
+                <Card>
+                  <CardItem>
+                    <Body>
+                      <View>
+                        <Text>Starting equipment</Text>
+                      </View>
+                      <View>
+                        <List>
+                          {
+                            startingEquipment.starting_equipment.map((eq: EquipmentEntrySimple, index: number) =>
+                              <ListItem key={index}>
+                                <Text>{eq.equipment.name} - {eq.quantity}</Text>
+                              </ListItem>
+                            )
+                          }
+                        </List>
+                      </View>
+                    </Body>
+                  </CardItem>
+                </Card>
+              }
               <Card>
                 <CardItem>
                   <Text style={{ fontSize: 20, marginVertical: 15, marginLeft: 8 }}>
                     Choose starting equipment
                   </Text>
                 </CardItem>
-
+                <EquipmentOptionsSwitcher className={classId} />
               </Card>
             </>
           }
