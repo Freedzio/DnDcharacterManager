@@ -1,15 +1,19 @@
 import getEquipmentList from './common/getEquipmentList';
-import { JustUrl } from '../../common/models/models';
+import { JustUrl, EqItem } from '../../common/models/models';
 import ChoiceWrapper from './common/ChoiceWrapper';
 import React, { useState, useEffect } from 'react';
 import StyledButton from './common/StyledButton';
 import { StoreProps } from '../../redux/store';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import EqPicker from './common/EqPicker';
 import { View, Text } from 'native-base';
 import Or from './common/Or';
+import { addItems } from '../../redux/items';
+import { ApiConfig } from '../../common/constants/ApiConfig';
+import apiWrapper from '../../common/functions/apiWrapper';
+import GoNextButton from './common/GoNextButton';
 
-export default function Cleric() {
+export default function Cleric({ onNextPress, navigation }: any) {
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -20,6 +24,10 @@ export default function Cleric() {
   const [chosenSimple, setChosenSimple] = useState<string>('choose');
 
   const proficiencies = Object.keys(useSelector((store: StoreProps) => store.proficiencies));
+
+  const dispatch = useDispatch();
+  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+
 
   const choice1 = {
     a: {
@@ -69,9 +77,20 @@ export default function Cleric() {
     }
   }
 
-  const choice5 = {
-    index: "holy-symbols",
-    name: "Holy Symbol",
+  function getItem(item: string) {
+    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+  };
+
+  function getChosenData() {
+    getItem(chosen1)
+    getItem(chosen2)
+    if (chosen3 === 'simple-weapons') getItem(chosenSimple)
+    else {
+      getItem('crossbow-light')
+      getItem('crossbow-bolt')
+    }
+    getItem(chosen4)
+    getItem(chosenSymbol)
   }
 
   useEffect(() => {
@@ -82,6 +101,11 @@ export default function Cleric() {
       .then(data => setSimpleWeapons(data))
   }, []);
 
+
+  function goNext() {
+    onNextPress();
+    getChosenData();
+  }
   return (
     <View>
       <ChoiceWrapper>
@@ -114,6 +138,7 @@ export default function Cleric() {
         <Text>Choose holy symbol</Text>
         <EqPicker selectedValue={chosenSymbol} data={holySymbols} onChange={setChosenSymbol} />
       </ChoiceWrapper>
+      <GoNextButton goNext={goNext} navigation={navigation} />
     </View>
   )
 }

@@ -30,12 +30,12 @@ export function deleteProficiencies(payload: Array<string>) {
 const initialState: { [index: string]: Proficiency } = {};
 
 export default function proficienciesReducer(state = initialState, action: ActionProps) {
+    var newState = { ...state };
     switch (action.type) {
         case APPLY_SNAPSHOT:
             return action.payload.proficiencies
 
         case ADD_PROFICIENCIES:
-            var newState = { ...state };
             const incomingData = mapArrayToObject(action.payload)
 
             newState = {
@@ -48,7 +48,6 @@ export default function proficienciesReducer(state = initialState, action: Actio
             }
 
         case DELETE_PROFICIENCIES:
-            var newState = { ...state }
 
             for (let i = 0; i < action.payload.length; i++) {
                 delete newState[action.payload[i]]

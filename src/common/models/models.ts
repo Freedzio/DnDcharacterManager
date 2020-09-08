@@ -45,6 +45,52 @@ export interface Subrace {
     desc: string
 }
 
+export interface EqItem {
+    index: string,
+    name: string,
+    euqipment_category: JustUrl,
+    weight: number,
+    cost: {
+        quantity: number,
+        unit: string
+    },
+    url: string
+};
+
+export interface Armor extends EqItem {
+    armor_category: string,
+    armor_class: {
+        base: number,
+        dex_bonus: boolean,
+        max_bonus: number
+    },
+    str_minimum: number,
+    stealth_disadvantage: boolean
+}
+
+export interface Weapon extends EqItem {
+    weapon_category: string,
+    weapon_range: string,
+    category_range: string,
+    damage: Damage,
+    range: {
+        normal: number,
+        long: number | null
+    },
+    properties: JustUrl,
+    '2h_damage': Damage
+}
+
+export interface AdventuringGear extends EqItem {
+    gear_category: JustUrl,
+    quantity: number
+}
+
+export interface Damage {
+    damage_dice: string,
+    damage_type: JustUrl
+}
+
 export interface JustUrl {
     name: string,
     url: string,

@@ -13,43 +13,43 @@ import Sorcerer from './Sorcerer'
 import Warlock from './Warlock'
 import Wizard from './Wizard'
 
-export default function EquipmentOptionsSwitcher({ className }: Props) {
+export default function EquipmentOptionsSwitcher({ className, onNextPress, navigation }: Props) {
   switch (className) {
     case 'barbarian':
-      return <Barbarian />
+      return <Barbarian onNextPress={onNextPress} navigation={navigation} />
 
     case 'bard':
-      return <Bard />
+      return <Bard onNextPress={onNextPress} navigation={navigation} />
 
     case 'cleric':
-      return <Cleric />
+      return <Cleric onNextPress={onNextPress} navigation={navigation} />
 
     case 'druid':
-      return <Druid />
+      return <Druid onNextPress={onNextPress} navigation={navigation} />
 
     case 'fighter':
-      return <Fighter />
+      return <Fighter onNextPress={onNextPress} navigation={navigation} />
 
     case 'monk':
-      return <Monk />
+      return <Monk onNextPress={onNextPress} navigation={navigation} />
 
     case 'paladin':
-      return <Paladin />
+      return <Paladin onNextPress={onNextPress} navigation={navigation} />
 
     case 'ranger':
-      return <Ranger />
+      return <Ranger onNextPress={onNextPress} navigation={navigation} />
 
     case 'rogue':
-      return <Rogue />
+      return <Rogue onNextPress={onNextPress} navigation={navigation} />
 
     case 'sorcerer':
-      return <Sorcerer />
+      return <Sorcerer onNextPress={onNextPress} navigation={navigation} />
 
     case 'warlock':
-      return <Warlock />
+      return <Warlock onNextPress={onNextPress} navigation={navigation} />
 
     case 'wizard':
-      return <Wizard />
+      return <Wizard onNextPress={onNextPress} navigation={navigation} />
 
     default:
       return <View><Text>Whoopsie daisy, I wasnt ready</Text></View>
@@ -57,5 +57,7 @@ export default function EquipmentOptionsSwitcher({ className }: Props) {
 }
 
 interface Props {
-  className: string
+  className: string,
+  onNextPress: () => void,
+  navigation: any
 }

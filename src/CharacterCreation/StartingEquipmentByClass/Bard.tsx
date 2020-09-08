@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { View } from 'native-base'
 import ChoiceWrapper from './common/ChoiceWrapper'
-import { JustUrl } from '../../common/models/models'
+import { JustUrl, EqItem } from '../../common/models/models'
 import StyledButton from './common/StyledButton';
 import Or from './common/Or';
 import EqPicker from './common/EqPicker';
 import getEquipmentList from './common/getEquipmentList';
+import GoNextButton from './common/GoNextButton';
+import apiWrapper from '../../common/functions/apiWrapper';
+import { ApiConfig } from '../../common/constants/ApiConfig';
+import { useDispatch } from 'react-redux';
+import { addItems } from '../../redux/items';
 
-export default function Bard({ }: any) {
+export default function Bard({ onNextPress, navigation }: any) {
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -15,6 +20,9 @@ export default function Bard({ }: any) {
   const [instruments, setInstruments] = useState<Array<JustUrl>>([]);
   const [chosenInstrument, setChosenInstrument] = useState<string>('choose');
   const [chosenSimple, setChosenSimple] = useState<string>('choose');
+
+  const dispatch = useDispatch();
+  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
 
   const choice1 = {
     a: {
@@ -55,11 +63,30 @@ export default function Bard({ }: any) {
 
   useEffect(() => {
     getEquipmentList('simple-weapons')
-    .then(data => setSimpleWeapons(data));
+      .then(data => setSimpleWeapons(data));
 
     getEquipmentList('musical-instruments')
-    .then(data => setInstruments(data))
-  })
+      .then(data => setInstruments(data))
+  }, []);
+
+  function getChosenData() {
+    if (chosen1 === 'simple-weapons') getItem(chosenSimple)
+    else getItem(chosen1);
+
+    getItem(chosen2);
+
+    if (chosen3 === 'musical-instruments') getItem(chosenInstrument)
+    else getItem(chosen3)
+  }
+
+  function getItem(item: string) {
+    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+  }
+
+  function goNext() {
+    onNextPress();
+    getChosenData();
+  }
 
   return (
     <View>
@@ -88,6 +115,7 @@ export default function Bard({ }: any) {
           <EqPicker data={instruments} selectedValue={chosenInstrument} onChange={setChosenInstrument} />
         }
       </ChoiceWrapper>
+      <GoNextButton goNext={goNext} navigation={navigation} />
     </View>
   )
 }

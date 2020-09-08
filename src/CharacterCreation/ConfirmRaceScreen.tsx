@@ -113,7 +113,6 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                                 <Card style={{ height: tileHeight }}>
                                     <View style={{ flex: 1, justifyContent: "space-between" }}>
                                         <View>
-
                                             <Picker style={{ width: '100%' }} selectedValue={abilityBonus} onValueChange={v => setAbilityBonus(v as string)}>
                                                 <Picker.Item value='' label='------' />
                                                 {

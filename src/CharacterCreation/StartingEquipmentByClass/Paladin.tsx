@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text } from 'native-base';
-import { JustUrl } from '../../common/models/models';
+import { JustUrl, EqItem } from '../../common/models/models';
 import ChoiceWrapper from './common/ChoiceWrapper';
 import StyledButton from './common/StyledButton';
 import Or from './common/Or';
 import EqPicker from './common/EqPicker';
 import getEquipmentList from './common/getEquipmentList';
+import { useDispatch } from 'react-redux';
+import { addItems } from '../../redux/items';
+import apiWrapper from '../../common/functions/apiWrapper';
+import { ApiConfig } from '../../common/constants/ApiConfig';
+import GoNextButton from './common/GoNextButton';
 
-export default function Paladin() {
+export default function Paladin({onNextPress, navigation}: any) {
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -19,6 +24,9 @@ export default function Paladin() {
   const [martialWeapons, setMartialWeapons] = useState<Array<JustUrl>>([]);
   const [chosenSymbol, setChosenSymbol] = useState<string>('choose')
   const [holySymbols, setHolySymbols] = useState<Array<JustUrl>>([])
+
+  const dispatch = useDispatch();
+  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
 
   const choice1 = {
     a: {
@@ -64,6 +72,30 @@ export default function Paladin() {
       .then(data => setMartialWeapons(data))
   }, [])
 
+  function getItem(item: string) {
+    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+  }
+
+  function getChosenData() {
+    if (chosen1 === 'shield') {
+      getItem(chosen1)
+      getItem(martialWithShield)
+    } else {
+      getItem(chosenMartial1)
+      getItem(chosenMartial2)
+    };
+
+    if (chosen2 === 'simple-weapon') getItem(chosenSimple)
+    else getItem(chosen2)
+
+    getItem(chosen3)
+    getItem(chosenSymbol)
+  }
+
+  function goNext() {
+    onNextPress();
+    getChosenData();
+  }
   return (
     <View>
       <ChoiceWrapper>
@@ -101,6 +133,7 @@ export default function Paladin() {
         <Text>Choose holy symbol</Text>
         <EqPicker data={holySymbols} selectedValue={chosenSymbol} onChange={setChosenSymbol} />
       </ChoiceWrapper>
+      <GoNextButton goNext={goNext} navigation={navigation} />
     </View>
   )
 }

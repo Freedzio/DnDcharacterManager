@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text } from 'native-base'
-import { JustUrl } from '../../common/models/models';
+import { JustUrl, EqItem } from '../../common/models/models';
 import getEquipmentList from './common/getEquipmentList';
 import ChoiceWrapper from './common/ChoiceWrapper';
 import StyledButton from './common/StyledButton';
 import Or from './common/Or';
 import EqPicker from './common/EqPicker';
+import { useDispatch } from 'react-redux';
+import { addItems } from '../../redux/items';
+import apiWrapper from '../../common/functions/apiWrapper';
+import { ApiConfig } from '../../common/constants/ApiConfig';
+import GoNextButton from './common/GoNextButton';
 
-export default function Warlock() {
+export default function Warlock({ onNextPress, navigation }: any) {
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -16,6 +21,9 @@ export default function Warlock() {
   const [chosenSimpleStandalone, setChosenSimpleStandalone] = useState<string>('choose')
   const [chosenFocus, setChosenFocus] = useState<string>('choose')
   const [chosenSimple, setChosenSimple] = useState<string>('choose')
+
+  const dispatch = useDispatch();
+  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
 
   const choice1 = {
     a: {
@@ -50,6 +58,23 @@ export default function Warlock() {
     }
   }
 
+  function getItem(item: string) {
+    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+  }
+
+  function getChosenData() {
+    if (chosen1 === 'simple-weapons') getItem(chosenSimple)
+    else {
+      getItem(chosen1)
+      getItem('crossbow-bolts')
+    }
+
+    if (chosen2 === 'arcane-foci') getItem(chosenFocus)
+    else getItem(chosen2)
+
+    getItem(chosen3)
+  }
+
   useEffect(() => {
     getEquipmentList('simple-weapons')
       .then(data => setSimpleWeapons(data))
@@ -58,6 +83,12 @@ export default function Warlock() {
       .then(data => setFoci(data))
   }, []);
 
+
+  function goNext() {
+    onNextPress();
+    getChosenData();
+  }
+  
   return (
     <View>
       <ChoiceWrapper>
@@ -87,6 +118,7 @@ export default function Warlock() {
         <Text>Choose simple weapon</Text>
         <EqPicker data={simpleWeapons} selectedValue={chosenSimpleStandalone} onChange={setChosenSimpleStandalone} />
       </ChoiceWrapper>
+      <GoNextButton goNext={goNext} navigation={navigation} />
     </View>
   )
 }

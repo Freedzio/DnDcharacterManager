@@ -1,27 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import DummyView from '../common/components/DummyView';
-import { useDispatch, useSelector } from 'react-redux';
-import { applySnapshot } from '../redux/snapshot';
-import store, { StoreProps } from '../redux/store';
-import { Container, Content, Row, Card, CardItem, Text, View, List, ListItem, Body, Col, Button } from 'native-base';
-import ScreenHeader from '../common/components/ScreenHeader';
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, ChooseEquipmentOptions, ChooseEquipmentFromList, ChooseFromCategory } from '../common/models/models';
-import apiWrapper from '../common/functions/apiWrapper';
-import { ApiConfig } from '../common/constants/ApiConfig';
-import LoadingContainer from '../common/components/LoadingContainer';
-import Section from './Section';
-import mapForAccordionSake from '../common/functions/mapForAccordionSake';
-import getArrayOfNames from '../common/functions/getArrayOfNames';
-import { Picker } from '@react-native-community/picker';
-import _ from 'lodash'
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { setLoading } from '../redux/loading';
-import { Dimensions } from 'react-native';
-import reactotron from '../../ReactotronConfig';
-import Barbarian from './StartingEquipmentByClass/Barbarian';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem } from '../common/models/models';
+import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
-
-const dimensions = Dimensions.get('screen');
+import mapForAccordionSake from '../common/functions/mapForAccordionSake';
+import LoadingContainer from '../common/components/LoadingContainer';
+import getArrayOfNames from '../common/functions/getArrayOfNames';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenHeader from '../common/components/ScreenHeader';
+import { ApiConfig } from '../common/constants/ApiConfig';
+import { Picker } from '@react-native-community/picker';
+import apiWrapper from '../common/functions/apiWrapper';
+import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { applySnapshot, takeSnapshot } from '../redux/snapshot';
+import { setLoading } from '../redux/loading';
+import { StoreProps } from '../redux/store';
+import Section from './Section';
+import _ from 'lodash'
+import { addProficiencies } from '../redux/proficiencies';
+import { addItems } from '../redux/items';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
   const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>();
@@ -36,13 +32,49 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const snapshot = useSelector((store: StoreProps) => store.snapshot);
   const className = useSelector((store: StoreProps) => store.class);
   const hitDie = useSelector((store: StoreProps) => store.hitDie);
+  const store = useSelector((store: StoreProps) => store);
 
   const filteredProficiencies = filterProficiencies(proficiencies);
   const mappedProficiencies = mapForAccordionSake(filteredProficiencies);
 
   const dispatch = useDispatch();
   const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
-  const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading))
+  const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
+  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+  const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
+  const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
+
+  async function getChosenProficiencies() {
+    const values = Object.values(chosenProficiencies);
+    let arr = [];
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] !== 'choose') {
+        const data = await apiWrapper(ApiConfig.proficiency(values[i]));
+        arr.push(await data)
+      }
+    }
+
+    dispatchProficiencies(arr);
+  }
+
+  async function getItemsData() {
+    let arr = [];
+    for (let i = 0; i < startingEquipment?.starting_equipment.length; i++) {
+      const entry = startingEquipment?.starting_equipment[i];
+
+      const data = await apiWrapper(ApiConfig.item(entry?.equipment.index as string));
+      arr.push(await data);
+    }
+
+    dispatchItems(arr);
+  }
+
+  function goNext() {
+    dispatchTakeSnapshot();
+
+    getItemsData();
+    getChosenProficiencies();
+  }
 
   function filterProficiencies(proficiencies: { [key: string]: Proficiency }) {
     const keys = Object.keys(proficiencies);
@@ -100,7 +132,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           <Picker.Item value='chose' label='--Choose proficiency--' />
           {
             setOfChoices.from.map((item: JustUrl) =>
-              <Picker.Item label={item.name} value={item.name} />
+              <Picker.Item label={item.name} value={item.index as string} />
             )
           }
         </Picker>
@@ -230,7 +262,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
                     Choose starting equipment
                   </Text>
                 </CardItem>
-                <EquipmentOptionsSwitcher className={classId} />
+                <EquipmentOptionsSwitcher className={classId} onNextPress={goNext} navigation={navigation}/>
               </Card>
             </>
           }
@@ -243,9 +275,4 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
 
 interface Chooser {
   [key: string]: string
-}
-
-interface EquipmentChooser {
-  value: string & Array<string>,
-  chosen: boolean
 }

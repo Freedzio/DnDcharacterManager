@@ -1,4 +1,4 @@
-import { AbilityScores, Proficiency, Trait } from '../common/models/models';
+import { AbilityScores, Proficiency, Trait, EqItem } from '../common/models/models';
 import basicInfoReducer, { BasicInfo } from './basicInfo';
 import { createStore, combineReducers } from 'redux';
 import proficienciesReducer from './proficiencies';
@@ -14,6 +14,7 @@ import { Reducer } from 'react';
 import hitDieReducer from './hitDie';
 import loadingReducer from './loading';
 import subraceReducer from './subrace';
+import itemsReducer from './items';
 
 const rootReducer = combineReducers({
     race: raceReducer,
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
     snapshot: snapshotReducer,
     hitDie: hitDieReducer,
     loading: loadingReducer,
+    items: itemsReducer
 });
 
 const store = createStore(rootReducer, reactotron.createEnhancer());
@@ -50,7 +52,9 @@ export interface StoreProps {
     },
     hitDie: number
     loading: boolean
-    
+    items: {
+        [index: string]: EqItem
+    }
     snapshot: StoreProps
 }
 

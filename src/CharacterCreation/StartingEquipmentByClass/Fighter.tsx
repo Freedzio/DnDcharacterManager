@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { View } from 'native-base';
-import { JustUrl } from '../../common/models/models';
+import { JustUrl, EqItem } from '../../common/models/models';
 import getEquipmentList from './common/getEquipmentList';
 import ChoiceWrapper from './common/ChoiceWrapper';
 import StyledButton from './common/StyledButton';
 import Or from './common/Or';
 import EqPicker from './common/EqPicker';
 import _ from 'lodash'
+import { useDispatch } from 'react-redux';
+import { addItems } from '../../redux/items';
+import apiWrapper from '../../common/functions/apiWrapper';
+import { ApiConfig } from '../../common/constants/ApiConfig';
+import GoNextButton from './common/GoNextButton';
 
-export default function Fighter() {
+export default function Fighter({ onNextPress, navigation }: any) {
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -17,6 +22,11 @@ export default function Fighter() {
   const [chosenWithShield, setChosenWithShield] = useState<string>('choose');
   const [chosenMartial1, setChosenMartial1] = useState<string>('choose');
   const [chosenMartial2, setChosenMartial2] = useState<string>('choose');
+
+
+  const dispatch = useDispatch();
+  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+
 
   const choice1 = {
     a: {
@@ -67,6 +77,37 @@ export default function Fighter() {
       .then(data => setMartialWeapons(data))
   }, []);
 
+
+  function getItem(item: string) {
+    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+  }
+
+  function getChosenData() {
+    if (chosen1 === 'chain-mail') getItem(chosen1)
+    else {
+      getItem('leather')
+      getItem('longbow')
+      getItem('arrow')
+    };
+
+    if (chosen2 === 'shield') {
+      getItem('shield')
+      getItem(chosenWithShield)
+    } else {
+      getItem(chosenMartial1)
+      getItem(chosenMartial2)
+    };
+
+   getItem(chosen3)
+   if(chosen3 === 'crossbow-light') getItem('crossbow-bolts')
+
+   getItem(chosen4)
+  }
+
+  function goNext() {
+    onNextPress();
+    getChosenData();
+  }
   return (
     <View>
       <ChoiceWrapper>
@@ -100,6 +141,8 @@ export default function Fighter() {
         <Or />
         <StyledButton title={choice4.b.name} bordered={chosen4 !== choice4.b.index} onButtonPress={() => setChosen4(choice4.b.index)} />
       </ChoiceWrapper>
+      <GoNextButton goNext={goNext} navigation={navigation} />
+
     </View>
   )
 }
