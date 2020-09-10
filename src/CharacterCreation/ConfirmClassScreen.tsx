@@ -18,6 +18,7 @@ import Section from './Section';
 import _ from 'lodash'
 import { addProficiencies } from '../redux/proficiencies';
 import { addItems } from '../redux/items';
+import filterList from '../common/functions/filterList';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
   const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>();
@@ -131,7 +132,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           onValueChange={v => onProficienciesChange(key, v as string)}>
           <Picker.Item value='chose' label='--Choose proficiency--' />
           {
-            setOfChoices.from.map((item: JustUrl) =>
+            setOfChoices.from.filter(item => filterList(item.index, chosenProficiencies, key)).map((item: JustUrl) =>
               <Picker.Item label={item.name} value={item.index as string} />
             )
           }

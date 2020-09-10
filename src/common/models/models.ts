@@ -140,7 +140,7 @@ export interface Trait {
 export interface AbilityScores {
     [key: string]: {
         score: number
-        proficiency: boolean
+        proficiency?: boolean
     }
 
 }

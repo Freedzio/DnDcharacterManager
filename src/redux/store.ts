@@ -5,20 +5,18 @@ import proficienciesReducer from './proficiencies';
 import abilityScoresReducer from './abilityScores';
 import reactotron from '../../ReactotronConfig';
 import languagesReducer from './languages';
-import snapshotReducer, { APPLY_SNAPSHOT, TAKE_SNAPSHOT } from './snapshot';
+import snapshotReducer from './snapshot';
+import loadingReducer from './loading';
+import hitDieReducer from './hitDie';
 import traitsReducer from './traits';
-import raceReducer from './race';
 import classReducer from './class';
 import nameReducer from './name';
-import { Reducer } from 'react';
-import hitDieReducer from './hitDie';
-import loadingReducer from './loading';
-import subraceReducer from './subrace';
 import itemsReducer from './items';
+import raceReducer from './race';
+import skillsReducer from './skills';
 
 const rootReducer = combineReducers({
     race: raceReducer,
-    subrace: subraceReducer,
     class: classReducer,
     name: nameReducer,
     abilityScores: abilityScoresReducer,
@@ -29,7 +27,8 @@ const rootReducer = combineReducers({
     snapshot: snapshotReducer,
     hitDie: hitDieReducer,
     loading: loadingReducer,
-    items: itemsReducer
+    items: itemsReducer,
+    skills: skillsReducer
 });
 
 const store = createStore(rootReducer, reactotron.createEnhancer());
@@ -55,6 +54,7 @@ export interface StoreProps {
     items: {
         [index: string]: EqItem
     }
+    skills: Array<string>
     snapshot: StoreProps
 }
 
