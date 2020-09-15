@@ -1,4 +1,4 @@
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem } from '../common/models/models';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Features, Feature } from '../common/models/models';
 import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
 import mapForAccordionSake from '../common/functions/mapForAccordionSake';
@@ -19,20 +19,25 @@ import _ from 'lodash'
 import { addProficiencies } from '../redux/proficiencies';
 import { addItems } from '../redux/items';
 import filterList from '../common/functions/filterList';
+import { addFeatures } from '../redux/features';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
-  const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>();
+  const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>({} as StartingEquipment);
   const [chosenProficiencies, setChosenProficiencies] = useState<Chooser>({});
+  const [featureData, setFeatureData] = useState<Features>({} as Features);
+  const [chosenFeatures, setChosenFeatures] = useState<Chooser>({});
   const [spellcasting, setSpellcasting] = useState<Spellcasting>();
   const [classData, setClassData] = useState<CharacterClass>();
   const [ready, setReady] = useState<boolean>(false);
+  const [featuresToChooseFrom, setFeaturesToChooseFrom] = useState<Array<Feature>>([]);
 
   const classId = route.params.class
 
   const proficiencies = useSelector((store: StoreProps) => store.proficiencies)
   const snapshot = useSelector((store: StoreProps) => store.snapshot);
-  const className = useSelector((store: StoreProps) => store.class);
-  const hitDie = useSelector((store: StoreProps) => store.hitDie);
+  const features = useSelector((store: StoreProps) => store.features);
+  const className = useSelector((store: StoreProps) => Object.keys(store.classes)[0]);
+  const hitDie = useSelector((store: StoreProps) => Object.keys(store.hitDies)[0]);
   const store = useSelector((store: StoreProps) => store);
 
   const filteredProficiencies = filterProficiencies(proficiencies);
@@ -43,20 +48,21 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
   const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
+  const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features))
   const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
 
-  async function getChosenProficiencies() {
-    const values = Object.values(chosenProficiencies);
+  async function getChosenData(chosenData: Chooser, baseUrl: string, dispatcher: (data: any) => void) {
+    const values = Object.values(chosenData);
     let arr = [];
     for (let i = 0; i < values.length; i++) {
       if (values[i] !== 'choose') {
-        const data = await apiWrapper(ApiConfig.proficiency(values[i]));
+        const data = await apiWrapper(`${baseUrl}/${values[i]}`);
         arr.push(await data)
       }
     }
 
-    dispatchProficiencies(arr);
-  }
+    dispatcher(arr);
+  };
 
   async function getItemsData() {
     let arr = [];
@@ -74,7 +80,8 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
     dispatchTakeSnapshot();
 
     getItemsData();
-    getChosenProficiencies();
+    getChosenData(chosenProficiencies, ApiConfig.proficiencies, dispatchProficiencies);
+    getChosenData(chosenFeatures, ApiConfig.features, dispatchFeatures);
   }
 
   function filterProficiencies(proficiencies: { [key: string]: Proficiency }) {
@@ -108,16 +115,16 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
     return await apiWrapper(ApiConfig.startingEquipment(id))
   }
 
-  async function onProficienciesChange(key: string, value: string) {
+  async function onChooserChange(key: string, value: string, chooserObject: Chooser, setter: (v: any) => void) {
     const obj = {
-      ...chosenProficiencies,
+      ...chooserObject,
       [key]: value
     }
 
-    setChosenProficiencies(obj)
+    setter(obj)
   }
 
-  function renderPickersForSegment(setOfChoices: ChoosingOptions, index1: number) {
+  function renderPickersForSegment(setOfChoices: ChoosingOptions, index1: number, chooserObject: Chooser, setter: (v: any) => void, title: string) {
     const howMany = setOfChoices.choose;
 
     let arr = [];
@@ -128,11 +135,11 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
       arr.push(
         <Picker
           style={{ width: 360 }}
-          selectedValue={chosenProficiencies[key]}
-          onValueChange={v => onProficienciesChange(key, v as string)}>
-          <Picker.Item value='chose' label='--Choose proficiency--' />
+          selectedValue={chooserObject[key]}
+          onValueChange={v => onChooserChange(key, v as string, chooserObject, setter)}>
+          <Picker.Item value='chose' label='--Choose--' />
           {
-            setOfChoices.from.filter(item => filterList(item.index, chosenProficiencies, key)).map((item: JustUrl) =>
+            setOfChoices.from.filter(item => filterList(item.index, chooserObject, key)).map((item: JustUrl) =>
               <Picker.Item label={item.name} value={item.index as string} />
             )
           }
@@ -146,7 +153,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           <View>
             <View>
               <Text>
-                Choose class proficiencies
+                {title}
               </Text>
             </View>
             <SafeAreaView>
@@ -167,6 +174,24 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
       })
     }
     return newArr
+  };
+
+  function mapFeaturesDescription(features: { [index: string]: Feature }) {
+    let arr: Array<{ title: string, content: string }> = [];
+
+    const keys = Object.keys(features);
+
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const obj = {
+        title: features[key].name,
+        content: features[key].desc.join(' ')
+      }
+
+      arr.push(obj);
+    }
+
+    return arr;
   }
 
   useEffect(() => {
@@ -203,10 +228,42 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           .then((equipmentData: StartingEquipment) => setStartingEquipment(equipmentData))
 
         getSpellcasting(classData)
-          .then((spellcastingData: any) => setSpellcasting(spellcastingData))
+          .then((spellcastingData: any) => setSpellcasting(spellcastingData));
+
+        apiWrapper(ApiConfig.levelFeaturesByClass(classId, 1))
+          .then((data: Features) => {
+            setFeatureData(data);
+            if (data.feature_choices.length > 0) {
+              getChoosingFeatureData(data.feature_choices)
+            }
+          }).then(() => setChosenFeatures(obj));
       })
       .then(() => setReady(true));
   }, []);
+
+  async function getChoosingFeatureData(featureChoices: Array<JustUrl>) {
+    let obj = {};
+    let arr = [];
+
+    for (let i = 0; i < featureChoices.length; i++) {
+      const data: Feature = await apiWrapper(ApiConfig.feature(featureChoices[i].index as string))
+      arr.push(data);
+
+      const howMany = data.choice.choose;
+
+      for (let j = 0; j < howMany; j++) {
+        const a = i.toString();
+        const b = j.toString();
+        const key = a + b;
+        obj = {
+          ...obj,
+          [key as string]: 'choose'
+        }
+      }
+    }
+    setFeaturesToChooseFrom(arr)
+    setChosenFeatures(obj)
+  }
 
   return (
     <Container>
@@ -225,8 +282,14 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           />
           {
             classData && classData.proficiency_choices.map((setOfChoices: ChoosingOptions, index1: number) =>
-              renderPickersForSegment(setOfChoices, index1)
+              renderPickersForSegment(setOfChoices, index1, chosenProficiencies, setChosenProficiencies, 'Choose class proficiencies')
             )}
+          <Section title='Class features' listedData={mapFeaturesDescription(features)} />
+          {
+            featuresToChooseFrom.length > 0 && featureData.feature_choices?.map((choice: JustUrl, index: number) =>
+              renderPickersForSegment(featuresToChooseFrom.filter(item => item.index === choice.index)[0].choice, index, chosenFeatures, setChosenFeatures, 'Choose class features')
+            )
+          }
           {
             spellcasting &&
             <Section title='Spellcasting' listedData={mapDescription(spellcasting.info)} />
@@ -235,7 +298,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
             startingEquipment &&
             <>
               {
-                startingEquipment.starting_equipment &&
+                startingEquipment.starting_equipment?.length > 0 &&
                 <Card>
                   <CardItem>
                     <Body>
@@ -263,7 +326,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
                     Choose starting equipment
                   </Text>
                 </CardItem>
-                <EquipmentOptionsSwitcher className={classId} onNextPress={goNext} navigation={navigation}/>
+                <EquipmentOptionsSwitcher className={classId} onNextPress={goNext} navigation={navigation} />
               </Card>
             </>
           }

@@ -200,4 +200,72 @@ export interface ChooseEquipmentFromList {
     }
 }
 
+export interface Features {
+    level: number
+    ability_score_bonuses: number
+    prof_bonus: number
+    features: Array<JustUrl>
+    feature_choices: Array<JustUrl>
+    spellcasting: {
+        cantrips_known?: number
+        spell_slots_level_1?: number
+        spell_slots_level_2?: number
+        spell_slots_level_3?: number
+        spell_slots_level_4?: number
+        spell_slots_level_5?: number
+        spell_slots_level_6?: number
+        spell_slots_level_7?: number
+        spell_slots_level_8?: number
+        spell_slots_level_9?: number
+    }
+    class_specific: any
+    index: string
+    class: JustUrl
+    url: string
+};
+
+export interface Feature {
+    index: string
+    class: JustUrl,
+    name: string,
+    level: number,
+    desc: Array<string>
+    url: string
+    choice: ChoosingOptions
+};
+
+export interface Character {
+    name: string
+    race: string
+    class: string
+    abilityScores: {
+        [key: string]: {
+            score: number
+            proficiency: boolean
+        }
+    }
+    basciInfo: {
+        speed: number
+        size: string
+    }
+    languages: Array<string>
+    proficiencies: {
+        [key: string]: Proficiency
+    }
+    traits: {
+        [key: string]: Trait
+    }
+    features: {
+        [key: string]: Feature
+    }
+    items: {
+        [key: string]: Armor | Weapon | AdventuringGear
+    }
+    skills: Array<string>
+    expertise: Array<string>
+    equipped: {
+        [key: string]: Armor | Weapon
+    }
+}
+
 export interface AbilityBonuses extends AbilityScores { }

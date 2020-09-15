@@ -7,7 +7,7 @@ import { Container, Content, Body, List, ListItem, Text } from 'native-base';
 import ScreenHeader from '../common/components/ScreenHeader';
 import LoadingContainer from '../common/components/LoadingContainer';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { CharacterClass, Proficiency, JustUrl, AbilityScores, ChoosingOptions } from '../common/models/models';
+import { CharacterClass, Proficiency, JustUrl, AbilityScores, ChoosingOptions, Feature, Features } from '../common/models/models';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreProps } from '../redux/store';
 import { applySnapshot, takeSnapshot } from '../redux/snapshot';
@@ -16,8 +16,9 @@ import { addProficiencies } from '../redux/proficiencies';
 import { setAbilityProficiencies } from '../redux/abilityScores';
 import mapProficiencies from '../common/functions/mapProficiencies';
 import { CONFIRM_CLASS_SCREEN } from '../common/constants/routeNames';
-import { setClass } from '../redux/class';
+import { addClass } from '../redux/class';
 import { setLoading } from '../redux/loading';
+import { addFeatures } from '../redux/features';
 
 export default function ChooseClassScreen({ navigation }: any) {
     const [classes, setClasses] = useState<Array<string>>([]);
@@ -30,8 +31,9 @@ export default function ChooseClassScreen({ navigation }: any) {
     const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
     const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
     const dispatchHitDie = (hitDie: number) => dispatch(setHitDie(hitDie));
-    const dispatchClass = (className: string) => dispatch(setClass(className));
+    const dispatchClass = (className: string) => dispatch(addClass(className));
     const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
+    const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features));
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
     const dispatchAbilityProficiencies = (savingThrows: Partial<AbilityScores>) => dispatch(setAbilityProficiencies(savingThrows));
 
@@ -51,7 +53,16 @@ export default function ChooseClassScreen({ navigation }: any) {
 
         getClassData(className)
             .then(data => injectClassData(data))
-            .then(() => navigation.navigate(CONFIRM_CLASS_SCREEN, { class: className }))
+            .then(() => navigation.navigate(CONFIRM_CLASS_SCREEN, { class: className }));
+
+        apiWrapper(ApiConfig.levelFeaturesByClass(className, 1))
+            .then((data: Features) => {
+
+                for (let i = 0; i < data.features.length; i++) {
+                    apiWrapper(ApiConfig.feature(data.features[i].index as string))
+                        .then(data => dispatchFeatures([data]))
+                }
+            })
     }
 
     function injectClassData(classData: CharacterClass) {

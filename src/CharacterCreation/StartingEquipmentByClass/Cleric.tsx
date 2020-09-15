@@ -130,7 +130,7 @@ export default function Cleric({ onNextPress, navigation }: any) {
         }
       </ChoiceWrapper>
       <ChoiceWrapper>
-        <StyledButton title={choice4.a.name} onButtonPress={() => setChosen1(choice4.a.index)} bordered={chosen4 !== choice4.a.index} />
+        <StyledButton title={choice4.a.name} onButtonPress={() => setChosen4(choice4.a.index)} bordered={chosen4 !== choice4.a.index} />
         <Or />
         <StyledButton title={choice4.b.name} onButtonPress={() => setChosen4(choice4.b.index)} bordered={chosen4 !== choice4.b.index} />
       </ChoiceWrapper>

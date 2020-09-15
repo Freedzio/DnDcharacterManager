@@ -1,5 +1,6 @@
 import { ActionProps } from "./store";
 import { APPLY_SNAPSHOT } from "./snapshot";
+import { RESET_STORE } from "../common/constants/resetStore";
 
 export const SET_DESCRIPTION = 'SET_DESCRIPTION'
 export const RESET_DESRCIPTION = 'RESET_DESCRIPTION'
@@ -27,7 +28,7 @@ export default function descriptionReducer(state = initialState, action: ActionP
         case SET_DESCRIPTION:
             return action.payload
 
-        case RESET_DESRCIPTION:
+        case RESET_STORE:
             return initialState;
 
         default:

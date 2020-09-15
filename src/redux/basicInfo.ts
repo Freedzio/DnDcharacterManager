@@ -1,5 +1,6 @@
 import { ActionProps } from './store'
 import { APPLY_SNAPSHOT } from './snapshot';
+import { RESET_STORE } from "../common/constants/resetStore";
 
 export const SET_BASIC_INFO = 'SET_BASIC_INFO';
 export const RESET_BASIC_INFO = 'RESET_BASIC_INFO';
@@ -46,7 +47,7 @@ export default function basicInfoReducer(state = initalState, action: ActionProp
                 ...action.payload
             }
 
-        case RESET_BASIC_INFO:
+        case RESET_STORE:
             return initalState
 
         default:

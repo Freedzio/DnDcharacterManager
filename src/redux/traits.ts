@@ -1,5 +1,6 @@
 import { Trait } from "../common/models/models";
-import { ActionProps } from "./store";
+import { ActionProps} from "./store";
+import { RESET_STORE } from "../common/constants/resetStore";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
@@ -62,7 +63,7 @@ export default function traitsReducer(state = initialState, action: ActionProps)
                 delete newState[action.payload[i]]
             }
 
-        case RESET_TRAITS:
+        case RESET_STORE:
             return initialState
 
         case HANDLE_DRACONIC:

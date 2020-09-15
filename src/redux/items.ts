@@ -1,4 +1,5 @@
 import { ActionProps } from "./store";
+import { RESET_STORE } from "../common/constants/resetStore";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 import { EqItem } from "../common/models/models";
@@ -51,6 +52,9 @@ export default function itemsReducer(state = initialState, action: ActionProps) 
       }
 
       return { ...newState }
+
+      case RESET_STORE:
+        return initialState
 
     default:
       return state

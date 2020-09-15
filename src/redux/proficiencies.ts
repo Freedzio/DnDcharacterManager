@@ -1,5 +1,6 @@
 import { Proficiency } from "../common/models/models";
-import store, { ActionProps } from "./store";
+import { ActionProps } from "./store";
+import { RESET_STORE } from "../common/constants/resetStore";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
@@ -53,7 +54,7 @@ export default function proficienciesReducer(state = initialState, action: Actio
                 delete newState[action.payload[i]]
             }
 
-        case RESET_PROFICIENCIES:
+        case RESET_STORE:
             return initialState
 
         default:

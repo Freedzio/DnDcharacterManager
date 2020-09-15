@@ -24,10 +24,11 @@ export default function SetAttributesScreen({ navigation }: any) {
   });
 
   const availableAmounts = ['15', '14', '13', '12', '10', '8'];
+  const abilities = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']
 
   const store = useSelector((store: StoreProps) => store);
   const race = useSelector((store: StoreProps) => store.race);
-  const className = useSelector((store:StoreProps) => store.class);
+  const className = useSelector((store:StoreProps) =>Object.keys(store.classes)[0]);
   const snapshot = useSelector((store: StoreProps) => store.snapshot);
   const abilityScores = useSelector((store: StoreProps) => store.abilityScores);
 
@@ -84,7 +85,6 @@ export default function SetAttributesScreen({ navigation }: any) {
   return (
     <Container>
       <Content>
-
         <ScreenHeader title='SET ATTRIBUTES' subtitle={`for your ${race} ${className}`} />
         <Row>
           <Col>
@@ -101,7 +101,7 @@ export default function SetAttributesScreen({ navigation }: any) {
         </Row>
         <View style={{ padding: 10, flexDirection: "row", width: getDimensions().width, flexWrap: 'wrap', justifyContent: "space-between" }}>
           {
-            Object.keys(abilityScores).map((ability: string, index: number) =>
+           abilities.map((ability: string, index: number) =>
               <Card key={index} style={{ width: getDimensions().width / 3 - 20, height: 90 }}>
                 <View style={{ flex: 1, justifyContent: "space-around" }}>
                   <Text style={{ textAlign: "center", flex: 2.5 }}>{ability}</Text>

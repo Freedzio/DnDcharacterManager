@@ -1,4 +1,4 @@
-import { AbilityScores, Proficiency, Trait, EqItem } from '../common/models/models';
+import { AbilityScores, Proficiency, Trait, EqItem, Feature } from '../common/models/models';
 import basicInfoReducer, { BasicInfo } from './basicInfo';
 import { createStore, combineReducers } from 'redux';
 import proficienciesReducer from './proficiencies';
@@ -14,21 +14,26 @@ import nameReducer from './name';
 import itemsReducer from './items';
 import raceReducer from './race';
 import skillsReducer from './skills';
+import featuresReducer from './features';
+import expertiseReducer from './expertises'
+import { RESET_STORE } from '../common/constants/resetStore';
 
 const rootReducer = combineReducers({
     race: raceReducer,
-    class: classReducer,
+    classes: classReducer,
     name: nameReducer,
     abilityScores: abilityScoresReducer,
     basicInfo: basicInfoReducer,
     languages: languagesReducer,
     proficiencies: proficienciesReducer,
     traits: traitsReducer,
-    snapshot: snapshotReducer,
-    hitDie: hitDieReducer,
+    hitDies: hitDieReducer,
     loading: loadingReducer,
     items: itemsReducer,
-    skills: skillsReducer
+    skills: skillsReducer,
+    expertises: expertiseReducer,
+    features: featuresReducer,
+    snapshot: snapshotReducer,
 });
 
 const store = createStore(rootReducer, reactotron.createEnhancer());
@@ -36,7 +41,7 @@ const store = createStore(rootReducer, reactotron.createEnhancer());
 export default store
 
 export interface StoreProps {
-    class: string,
+    classes: { [key: string]: number },
     race: string,
     subrace: string,
     name: string,
@@ -49,16 +54,27 @@ export interface StoreProps {
     traits: {
         [index: string]: Trait
     },
-    hitDie: number
+    hitDies: {
+        [key: string]: number
+    }
     loading: boolean
     items: {
         [index: string]: EqItem
     }
     skills: Array<string>
+    features: {
+        [index: string]: Feature
+    }
     snapshot: StoreProps
 }
 
 export interface ActionProps {
     type: string,
     payload: any
+}
+
+export function resetStore() {
+    return {
+        type: RESET_STORE
+    }
 }

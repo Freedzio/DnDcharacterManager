@@ -1,6 +1,7 @@
 import { ActionProps } from "./store";
 import { AbilityScores, JustUrl } from "../common/models/models";
 import { APPLY_SNAPSHOT } from "./snapshot";
+import { RESET_STORE } from "../common/constants/resetStore";
 
 export const SET_ALL_ABILITY_SCORES = 'SET_ALL_ABILITY_SCORES';
 export const RESET_ABILITY_SCORES = 'RESET_ABILITY_SCORES';
@@ -109,7 +110,7 @@ export default function abilityScoresReducer(state = initialState, action: Actio
 
             return { ...newState }
 
-        case RESET_ABILITY_SCORES:
+        case RESET_STORE:
             return initialState
 
         default:

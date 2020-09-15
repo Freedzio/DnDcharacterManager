@@ -1,4 +1,5 @@
 import { ActionProps, StoreProps } from "./store";
+import { RESET_STORE } from "../common/constants/resetStore";
 
 export const TAKE_SNAPSHOT = 'TAKE_SNAPSHOT'
 export const APPLY_SNAPSHOT = 'APPLY_SNAPSHOT'
@@ -27,6 +28,9 @@ export default function snapshotReducer(state = initialState, action: ActionProp
     case APPLY_SNAPSHOT:
       const previousState = { ...action.payload.snapshot }
       return previousState
+
+    case RESET_STORE:
+      return initialState
 
     default:
       return state

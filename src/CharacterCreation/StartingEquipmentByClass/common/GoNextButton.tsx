@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Text } from 'native-base'
-import { SET_ATTRIBUTES_SCREEN } from '../../../common/constants/routeNames'
+import { CHOOSE_CLASS_FEATURES, SET_ATTRIBUTES_SCREEN } from '../../../common/constants/routeNames'
 
 export default function GoNextButton(props: any) {
   function goNext() {

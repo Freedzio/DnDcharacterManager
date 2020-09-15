@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Header, Body, Text, Content, Card, CardItem, Button, Grid, Row, Col, View } from 'native-base';
+import { Body, Text, Card, CardItem, Button, View, Fab, Icon } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage'
-import { StyleSheet } from 'react-native';
-import { CHOOSE_RACE_SCREEN } from '../common/constants/routeNames';
-var uuid = require('react-native-uuid');
+import { TouchableOpacity } from 'react-native';
+import { CREATION_SCREEN, SHEET_SCREEN } from '../common/constants/routeNames';
 
 export default function HomeScreen({ navigation }: any) {
-    const [allCharacters, setAllCharacters] = useState<Array<string>>([])
+    const [allCharacters, setAllCharacters] = useState<Array<string>>([]);
+    const [fabActive, setFabActive] = useState<boolean>(false);
 
     async function getAllCharacters() {
         const data = await AsyncStorage.getAllKeys();
@@ -21,7 +21,17 @@ export default function HomeScreen({ navigation }: any) {
     }
 
     function startCreation() {
-        navigation.navigate(CHOOSE_RACE_SCREEN)
+        navigation.push(CREATION_SCREEN)
+    }
+
+    async function onCharacterPress(id: string) {
+        const data = await AsyncStorage.getItem(id);
+
+        navigation.navigate(SHEET_SCREEN)
+    }
+
+    function toggleFab() {
+        setFabActive(!fabActive)
     }
 
     useEffect(() => {
@@ -33,32 +43,30 @@ export default function HomeScreen({ navigation }: any) {
             <View style={{ flex: 6 }}>
                 {
                     allCharacters.map((character: string, index: number) =>
-                        <Card key={index}>
-                            <CardItem>
-                                <Body>
-                                    <Text>
-                                        {character}
-                                    </Text>
-                                </Body>
-                            </CardItem>
-                        </Card>
+                        <TouchableOpacity key={index} onPress={() => onCharacterPress(character)}>
+                            <Card >
+                                <CardItem>
+                                    <Body>
+                                        <Text>
+                                            {character.split('_')[1]}
+                                        </Text>
+                                    </Body>
+                                </CardItem>
+                            </Card>
+                        </TouchableOpacity>
                     )
                 }
             </View>
             <View style={{ flex: 1 }}>
-                <Button block onPress={startCreation} style={styles.addButton}>
-                    <Text>yad</Text>
-                </Button>
-                <Button block onPress={clearStorage}>
-                    <Text>Wyczyść</Text>
-                </Button>
+                <Fab active={fabActive} onPress={toggleFab} direction='up'>
+                    <Icon name='add-circle-outline' />
+                    <Button onPress={startCreation}>
+                        <Icon name='beaker' />
+                    </Button>
+                    <Button style={{ backgroundColor: 'red' }} onPress={clearStorage} >
+                    </Button>
+                </Fab>
             </View>
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    addButton: {
-        marginVertical: 10
-    }
-})

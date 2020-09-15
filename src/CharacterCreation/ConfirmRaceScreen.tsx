@@ -71,7 +71,7 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
             dispatchAbilityBonuses(payload)
         }
         if (proficiency !== 'choose') dispatchProficiencies(await mapProficiencies(tempRaceData?.starting_proficiency_options.from.filter(item => item.name === proficiency) as JustUrl[]))
-        if (drake !== 'choose') dispatchHandleDraconic(Object.values(drakes.filter(item => item.dragon === drake)[0]).join(', '))
+        if (race === 'Dragonborn') dispatchHandleDraconic(Object.values(drakes.filter(item => item.dragon === drake)[0]).join(', '))
 
         navigation.navigate(CHOOSE_CLASS_SCREEN)
     }

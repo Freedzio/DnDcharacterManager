@@ -19,5 +19,8 @@ export const ApiConfig = {
     equipmentCategories: `${base}/equipment-categories`,
     equipmentCategory: (category: string) => `${base}/equipment-categories/${category}`,
     allEquipment: `${base}/equipment`,
-    item: (item: string) => `${base}/equipment/${item}`
+    item: (item: string) => `${base}/equipment/${item}`,
+    levelFeaturesByClass: (className: string, level: number) => `${base}/classes/${className}/levels/${level}`,
+    features :`${base}/features`,
+    feature: (feature: string) => `${base}/features/${feature}`
 }

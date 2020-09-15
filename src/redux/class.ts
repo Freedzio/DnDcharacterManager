@@ -1,11 +1,14 @@
 import { APPLY_SNAPSHOT } from "./snapshot";
+import { RESET_STORE } from "../common/constants/resetStore";
+import { ActionProps } from "./store";
 
-export const SET_CLASS = 'SET_CLASS';
+export const ADD_CLASS = 'ADDD_CLASS';
 export const RESET_CLASS = 'RESET_CLASS';
+export const LEVEL_CLASS = 'LEVEL_CLASS';
 
-export function setClass(characterClass: string) {
+export function addClass(characterClass: string) {
     return {
-        type: SET_CLASS,
+        type: ADD_CLASS,
         payload: characterClass
     }
 };
@@ -16,17 +19,40 @@ export function resetClass() {
     }
 };
 
-const initialState = '';
+export function levelClass(payload: string) {
+    return {
+        type: LEVEL_CLASS,
+        payload: payload
+    }
+}
 
-export default function classReducer(state = initialState, action: any) {
+const initialState: { [key: string]: number } = {};
+
+export default function classReducer(state = initialState, action: ActionProps) {
+    let newState: { [key: string]: number };
+    let className: string;
+    let temp: number;
+
     switch (action.type) {
         case APPLY_SNAPSHOT:
-            return action.payload.class
+            return action.payload.classes
 
-        case SET_CLASS:
-            return action.payload;
+        case ADD_CLASS:
+            return {
+                ...state,
+                [action.payload]: 1
+            };
 
-        case RESET_CLASS:
+        case LEVEL_CLASS:
+            newState = { ...state };
+            className = action.payload;
+            temp = state[className]
+            return {
+                ...newState,
+                [className]: temp++
+            }
+
+        case RESET_STORE:
             return initialState;
 
         default:
