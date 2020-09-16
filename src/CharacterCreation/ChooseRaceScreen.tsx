@@ -106,7 +106,8 @@ export default function ChooseRaceScreen({ navigation }: any) {
         dispatchRace(raceData.name);
         dispatchBasicInfo({
             speed: raceData.speed,
-            size: raceData.size
+            size: raceData.size,
+            proficiencyBonus: 2
         });
     }
 

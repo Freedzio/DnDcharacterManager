@@ -1,6 +1,6 @@
 import { ActionProps } from "./store";
 import { APPLY_SNAPSHOT } from "./snapshot";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { RESET_STORE } from "../common/constants/storeCommons";
 
 export const SET_DESCRIPTION = 'SET_DESCRIPTION'
 export const RESET_DESRCIPTION = 'RESET_DESCRIPTION'

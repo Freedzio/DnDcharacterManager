@@ -1,6 +1,6 @@
 import { Proficiency } from "../common/models/models";
 import { ActionProps } from "./store";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
@@ -33,6 +33,9 @@ const initialState: { [index: string]: Proficiency } = {};
 export default function proficienciesReducer(state = initialState, action: ActionProps) {
     var newState = { ...state };
     switch (action.type) {
+        case APPLY_CHARACTER:
+            return action.payload.proficiencies
+
         case APPLY_SNAPSHOT:
             return action.payload.proficiencies
 

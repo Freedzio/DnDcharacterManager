@@ -1,5 +1,5 @@
 import { ActionProps } from "./store";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 import { EqItem } from "../common/models/models";
@@ -32,11 +32,13 @@ export default function itemsReducer(state = initialState, action: ActionProps) 
   var newState = { ...state };
 
   switch (action.type) {
+    case APPLY_CHARACTER:
+      return action.payload.items
+
     case APPLY_SNAPSHOT:
       return action.payload.items
 
     case ADD_ITEMS:
-
       const incomingData = mapArrayToObject(action.payload);
 
       newState = {

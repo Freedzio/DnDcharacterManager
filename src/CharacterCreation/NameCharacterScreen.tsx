@@ -11,6 +11,8 @@ import _ from 'lodash'
 import { addName } from '../redux/name';
 import AsyncStorage from '@react-native-community/async-storage';
 import { HOME_SCREEN } from '../common/constants/routeNames';
+import { increaseMaxHP } from '../redux/maxHP';
+import getAbilityModifier from '../common/functions/getAbilityModifier';
 
 export default function NameCharacterScreen({ navigation }: any) {
   const [name, setName] = useState<string>('');
@@ -19,14 +21,12 @@ export default function NameCharacterScreen({ navigation }: any) {
   const store = useSelector((store: StoreProps) => store);
   const proficiencies = useSelector((store: StoreProps) => store.proficiencies);
   const features = useSelector((store: StoreProps) => store.features);
+  const traits = useSelector((store: StoreProps) => store.traits);
 
   const dispatch = useDispatch();
   const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
   const dispatchName = (name: string) => dispatch(addName(name));
-  
-  const dispatchSkills = (skills: Array<string>) => dispatch(addSkills(skills));
-  const dispatchExpertise = (expertise: Array<string>) => dispatch(addSkills(expertise));
   const dispatchResetStore = () => dispatch(resetStore());
 
   useEffect(() => {
@@ -39,13 +39,13 @@ export default function NameCharacterScreen({ navigation }: any) {
   }, []);
 
   function filterProficiencies(criteria: string) {
-    const proficienciesKeys = Object.keys(proficiencies).concat(Object.keys(features));
+    const proficienciesKeys = Object.keys(proficiencies).concat(Object.keys(features)).concat(Object.keys(traits));
     const filtered = proficienciesKeys.filter(item => item.includes(criteria));
 
     let tempArr = [];
 
     for (let i = 0; i < filtered.length; i++) {
-      let splitted = filtered[i].split('-')
+      let splitted = filtered[i].split(`${criteria}-`)
       tempArr.push(splitted[splitted.length - 1])
     }
 
@@ -79,24 +79,33 @@ export default function NameCharacterScreen({ navigation }: any) {
     const expertises = filterProficiencies('expertise');
     const filteredProficiencies = filterOutSkills(proficiencies);
     const filteredFeatures = filterOutSkills(features);
+    const filteredTraits = filterOutSkills(traits)
+    const CON = getAbilityModifier(store.abilityScores['CON'].score);
+
+    const storageID = `${id}_${name}`
 
     let obj = {
+      id: storageID,
       name: name,
-      class: store.classes,
+      classes: store.classes,
       race: store.race,
+      hitDies: store.hitDies,
       abilityScores: store.abilityScores,
       basicInfo: store.basicInfo,
       languages: store.languages,
-      traits: store.traits,
+      traits: filteredTraits,
       features: filteredFeatures,
       skills: skills,
       expertises: expertises,
       proficiencies: filteredProficiencies,
-      items: store.items
+      items: store.items,
+      maxHP: store.maxHP + (CON < 0 ? 0 : CON)
     };
+    dispatchLoading(true);
 
-    await AsyncStorage.setItem(`${id}_${name}`, JSON.stringify(obj));
+    await AsyncStorage.setItem(storageID, JSON.stringify(obj));
 
+    dispatchResetStore();
 
     navigation.push(HOME_SCREEN);
   }

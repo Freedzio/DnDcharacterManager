@@ -1,7 +1,7 @@
 import { Feature } from "../common/models/models";
 import { APPLY_SNAPSHOT } from "./snapshot";
 import { ActionProps } from "./store";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 
 export const ADD_FEATURES = 'ADD_FEATURES';
 
@@ -18,6 +18,9 @@ export default function featuresReducer(state = initialState, action: ActionProp
   let newState = { ...state };
 
   switch (action.type) {
+    case APPLY_CHARACTER:
+      return action.payload.features
+
     case APPLY_SNAPSHOT:
       return action.payload.features
 

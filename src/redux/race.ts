@@ -1,6 +1,6 @@
 import { act } from "react-test-renderer";
 import { APPLY_SNAPSHOT } from "./snapshot";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import { ActionProps } from "./store";
 
 export const SET_RACE = 'SET_RACE';
@@ -23,6 +23,9 @@ const initialState = '';
 
 export default function raceReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
+        case APPLY_CHARACTER:
+            return action.payload.race
+
         case APPLY_SNAPSHOT:
             return action.payload.race
 

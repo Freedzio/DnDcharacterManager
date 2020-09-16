@@ -1,6 +1,6 @@
 import { Trait } from "../common/models/models";
-import { ActionProps} from "./store";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { ActionProps } from "./store";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
@@ -40,6 +40,9 @@ const initialState: { [index: string]: Trait } = {};
 
 export default function traitsReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
+        case APPLY_CHARACTER:
+            return action.payload.traits
+
         case APPLY_SNAPSHOT:
             return action.payload.traits
 

@@ -20,6 +20,7 @@ import { addProficiencies } from '../redux/proficiencies';
 import { addItems } from '../redux/items';
 import filterList from '../common/functions/filterList';
 import { addFeatures } from '../redux/features';
+import reactotron from '../../ReactotronConfig';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
   const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>({} as StartingEquipment);
@@ -31,13 +32,14 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const [ready, setReady] = useState<boolean>(false);
   const [featuresToChooseFrom, setFeaturesToChooseFrom] = useState<Array<Feature>>([]);
 
+  reactotron.log(featuresToChooseFrom)
+
   const classId = route.params.class
 
   const proficiencies = useSelector((store: StoreProps) => store.proficiencies)
   const snapshot = useSelector((store: StoreProps) => store.snapshot);
   const features = useSelector((store: StoreProps) => store.features);
   const className = useSelector((store: StoreProps) => Object.keys(store.classes)[0]);
-  const hitDie = useSelector((store: StoreProps) => Object.keys(store.hitDies)[0]);
   const store = useSelector((store: StoreProps) => store);
 
   const filteredProficiencies = filterProficiencies(proficiencies);
@@ -271,7 +273,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
         <LoadingContainer ready={ready}>
           <ScreenHeader title='YOU CHOSE' subtitle={className} />
           <Section
-            title={`Hit die: d${hitDie}`}
+            title={`Hit die: d${classData?.hit_die}`}
           />
           <Section
             title='Saving throws'

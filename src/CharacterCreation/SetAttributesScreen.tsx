@@ -11,6 +11,9 @@ import filterList from '../common/functions/filterList';
 import { AbilityScores } from '../common/models/models';
 import { setAbilityScore } from '../redux/abilityScores';
 import { NAME_CHARACTER_SCREEN } from '../common/constants/routeNames';
+import { increaseMaxHP } from '../redux/maxHP';
+import getAbilityModifier from '../common/functions/getAbilityModifier';
+import { abilities } from '../common/constants/abilitiesArray';
 
 export default function SetAttributesScreen({ navigation }: any) {
   const [distributionType, setDistributionType] = useState<string>('predefined');
@@ -23,12 +26,11 @@ export default function SetAttributesScreen({ navigation }: any) {
     'CHA': '0',
   });
 
-  const availableAmounts = ['15', '14', '13', '12', '10', '8'];
-  const abilities = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']
+  const availableAmounts = ['15', '14', '13', '12', '10', '8']; 
 
   const store = useSelector((store: StoreProps) => store);
   const race = useSelector((store: StoreProps) => store.race);
-  const className = useSelector((store:StoreProps) =>Object.keys(store.classes)[0]);
+  const className = useSelector((store: StoreProps) => Object.keys(store.classes)[0]);
   const snapshot = useSelector((store: StoreProps) => store.snapshot);
   const abilityScores = useSelector((store: StoreProps) => store.abilityScores);
 
@@ -69,16 +71,17 @@ export default function SetAttributesScreen({ navigation }: any) {
     const keys = Object.keys(scores);
     let newScores = {}
 
-    for(let i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       newScores = {
         ...newScores,
         [keys[i]]: {
           score: parseInt(scores[keys[i]])
-        } 
+        }
       }
     }
 
-    dispatchAbilityScores(newScores);
+    dispatchAbilityScores(newScores)    
+
     navigation.navigate(NAME_CHARACTER_SCREEN)
   }
 
@@ -101,7 +104,7 @@ export default function SetAttributesScreen({ navigation }: any) {
         </Row>
         <View style={{ padding: 10, flexDirection: "row", width: getDimensions().width, flexWrap: 'wrap', justifyContent: "space-between" }}>
           {
-           abilities.map((ability: string, index: number) =>
+            abilities.map((ability: string, index: number) =>
               <Card key={index} style={{ width: getDimensions().width / 3 - 20, height: 90 }}>
                 <View style={{ flex: 1, justifyContent: "space-around" }}>
                   <Text style={{ textAlign: "center", flex: 2.5 }}>{ability}</Text>
@@ -140,7 +143,7 @@ export default function SetAttributesScreen({ navigation }: any) {
           </View>
         </View>
         {
-          Object.keys(abilityScores).map((ability: string, index: number) =>
+          abilities.map((ability: string, index: number) =>
             <View style={{ flexDirection: "row", padding: 14 }}>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontWeight: "bold" }}>{ability} {abilityScores[ability].proficiency ? '*' : ''} </Text>

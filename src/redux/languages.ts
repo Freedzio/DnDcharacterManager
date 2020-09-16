@@ -1,5 +1,5 @@
 import { ActionProps } from "./store";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const SET_LANGUAGES = 'SET_LANGUAGES';
@@ -22,6 +22,9 @@ const initialState: string[] = [];
 
 export default function languagesReducer(state = initialState, action: ActionProps) {
     switch (action.type) {
+        case APPLY_CHARACTER:
+            return action.payload.languages
+
         case APPLY_SNAPSHOT:
             return action.payload.languages;
 

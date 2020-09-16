@@ -1,6 +1,6 @@
 import { ActionProps } from './store'
 import { APPLY_SNAPSHOT } from './snapshot';
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 
 export const SET_BASIC_INFO = 'SET_BASIC_INFO';
 export const RESET_BASIC_INFO = 'RESET_BASIC_INFO';
@@ -30,11 +30,15 @@ const initalState = {
     speed: 0,
     alignment: '',
     age: 0,
-    size: ''
+    size: '',
+    proficiencyBonus: 0
 }
 
 export default function basicInfoReducer(state = initalState, action: ActionProps) {
     switch (action.type) {
+        case APPLY_CHARACTER:
+            return action.payload.basicInfo
+            
         case APPLY_SNAPSHOT:
             return action.payload.basicInfo
 
@@ -60,5 +64,6 @@ export interface BasicInfo {
     speed: number,
     alignment?: string,
     age?: number,
-    size: string
+    size: string,
+    proficiencyBonus: number
 }

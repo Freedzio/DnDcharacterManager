@@ -1,5 +1,5 @@
 import { APPLY_SNAPSHOT } from "./snapshot";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import { ActionProps } from "./store";
 
 export const ADD_CLASS = 'ADDD_CLASS';
@@ -34,6 +34,9 @@ export default function classReducer(state = initialState, action: ActionProps) 
     let temp: number;
 
     switch (action.type) {
+        case APPLY_CHARACTER:
+            return action.payload.classes
+            
         case APPLY_SNAPSHOT:
             return action.payload.classes
 

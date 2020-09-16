@@ -19,6 +19,7 @@ import { CONFIRM_CLASS_SCREEN } from '../common/constants/routeNames';
 import { addClass } from '../redux/class';
 import { setLoading } from '../redux/loading';
 import { addFeatures } from '../redux/features';
+import { increaseMaxHP } from '../redux/maxHP';
 
 export default function ChooseClassScreen({ navigation }: any) {
     const [classes, setClasses] = useState<Array<string>>([]);
@@ -31,6 +32,7 @@ export default function ChooseClassScreen({ navigation }: any) {
     const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
     const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
     const dispatchHitDie = (hitDie: number) => dispatch(setHitDie(hitDie));
+    const dispatchMaxHP = (maxHP: number) => dispatch(increaseMaxHP(maxHP));
     const dispatchClass = (className: string) => dispatch(addClass(className));
     const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
     const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features));
@@ -69,6 +71,7 @@ export default function ChooseClassScreen({ navigation }: any) {
         mapProficiencies(classData.proficiencies).then(data => dispatchProficiencies(data))
         dispatchClass(classData.name)
         dispatchHitDie(classData.hit_die);
+        dispatchMaxHP(classData.hit_die);
 
         let savingThrows: Partial<AbilityScores> = {};
 

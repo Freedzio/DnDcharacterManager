@@ -1,0 +1,1 @@
+export const abilities = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']

@@ -235,6 +235,7 @@ export interface Feature {
 };
 
 export interface Character {
+    id: string
     name: string
     race: string
     class: string

@@ -1,5 +1,5 @@
 import { ActionProps, StoreProps } from "./store";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { RESET_STORE } from "../common/constants/storeCommons";
 
 export const TAKE_SNAPSHOT = 'TAKE_SNAPSHOT'
 export const APPLY_SNAPSHOT = 'APPLY_SNAPSHOT'

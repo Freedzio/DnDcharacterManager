@@ -1,0 +1,21 @@
+export const ACROBATICS = 'acrobatics'
+export const ANIMAL_HANDLING = 'animal-handling'
+export const ARCANA = 'arcana'
+export const ATHLETICS = 'athletics'
+export const DECEPTION = 'deception'
+export const HISTORY = 'history'
+export const INSIGHT = 'insight'
+export const INTIMIDATION = 'intimidation'
+export const INVESTIGATION = 'investigation'
+export const MEDICNE = 'medicine'
+export const NATURE = 'nature'
+export const PERCEPTION = 'perception'
+export const PERFORMANCE = 'performance'
+export const PERSUASION = 'persuasion'
+export const RELIGION = 'religion'
+export const SLEIGHT_OF_HAND = 'sleight-of-hand'
+export const STEALTH = 'stealth'
+export const SURVIVAL = 'survival'
+
+export const allSkills = [ANIMAL_HANDLING, ARCANA, ACROBATICS, ATHLETICS, DECEPTION, HISTORY, INSIGHT, INTIMIDATION,
+  INVESTIGATION, MEDICNE, NATURE, PERCEPTION, PERSUASION, RELIGION, SLEIGHT_OF_HAND, STEALTH, SURVIVAL]

@@ -1,5 +1,5 @@
 import { ActionProps } from "./store";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 
 export const ADD_SKILLS = 'ADD_SKILLS'
 export const DELETE_SKILLS = 'DELETE_SKILLS'
@@ -21,6 +21,9 @@ const initialState: Array<string> = [];
 
 export default function skillsReducer(state = initialState, action: ActionProps) {
   switch (action.type) {
+    case APPLY_CHARACTER:
+      return action.payload.skills
+
     case ADD_SKILLS:
       return state.concat(action.payload)
 

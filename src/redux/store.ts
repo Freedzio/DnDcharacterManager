@@ -1,4 +1,4 @@
-import { AbilityScores, Proficiency, Trait, EqItem, Feature } from '../common/models/models';
+import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character } from '../common/models/models';
 import basicInfoReducer, { BasicInfo } from './basicInfo';
 import { createStore, combineReducers } from 'redux';
 import proficienciesReducer from './proficiencies';
@@ -16,14 +16,18 @@ import raceReducer from './race';
 import skillsReducer from './skills';
 import featuresReducer from './features';
 import expertiseReducer from './expertises'
-import { RESET_STORE } from '../common/constants/resetStore';
+import { APPLY_CHARACTER, RESET_STORE } from '../common/constants/storeCommons';
+import idReducer from './id';
+import maxHPReducer from './maxHP';
 
 const rootReducer = combineReducers({
-    race: raceReducer,
-    classes: classReducer,
+    id: idReducer,
     name: nameReducer,
-    abilityScores: abilityScoresReducer,
+    race: raceReducer,
     basicInfo: basicInfoReducer,
+    maxHP: maxHPReducer,
+    classes: classReducer,
+    abilityScores: abilityScoresReducer,
     languages: languagesReducer,
     proficiencies: proficienciesReducer,
     traits: traitsReducer,
@@ -41,10 +45,12 @@ const store = createStore(rootReducer, reactotron.createEnhancer());
 export default store
 
 export interface StoreProps {
-    classes: { [key: string]: number },
+    id: string
+    name: string,
     race: string,
     subrace: string,
-    name: string,
+    maxHP: number,
+    classes: { [key: string]: number },
     abilityScores: AbilityScores,
     basicInfo: BasicInfo,
     languages: Array<string>,
@@ -62,6 +68,7 @@ export interface StoreProps {
         [index: string]: EqItem
     }
     skills: Array<string>
+    expertises: Array<string>
     features: {
         [index: string]: Feature
     }
@@ -78,3 +85,11 @@ export function resetStore() {
         type: RESET_STORE
     }
 }
+
+export function applyCharacter(payload: Character) {
+    return {
+        type: APPLY_CHARACTER,
+        payload: payload
+    }
+}
+

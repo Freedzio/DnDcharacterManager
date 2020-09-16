@@ -1,7 +1,7 @@
 import { ActionProps } from "./store";
 import { AbilityScores, JustUrl } from "../common/models/models";
 import { APPLY_SNAPSHOT } from "./snapshot";
-import { RESET_STORE } from "../common/constants/resetStore";
+import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 
 export const SET_ALL_ABILITY_SCORES = 'SET_ALL_ABILITY_SCORES';
 export const RESET_ABILITY_SCORES = 'RESET_ABILITY_SCORES';
@@ -68,6 +68,9 @@ export default function abilityScoresReducer(state = initialState, action: Actio
     let key: string;
 
     switch (action.type) {
+        case APPLY_CHARACTER:
+            return action.payload.abilityScores
+
         case APPLY_SNAPSHOT:
             return action.payload.abilityScores
 
