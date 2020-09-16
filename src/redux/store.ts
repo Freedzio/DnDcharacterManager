@@ -1,4 +1,4 @@
-import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character } from '../common/models/models';
+import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character, Armor, Weapon, AdventuringGear } from '../common/models/models';
 import basicInfoReducer, { BasicInfo } from './basicInfo';
 import { createStore, combineReducers } from 'redux';
 import proficienciesReducer from './proficiencies';
@@ -19,6 +19,7 @@ import expertiseReducer from './expertises'
 import { APPLY_CHARACTER, RESET_STORE } from '../common/constants/storeCommons';
 import idReducer from './id';
 import maxHPReducer from './maxHP';
+import equippedReducer from './equipped';
 
 const rootReducer = combineReducers({
     id: idReducer,
@@ -34,6 +35,7 @@ const rootReducer = combineReducers({
     hitDies: hitDieReducer,
     loading: loadingReducer,
     items: itemsReducer,
+    equipped: equippedReducer,
     skills: skillsReducer,
     expertises: expertiseReducer,
     features: featuresReducer,
@@ -65,8 +67,9 @@ export interface StoreProps {
     }
     loading: boolean
     items: {
-        [index: string]: EqItem
+        [index: string]: Armor & Weapon & AdventuringGear
     }
+    equipped: Array<string>
     skills: Array<string>
     expertises: Array<string>
     features: {

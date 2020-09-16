@@ -6,13 +6,16 @@ import { applySnapshot } from '../redux/snapshot';
 import { setLoading } from '../redux/loading';
 import { resetStore, StoreProps } from '../redux/store';
 import uuid from 'react-native-uuid';
-import { addSkills } from '../redux/skills';
 import _ from 'lodash'
 import { addName } from '../redux/name';
 import AsyncStorage from '@react-native-community/async-storage';
 import { HOME_SCREEN } from '../common/constants/routeNames';
-import { increaseMaxHP } from '../redux/maxHP';
 import getAbilityModifier from '../common/functions/getAbilityModifier';
+import apiWrapper from '../common/functions/apiWrapper';
+import { baseForDescriptionSake } from '../common/constants/ApiConfig';
+import { AdventuringGear, Armor, Weapon } from '../common/models/models';
+import { addItems, deleteItems } from '../redux/items';
+import mapArrayToObject from '../common/functions/mapArrayToObject';
 
 export default function NameCharacterScreen({ navigation }: any) {
   const [name, setName] = useState<string>('');
@@ -28,6 +31,8 @@ export default function NameCharacterScreen({ navigation }: any) {
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
   const dispatchName = (name: string) => dispatch(addName(name));
   const dispatchResetStore = () => dispatch(resetStore());
+  const dispatchItems = (items: Array<Armor & Weapon & AdventuringGear>) => dispatch(addItems(items))
+  const dispatchDeleteItems = (items: Array<string>) => dispatch(deleteItems(items))
 
   useEffect(() => {
     navigation.addListener('beforeRemove', () => {
@@ -82,6 +87,31 @@ export default function NameCharacterScreen({ navigation }: any) {
     const filteredTraits = filterOutSkills(traits)
     const CON = getAbilityModifier(store.abilityScores['CON'].score);
 
+    let packContents = [];
+    const pack = Object.keys(store.items).filter(item => item.includes('pack'));
+
+    let newItems = {}
+
+    const tempItems = {
+      ...store.items
+    }
+
+    if (pack.length > 0) {
+      delete tempItems[pack[0]]
+
+      packContents = store.items[pack[0]].contents;
+
+      let arr = [];
+
+      for (let i = 0; i < packContents.length; i++) {
+        const item = await apiWrapper(baseForDescriptionSake + packContents[i].item_url);
+
+        arr.push(await item)
+      }
+
+      newItems = mapArrayToObject(arr)
+    }
+
     const storageID = `${id}_${name}`
 
     let obj = {
@@ -98,7 +128,11 @@ export default function NameCharacterScreen({ navigation }: any) {
       skills: skills,
       expertises: expertises,
       proficiencies: filteredProficiencies,
-      items: store.items,
+      equipped: [],
+      items: {
+        ...tempItems,
+        ...newItems
+      },
       maxHP: store.maxHP + (CON < 0 ? 0 : CON)
     };
     dispatchLoading(true);

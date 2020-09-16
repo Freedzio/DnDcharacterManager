@@ -2,7 +2,7 @@ import { ActionProps } from "./store";
 import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import mapArrayToObject from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
-import { EqItem } from "../common/models/models";
+import { AdventuringGear, Armor, EqItem, Weapon } from "../common/models/models";
 
 export const WEAPON = 'WEAPON';
 export const ARMOR = 'ARMOR';
@@ -12,7 +12,7 @@ export const TOOLS = 'TOOLS';
 export const ADD_ITEMS = 'ADD_ITEMS'
 export const DELETE_ITEMS = 'DELETE_ITEMS'
 
-export function addItems(payload: Array<EqItem>) {
+export function addItems(payload: Array<Armor & Weapon & AdventuringGear>) {
   return {
     type: ADD_ITEMS,
     payload: payload
@@ -26,7 +26,7 @@ export function deleteItems(payload: Array<string>) {
   }
 }
 
-const initialState: { [index: string]: any } = {};
+const initialState: { [index: string]: Armor & Weapon & AdventuringGear } = {};
 
 export default function itemsReducer(state = initialState, action: ActionProps) {
   var newState = { ...state };
@@ -55,8 +55,8 @@ export default function itemsReducer(state = initialState, action: ActionProps) 
 
       return { ...newState }
 
-      case RESET_STORE:
-        return initialState
+    case RESET_STORE:
+      return initialState
 
     default:
       return state

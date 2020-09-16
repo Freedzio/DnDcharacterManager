@@ -1,4 +1,4 @@
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Features, Feature } from '../common/models/models';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Features, Feature, Weapon, AdventuringGear, Armor } from '../common/models/models';
 import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
 import mapForAccordionSake from '../common/functions/mapForAccordionSake';
@@ -32,8 +32,6 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const [ready, setReady] = useState<boolean>(false);
   const [featuresToChooseFrom, setFeaturesToChooseFrom] = useState<Array<Feature>>([]);
 
-  reactotron.log(featuresToChooseFrom)
-
   const classId = route.params.class
 
   const proficiencies = useSelector((store: StoreProps) => store.proficiencies)
@@ -48,7 +46,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const dispatch = useDispatch();
   const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
   const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
-  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+  const dispatchItems = (items: Array<Armor & Weapon & AdventuringGear>) => dispatch(addItems(items));
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
   const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features))
   const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));

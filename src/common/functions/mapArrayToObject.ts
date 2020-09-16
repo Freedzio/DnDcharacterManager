@@ -1,8 +1,12 @@
+import uuid from "react-native-uuid"
+
 export default function mapArrayToObject(arr: Array<any>) {
     return Array.from(arr).reduce((obj, item) => {
+        const id = uuid.v4();
+
         return obj = {
             ...obj,
-            [item.index as string]: item
+            [id + '_' + item.index]: item
         }
     }, {})
 }

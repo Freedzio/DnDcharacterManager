@@ -21,7 +21,7 @@ const initialState: Array<string> = [];
 
 export default function skillsReducer(state = initialState, action: ActionProps) {
   switch (action.type) {
-    case APPLY_CHARACTER:
+  case APPLY_CHARACTER:
       return action.payload.skills
 
     case ADD_SKILLS:

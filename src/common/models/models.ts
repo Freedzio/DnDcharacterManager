@@ -48,7 +48,7 @@ export interface Subrace {
 export interface EqItem {
     index: string,
     name: string,
-    euqipment_category: JustUrl,
+    equipment_category: JustUrl,
     weight: number,
     cost: {
         quantity: number,
@@ -84,6 +84,7 @@ export interface Weapon extends EqItem {
 export interface AdventuringGear extends EqItem {
     gear_category: JustUrl,
     quantity: number
+    contents: Array<{ item_url: string, quantity: number }>
 }
 
 export interface Damage {
