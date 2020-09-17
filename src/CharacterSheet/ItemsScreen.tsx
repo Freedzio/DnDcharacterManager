@@ -2,7 +2,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { Button, Container, Content, List, ListItem, Text, View } from 'native-base'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import reactotron from 'reactotron-react-native';
 import ScreenHeader from '../common/components/ScreenHeader';
 import { equipItem, unequipItem } from '../redux/equipped';
 import { StoreProps } from '../redux/store'
@@ -19,10 +18,23 @@ export default function ItemsScreen() {
   const dispatchUnequip = (item: string) => dispatch(unequipItem(item))
 
   async function onItemPress(item: string) {
-    if (equipped.includes(item)) dispatchUnequip(item)
-    else dispatchEquip(item);
-
-    AsyncStorage.setItem(id, JSON.stringify(store))
+    if (equipped.includes(item)) {
+      dispatchUnequip(item)
+      let temp = [...equipped];
+      await AsyncStorage.setItem(id, JSON.stringify({
+        ...store,
+        equipped: temp.filter(eqItem => eqItem !== item)
+      }))
+    }
+    else {
+      dispatchEquip(item);
+      let temp = [...equipped];
+      temp.push(item);
+      await AsyncStorage.setItem(id, JSON.stringify({
+        ...store,
+        equipped: temp
+      }))
+    }
   }
 
   return (
@@ -39,8 +51,8 @@ export default function ItemsScreen() {
           {
             equipped.map((item: string, index: number) =>
               <ListItem>
-                <Text style={{ flex: 1.5, fontWeight: "bold" }}>{items[item].name}</Text>
-                <Text style={{ flex: 1, fontWeight: "bold" }}>{items[item].equipment_category.name}</Text>
+                <Text style={{ flex: 1.5 }}>{items[item].name}</Text>
+                <Text style={{ flex: 1 }}>{items[item].equipment_category.name}</Text>
                 <View style={{ flex: 1 }} />
               </ListItem>
             )

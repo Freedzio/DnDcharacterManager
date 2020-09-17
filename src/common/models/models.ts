@@ -77,7 +77,7 @@ export interface Weapon extends EqItem {
         normal: number,
         long: number | null
     },
-    properties: JustUrl,
+    properties: Array<JustUrl>,
     '2h_damage': Damage
 }
 

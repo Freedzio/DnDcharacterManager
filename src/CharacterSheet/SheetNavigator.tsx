@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import React from 'react'
-import { BASIC_INFO_SCREEN, ITEMS_SCREEN, SKILLS_SCREEN } from '../common/constants/routeNames'
+import { ATTACKS_SCREEN, BASIC_INFO_SCREEN, ITEMS_SCREEN, SKILLS_SCREEN } from '../common/constants/routeNames'
+import AttacksScreen from './AttacksScreen'
 import BasicInfoScreen from './BasicInfoScreen'
 import ItemsScreen from './ItemsScreen'
 import SkillsScreen from './SkillsScreen'
@@ -14,6 +15,7 @@ export default function SheetNavigator() {
       <Tab.Screen name={BASIC_INFO_SCREEN} component={BasicInfoScreen} />
       <Tab.Screen name={SKILLS_SCREEN} component={SkillsScreen} />
       <Tab.Screen name={ITEMS_SCREEN} component={ItemsScreen} />
+      <Tab.Screen name={ATTACKS_SCREEN} component={AttacksScreen} />
     </Tab.Navigator>
   )
 }
