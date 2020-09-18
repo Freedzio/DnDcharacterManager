@@ -23,8 +23,8 @@ export default function BasicInfoScreen() {
   const items = useSelector((store: StoreProps) => store.items)
 
   function calculateArmorClass() {
-    if (Object.keys(features).includes('monk-unarmored-defense') && equipped.filter(item => items[item].equipment_category.index === 'armor').length === 0) return 10 + getAbilityModifier(abilityScores['DEX'].score) + getAbilityModifier(abilityScores['WIS'].score);
-    if (Object.keys(features).includes('barbarian-unarmored-defense') && equipped.filter(item => items[item].equipment_category.index === 'armor' && items[item].index !== 'shield').length === 0) return 10 + getAbilityModifier(abilityScores['DEX'].score) + getAbilityModifier(abilityScores['CON'].score);
+    if (Object.keys(features).includes('monk-unarmored-defense') && !equipped.some(item => items[item].equipment_category.index === 'armor')) return 10 + getAbilityModifier(abilityScores['DEX'].score) + getAbilityModifier(abilityScores['WIS'].score);
+    if (Object.keys(features).includes('barbarian-unarmored-defense') && !equipped.some(item => items[item].equipment_category.index === 'armor' && items[item].index !== 'shield')) return 10 + getAbilityModifier(abilityScores['DEX'].score) + getAbilityModifier(abilityScores['CON'].score);
 
     const equippedArmor = equipped.filter(item => items[item].equipment_category.index === 'armor' && items[item].index !== 'shield');
 
@@ -43,9 +43,13 @@ export default function BasicInfoScreen() {
 
         ac += items[item].armor_class.base;
 
-        const mod = getAbilityModifier(abilityScores['DEX'].score)
+        const mod = getAbilityModifier(abilityScores['DEX'].score);
 
-        if (items[item].armor_class.dex_bonus) ac += (mod > 2 ? 2 : (mod < 0 ? 0 : mod))
+        if (items[item].armor_class.dex_bonus && mod > 0) {
+          const maxBonus = items[item].armor_class.max_bonus
+          if (maxBonus === null) ac += mod
+          else ac += (mod > maxBonus ? maxBonus : mod);
+        }
       }
 
     return ac

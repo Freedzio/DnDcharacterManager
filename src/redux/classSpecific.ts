@@ -19,7 +19,7 @@ export default function classSpecificReducer(state = initialState, action: Actio
 
   switch (action.type) {
     case APPLY_CHARACTER:
-      return action.payload.classSpecific
+      return action.payload.classSpecifics
 
     case RESET_STORE:
       return initialState

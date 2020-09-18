@@ -22,6 +22,7 @@ import maxHPReducer from './maxHP';
 import equippedReducer from './equipped';
 import spellsReducer from './spells';
 import classSpecificReducer from './classSpecific';
+import spellcastingReducer from './spellcasting';
 
 const rootReducer = combineReducers({
     id: idReducer,
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
     expertises: expertiseReducer,
     features: featuresReducer,
     spells: spellsReducer,
+    spellcasting: spellcastingReducer,
     classSpecifics: classSpecificReducer,
     snapshot: snapshotReducer
 });

@@ -17,11 +17,16 @@ export default function AttacksScreen() {
     const splittedID = item.split('_');
     const pureItem = splittedID[splittedID.length - 1];
 
-    const hasProf = Object.keys(proficiencies).includes(pureItem) || Object.keys(proficiencies).includes(items[item].weapon_category);
+    const hasProf = JSON.stringify(Object.keys(proficiencies)).includes(pureItem) || JSON.stringify(Object.keys(proficiencies).includes(items[item].weapon_category));
     const STR = getAbilityModifier(abilityScores['STR'].score);
     const DEX = getAbilityModifier(abilityScores['DEX'].score);
 
-    return hasProf ? profBonus : 0 + (items[item].properties.some(prop => prop.index === 'finesse') ? determineHigherMod() : STR)
+    let rollModifier = 0;
+    if (hasProf) rollModifier += profBonus;
+
+    if(items[item].weapon_range === 'Ranged') return rollModifier + DEX;
+    if (items[item].properties.some(prop => prop.index === 'finesse')) return rollModifier + determineHigherMod();
+    return rollModifier + STR    
   }
 
   function determineHigherMod() {
