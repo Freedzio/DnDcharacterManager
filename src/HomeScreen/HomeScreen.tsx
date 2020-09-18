@@ -87,7 +87,7 @@ export default function HomeScreen({ navigation }: any) {
                 </LoadingContainer>
             </Content>
             <Fab active={fabActive} onPress={toggleFab} direction='up'>
-                <Icon name='add-circle-outline' />
+                <Icon type='Ionicons' name='alarm' />
                 <Button onPress={startCreation}>
                     <Icon name='beaker' />
                 </Button>

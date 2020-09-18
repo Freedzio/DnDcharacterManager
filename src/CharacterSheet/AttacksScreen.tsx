@@ -3,6 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import ScreenHeader from '../common/components/ScreenHeader';
 import getAbilityModifier from '../common/functions/getAbilityModifier';
+import renderPlusOrMinus from '../common/functions/renderPlusOrMinus';
 import { StoreProps } from '../redux/store';
 
 export default function AttacksScreen() {
@@ -36,11 +37,6 @@ export default function AttacksScreen() {
     return `${dmgRoll.damage_dice} + ${items[item].properties.some(prop => prop.index === 'finesse') ? determineHigherMod() : getAbilityModifier(abilityScores['STR'].score)} ${dmgRoll.damage_type.name}`
   }
 
-  function renderPlusOrMinus(mod: number) {
-    return mod > 0 ? `+${mod}` : mod
-
-  }
-
   function getUnarmedMod(a: number, b: number) {
     return a + b;
   }
@@ -51,9 +47,9 @@ export default function AttacksScreen() {
         <ScreenHeader title="WEAPON ATTACKS" />
         <List>
           <ListItem>
-            <Text style={{ flex: 1 }}>Weapon</Text>
-            <Text style={{ flex: 1 }}>Modifier</Text>
-            <Text style={{ flex: 1 }}>Damage</Text>
+            <Text style={{ flex: 1, fontWeight: 'bold' }}>Weapon</Text>
+            <Text style={{ flex: 1, fontWeight: 'bold' }}>Modifier</Text>
+            <Text style={{ flex: 1, fontWeight: 'bold' }}>Damage</Text>
           </ListItem>
           <ListItem>
             <Text style={{ flex: 1 }}>Unarmed strikes</Text>

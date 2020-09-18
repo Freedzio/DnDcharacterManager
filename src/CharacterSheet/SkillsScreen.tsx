@@ -11,6 +11,7 @@ import { addExpertises, deleteExpertises } from '../redux/expertises'
 import { addSkills, deleteSkills } from '../redux/skills'
 import { StoreProps } from '../redux/store'
 import _ from 'lodash'
+import renderPlusOrMinus from '../common/functions/renderPlusOrMinus'
 
 export default function SkillsScreen() {
   const [editing, setEditing] = useState<boolean>(false);
@@ -43,7 +44,7 @@ export default function SkillsScreen() {
     if (expertises.includes(skill)) bonus = basicInfo.proficiencyBonus * 2
     else if (skills.includes(skill)) bonus = basicInfo.proficiencyBonus
 
-    return baseModifier + bonus
+    return renderPlusOrMinus(baseModifier + bonus)
   }
 
   function parseSkillName(skill: string) {
@@ -82,7 +83,7 @@ export default function SkillsScreen() {
                 <Card style={{ width: getDimensions().width / 3 - 10, height: 90 }} key={index}>
                   <Text style={{ fontWeight: 'bold', textAlign: "center", fontSize: 20 }}>{ability}</Text>
                   <Text style={{ textAlign: "center", fontSize: 30 }}>{abilityScores[ability].score}</Text>
-                  <Text style={{ textAlign: 'center', fontSize: 20 }}>{`${modifier > 0 ? '+' : ''}${modifier}`}</Text>
+                  <Text style={{ textAlign: 'center', fontSize: 20 }}>{renderPlusOrMinus(modifier)}</Text>
                 </Card>
               )
             })
@@ -101,7 +102,7 @@ export default function SkillsScreen() {
                 <ListItem key={index}>
                   <Text style={{ flex: 1.5 }}>{ability}</Text>
                   <Text style={{ flex: 2, fontWeight: hasProf ? 'bold' : 'normal' }}>{abilityScores[ability].proficiency ? 'YES' : 'NO'}</Text>
-                  <Text style={{ flex: 1 }}>{getAbilityModifier(abilityScores[ability].score) + (abilityScores[ability].proficiency ? basicInfo.proficiencyBonus : 0)}</Text>
+                  <Text style={{ flex: 1, fontWeight: 'bold' }}>{renderPlusOrMinus(getAbilityModifier(abilityScores[ability].score) + (abilityScores[ability].proficiency ? basicInfo.proficiencyBonus : 0))}</Text>
                 </ListItem>
               )
             })

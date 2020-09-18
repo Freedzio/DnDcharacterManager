@@ -32,19 +32,21 @@ export default function BasicInfoScreen() {
 
     let ac = 0;
 
-    if (equipped.filter(item => items[item].index === 'shield').length > 0) ac += 2;
+    if (equipped.some(item => items[item].index === 'shield')) ac += 2;
+    if (Object.keys(features).some(feat => feat.includes('fighting-style-defense'))) ac += 1;
+    if (features)
 
-    for (let i = 0; i < equippedArmor.length; i++) {
-      if (Object.keys(features).includes('fighting-style-defense')) ac++;
+      for (let i = 0; i < equippedArmor.length; i++) {
+        if (Object.keys(features).includes('fighting-style-defense')) ac++;
 
-      const item = equippedArmor[i];
+        const item = equippedArmor[i];
 
-      ac += items[item].armor_class.base;
+        ac += items[item].armor_class.base;
 
-      const mod = getAbilityModifier(abilityScores['DEX'].score)
+        const mod = getAbilityModifier(abilityScores['DEX'].score)
 
-      if (items[item].armor_class.dex_bonus) ac += (mod > 2 ? 2 : (mod < 0 ? 0 : mod))
-    }
+        if (items[item].armor_class.dex_bonus) ac += (mod > 2 ? 2 : (mod < 0 ? 0 : mod))
+      }
 
     return ac
   }
