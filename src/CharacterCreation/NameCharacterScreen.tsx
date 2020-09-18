@@ -13,8 +13,6 @@ import { HOME_SCREEN } from '../common/constants/routeNames';
 import getAbilityModifier from '../common/functions/getAbilityModifier';
 import apiWrapper from '../common/functions/apiWrapper';
 import { baseForDescriptionSake } from '../common/constants/ApiConfig';
-import { AdventuringGear, Armor, Weapon } from '../common/models/models';
-import { addItems, deleteItems } from '../redux/items';
 import mapArrayToObject from '../common/functions/mapArrayToObject';
 
 export default function NameCharacterScreen({ navigation }: any) {
@@ -31,8 +29,6 @@ export default function NameCharacterScreen({ navigation }: any) {
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
   const dispatchName = (name: string) => dispatch(addName(name));
   const dispatchResetStore = () => dispatch(resetStore());
-  const dispatchItems = (items: Array<Armor & Weapon & AdventuringGear>) => dispatch(addItems(items))
-  const dispatchDeleteItems = (items: Array<string>) => dispatch(deleteItems(items))
 
   useEffect(() => {
     navigation.addListener('beforeRemove', () => {
@@ -133,6 +129,9 @@ export default function NameCharacterScreen({ navigation }: any) {
         ...tempItems,
         ...newItems
       },
+      spells: {},
+      spellcasting: store.spellcasting,
+      classSpecifics: store.classSpecifics,
       maxHP: store.maxHP + (CON < 0 ? 0 : CON)
     };
     dispatchLoading(true);

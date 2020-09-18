@@ -201,29 +201,32 @@ export interface ChooseEquipmentFromList {
     }
 }
 
-export interface Features {
+export interface LevelFeatures {
     level: number
     ability_score_bonuses: number
     prof_bonus: number
     features: Array<JustUrl>
     feature_choices: Array<JustUrl>
-    spellcasting: {
-        cantrips_known?: number
-        spell_slots_level_1?: number
-        spell_slots_level_2?: number
-        spell_slots_level_3?: number
-        spell_slots_level_4?: number
-        spell_slots_level_5?: number
-        spell_slots_level_6?: number
-        spell_slots_level_7?: number
-        spell_slots_level_8?: number
-        spell_slots_level_9?: number
-    }
-    class_specific: any
+    spellcasting?: Spellcasting
+    class_specific: ClassSpecific
     index: string
     class: JustUrl
     url: string
 };
+
+export interface Spellcasting {
+    cantrips_known: number
+    spell_slots_level_1: number
+    spell_slots_level_2: number
+    spell_slots_level_3: number
+    spell_slots_level_4: number
+    spell_slots_level_5: number
+    spell_slots_level_6?: number
+    spell_slots_level_7?: number
+    spell_slots_level_8?: number
+    spell_slots_level_9?: number
+
+}
 
 export interface Feature {
     index: string
@@ -234,6 +237,32 @@ export interface Feature {
     url: string
     choice: ChoosingOptions
 };
+
+export interface Spell {
+    index: string
+    name: string
+    desc: Array<string>
+    higher_level: Array<string>
+    range: string
+    components: Array<string>
+    material: string
+    ritual: boolean
+    duration: string
+    concentration: boolean
+    casting_time: string
+    level: number
+    attack_type: string
+    damage: {
+        damage_type: JustUrl,
+        damage_at_slot_level: {
+            [slot: string]: string
+        }
+    }
+    school: JustUrl
+    classes: Array<JustUrl>
+    subclasses: Array<JustUrl>
+    url: string
+}
 
 export interface Character {
     id: string
@@ -269,5 +298,70 @@ export interface Character {
         [key: string]: Armor | Weapon
     }
 }
+
+export interface BarbarianSpecific {
+    rage_count: number,
+    rage_damage_bonus: number,
+    brutal_critical_dice: number
+}
+
+export interface BardSpecific {
+    bardic_inspiration_die: number,
+    song_of_rest_die: number,
+    magical_secrets_max_5: number,
+    magical_secrets_max_7: number,
+    magical_secrets_max_9: number
+}
+export interface ClericSpecific {
+    channel_divinity_charges: number,
+    destroy_undead_cr: number
+}
+export interface DruidSpecific {
+    wild_shape_max_cr: number,
+    wild_shape_swim: boolean,
+    wild_shape_fly: boolean
+}
+export interface FighterSpecific {
+    action_surges: number,
+    indomitable_uses: number,
+    extra_attacks: number
+}
+export interface MonkSpecific {
+    martial_arts: {
+        dice_count: number,
+        dice_value: number
+    },
+    ki_points: number,
+    unarmored_movement: number
+}
+export interface PaladinSpecific {
+    aura_range: number
+}
+export interface RangerSpecific {
+    favored_enemies: number,
+    favored_terrain: number
+}
+export interface RogueSpecific {
+    sneak_attack: {
+        dice_count: number,
+        dice_value: number
+    }
+}
+export interface SorcererSpecific {
+    sorcery_points: number,
+    metamagic_known: number
+}
+export interface WarlockSpecific {
+    invocations_known: number,
+    mystic_arcanum_level_6: number,
+    mystic_arcanum_level_7: number,
+    mystic_arcanum_level_8: number,
+    mystic_arcanum_level_9: number
+}
+export interface WizardSpecific {
+    arcane_recovery_levels: number
+}
+
+export interface ClassSpecific extends BardSpecific, BarbarianSpecific, ClericSpecific, DruidSpecific, FighterSpecific, MonkSpecific, PaladinSpecific, RogueSpecific, RangerSpecific, SorcererSpecific, WarlockSpecific, WizardSpecific { }
 
 export interface AbilityBonuses extends AbilityScores { }

@@ -1,4 +1,4 @@
-import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character, Armor, Weapon, AdventuringGear } from '../common/models/models';
+import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character, Armor, Weapon, AdventuringGear, Spell, ClassSpecific, Spellcasting } from '../common/models/models';
 import basicInfoReducer, { BasicInfo } from './basicInfo';
 import { createStore, combineReducers } from 'redux';
 import proficienciesReducer from './proficiencies';
@@ -20,6 +20,8 @@ import { APPLY_CHARACTER, RESET_STORE } from '../common/constants/storeCommons';
 import idReducer from './id';
 import maxHPReducer from './maxHP';
 import equippedReducer from './equipped';
+import spellsReducer from './spells';
+import classSpecificReducer from './classSpecific';
 
 const rootReducer = combineReducers({
     id: idReducer,
@@ -39,7 +41,9 @@ const rootReducer = combineReducers({
     skills: skillsReducer,
     expertises: expertiseReducer,
     features: featuresReducer,
-    snapshot: snapshotReducer,
+    spells: spellsReducer,
+    classSpecifics: classSpecificReducer,
+    snapshot: snapshotReducer
 });
 
 const store = createStore(rootReducer, reactotron.createEnhancer());
@@ -66,6 +70,12 @@ export interface StoreProps {
         [key: string]: number
     }
     loading: boolean
+    spells: {
+        [key: string]: Spell
+    }
+    spellcasting: {
+        [classId: string]: Spellcasting
+    }
     items: {
         [index: string]: Armor & Weapon & AdventuringGear
     }
@@ -75,6 +85,7 @@ export interface StoreProps {
     features: {
         [index: string]: Feature
     }
+    classSpecifics: ClassSpecific
     snapshot: StoreProps
 }
 
