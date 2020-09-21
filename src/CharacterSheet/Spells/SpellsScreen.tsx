@@ -1,6 +1,5 @@
 import { Container, Content, Fab, Icon, List, ListItem, Text, View } from 'native-base'
 import React, { useEffect, useState } from 'react'
-import { StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
 import ScreenHeader from '../../common/components/ScreenHeader'
 import { SPELLS_CHOOSE_SCREEN } from '../../common/constants/routeNames'
@@ -10,6 +9,7 @@ import _ from 'lodash'
 import getAbilityModifier from '../../common/functions/getAbilityModifier'
 import renderPlusOrMinus from '../../common/functions/renderPlusOrMinus'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { spellStyle } from '../../common/styles/styles'
 
 const initialState = {
   '0': 0,
@@ -82,60 +82,60 @@ export default function SpellsScreen({ navigation }: any) {
           spellcasting === {} ? <Text style={{ fontSize: 30, textAlign: "center" }}>You cannot cast spells!</Text> :
             <List>
               <ListItem>
-                <Text style={styles.columnNames}>Name</Text>
-                <Text style={styles.columnNames}>Modifier</Text>
-                <Text style={styles.columnNames}>Damage</Text>
-                <Text style={styles.columnNames}>Damage type</Text>
-                <Text style={styles.columnNames}>Range</Text>
+                <Text style={spellStyle.columnNames}>Name</Text>
+                <Text style={spellStyle.columnNames}>Modifier</Text>
+                <Text style={spellStyle.columnNames}>Damage</Text>
+                <Text style={spellStyle.columnNames}>Damage type</Text>
+                <Text style={spellStyle.columnNames}>Range</Text>
               </ListItem>
               <ListItem>
-                <Text style={styles.columnNames}>Casting time</Text>
-                <Text style={styles.columnNames}>Duration</Text>
-                <Text style={styles.columnNames}>Components</Text>
-                <Text style={styles.columnNames}>DC</Text>
-                <Text style={styles.columnNames}>On save</Text>
+                <Text style={spellStyle.columnNames}>Casting time</Text>
+                <Text style={spellStyle.columnNames}>Duration</Text>
+                <Text style={spellStyle.columnNames}>Components</Text>
+                <Text style={spellStyle.columnNames}>DC</Text>
+                <Text style={spellStyle.columnNames}>On save</Text>
               </ListItem>
               {
                 Object.keys(spellSlots).map((level: string, index: number) =>
-                  <>
+                  <View key={index}>
                     <ListItem>
-                      <Text style={styles.levelHeader}>{level === '0' ? `Cantrips (${spellSlots[level]} known)` : `Level ${level} spells (${spellSlots[level]} slots)`} </Text>
+                      <Text style={spellStyle.levelHeader}>{level === '0' ? `Cantrips (${spellSlots[level]} known)` : `Level ${level} spells (${spellSlots[level]} slots)`} </Text>
                     </ListItem>
                     {
                       Object.keys(spells).filter(spell => spells[spell].level === parseInt(level)).map((spell: string, index: number) =>
-                        <TouchableOpacity onPress={() => onSpellPress(spell)}>
+                        <TouchableOpacity onPress={() => onSpellPress(spell)} key={index}>
                           <ListItem style={{ borderTopWidth: 2 }}>
-                            <Text style={styles.spellMain}>{spells[spell].name}</Text>
-                            <Text style={styles.spellMain}>{spells[spell].attack_type ? renderPlusOrMinus(getAbilityModifier(abilityScores[spells[spell].spellcasting_ability].score) + profBonus) : '---'} </Text>
-                            <Text style={styles.spellMain}>{spells[spell].damage ? (spells[spell].level > 0 ? spells[spell].damage.damage_at_slot_level[parseInt(level)] : getCantripDamage(spells[spell])) : '---'}</Text>
-                            <Text style={styles.spellMain}>{spells[spell].damage ? spells[spell].damage.damage_type.name : '---'} </Text>
-                            <Text style={styles.spellMain}>{spells[spell].range} </Text>
+                            <Text style={spellStyle.spellMain}>{spells[spell].name}</Text>
+                            <Text style={spellStyle.spellMain}>{spells[spell].attack_type ? renderPlusOrMinus(getAbilityModifier(abilityScores[spells[spell].spellcasting_ability].score) + profBonus) : '---'} </Text>
+                            <Text style={spellStyle.spellMain}>{spells[spell].damage ? (spells[spell].level > 0 ? spells[spell].damage.damage_at_slot_level[parseInt(level)] : getCantripDamage(spells[spell])) : '---'}</Text>
+                            <Text style={spellStyle.spellMain}>{spells[spell].damage ? spells[spell].damage.damage_type.name : '---'} </Text>
+                            <Text style={spellStyle.spellMain}>{spells[spell].range} </Text>
                           </ListItem>
                           <ListItem style={{ borderBottomWidth: 2 }} >
-                            <Text style={styles.spellSub}>{spells[spell].casting_time}</Text>
-                            <Text style={styles.spellSub}>{spells[spell].duration}</Text>
-                            <Text style={styles.spellSub}>{spells[spell].components.join(', ')}</Text>
-                            <Text style={styles.spellSub}>{spells[spell].dc ? `${spells[spell].dc.dc_type.name} ${8 + profBonus + getAbilityModifier(abilityScores[spells[spell].spellcasting_ability].score)}` : '---'}</Text>
-                            <Text style={styles.spellSub}>{spells[spell].dc ? spells[spell].dc.dc_success : '---'}</Text>
+                            <Text style={spellStyle.spellSub}>{spells[spell].casting_time}</Text>
+                            <Text style={spellStyle.spellSub}>{spells[spell].duration}</Text>
+                            <Text style={spellStyle.spellSub}>{spells[spell].components.join(', ')}</Text>
+                            <Text style={spellStyle.spellSub}>{spells[spell].dc ? `${spells[spell].dc.dc_type.name} ${8 + profBonus + getAbilityModifier(abilityScores[spells[spell].spellcasting_ability].score)}` : '---'}</Text>
+                            <Text style={spellStyle.spellSub}>{spells[spell].dc ? spells[spell].dc.dc_success : '---'}</Text>
                           </ListItem>
                           {
                             chosenSpell === spell &&
                             <View>
                               {
                                 spells[spell].desc.map((desc: string, index: number) =>
-                                  <Text style={styles.desc}>{desc}</Text>
+                                  <Text style={spellStyle.desc}>{desc}</Text>
                                 )
                               }
                               {
                                 spells[spell].higher_level &&
-                                <Text style={styles.desc}>{spells[spell].higher_level}</Text>
+                                <Text style={spellStyle.desc}>{spells[spell].higher_level}</Text>
                               }
                             </View>
                           }
                         </TouchableOpacity>
                       )
                     }
-                  </>
+                  </View>
                 )
               }
             </List>
@@ -147,31 +147,3 @@ export default function SpellsScreen({ navigation }: any) {
     </Container>
   )
 }
-
-const styles = StyleSheet.create({
-  levelHeader: {
-    fontSize: 24,
-    fontWeight: 'bold'
-  },
-  columnNames: {
-    textAlign: "center",
-    fontWeight: 'bold',
-    flex: 1
-  },
-  spellMain: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: 'bold'
-  },
-  spellSub: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 14
-  },
-  desc: {
-    fontSize: 16,
-    marginVertical: 5,
-    marginHorizontal: 10
-  }
-})

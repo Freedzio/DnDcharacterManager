@@ -158,8 +158,8 @@ export default function ChooseRaceScreen({ navigation }: any) {
                             races.map((race, index) => {
                                 const selected = index === selectedRaceIndex
                                 return (
-                                    <>
-                                        <TouchableOpacity key={race} onPress={() => onRacePress(race.toLowerCase(), index)}>
+                                    <View key={index}>
+                                        <TouchableOpacity onPress={() => onRacePress(race.toLowerCase(), index)}>
                                             <ListItem selected={selected}>
                                                 <Body>
                                                     <Text style={{ fontWeight: selected ? 'bold' : 'normal' }}>
@@ -182,7 +182,7 @@ export default function ChooseRaceScreen({ navigation }: any) {
                                                     )}
                                             </List>
                                         </View>
-                                    </>
+                                    </View>
                                 )
                             })
                         }

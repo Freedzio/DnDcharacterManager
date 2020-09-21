@@ -1,13 +1,15 @@
 import AsyncStorage from '@react-native-community/async-storage';
-import { Button, Container, Content, List, ListItem, Text, View } from 'native-base'
+import { Button, Container, Content, Fab, Icon, List, ListItem, Text, View } from 'native-base'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import ScreenHeader from '../common/components/ScreenHeader';
-import { equipItem, unequipItem } from '../redux/equipped';
-import { decreaseQuantity, DECREASE_QUANTITY, increaseQuantity, INCREASE_QUANTITY } from '../redux/items';
-import { StoreProps } from '../redux/store'
+import ScreenHeader from '../../common/components/ScreenHeader';
+import { ADD_ITEMS_SCREEN } from '../../common/constants/routeNames';
+import { spellStyle } from '../../common/styles/styles';
+import { equipItem, unequipItem } from '../../redux/equipped';
+import { decreaseQuantity, DECREASE_QUANTITY, deleteItem, DELETE_ITEM, increaseQuantity, INCREASE_QUANTITY } from '../../redux/items';
+import { StoreProps } from '../../redux/store'
 
-export default function ItemsScreen() {
+export default function ItemsScreen({ navigation }: any) {
   const equipped = useSelector((store: StoreProps) => store.equipped);
   const name = useSelector((store: StoreProps) => store.name);
   const items = useSelector((store: StoreProps) => store.items)
@@ -17,8 +19,9 @@ export default function ItemsScreen() {
   const dispatch = useDispatch();
   const dispatchEquip = (item: string) => dispatch(equipItem(item));
   const dispatchUnequip = (item: string) => dispatch(unequipItem(item));
-  const dispatchIncrease = (item: string) => dispatch(increaseQuantity(item))
-  const dispatchDecrease = (item: string) => dispatch(decreaseQuantity(item))
+  const dispatchIncrease = (item: string) => dispatch(increaseQuantity(item));
+  const dispatchDecrease = (item: string) => dispatch(decreaseQuantity(item));
+  const dispatchDeleteItem = (item: string) => dispatch(deleteItem(item));
 
   async function onItemPress(item: string) {
     if (equipped.includes(item)) {
@@ -64,6 +67,22 @@ export default function ItemsScreen() {
         }
       }
     }))
+  };
+
+  async function onDeleteItem(item: string) {
+    dispatchDeleteItem(item);
+    dispatchUnequip(item);
+
+    let newItems = store.items;
+    delete newItems[item]
+
+    await AsyncStorage.setItem(id, JSON.stringify({
+      ...store,
+      items: {
+        ...newItems
+      },
+      equipped: store.equipped.filter(eq => eq !== item)
+    }))
   }
 
   return (
@@ -73,16 +92,16 @@ export default function ItemsScreen() {
         <Text style={{ fontSize: 30 }}>Equipped</Text>
         <List>
           <ListItem>
-            <Text style={{ flex: 1.5, fontWeight: "bold" }}>Name</Text>
-            <Text style={{ flex: 1, fontWeight: "bold" }}>Type</Text>
-            <View style={{ flex: 1 }} />
+            <Text style={spellStyle.columnNames}>Name</Text>
+            <Text style={spellStyle.columnNames}>Type</Text>
+            <View style={{ flex: 2 }} />
           </ListItem>
           {
             equipped.map((item: string, index: number) =>
-              <ListItem>
-                <Text style={{ flex: 1.5 }}>{items[item].name}</Text>
-                <Text style={{ flex: 1 }}>{items[item].equipment_category.name}</Text>
-                <View style={{ flex: 1 }} />
+              <ListItem key={index}>
+                <Text style={spellStyle.spellSub}>{items[item].name}</Text>
+                <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
+                <View style={{ flex: 2 }} />
               </ListItem>
             )
           }
@@ -90,16 +109,16 @@ export default function ItemsScreen() {
         <Text style={{ fontSize: 30 }}>Backpack</Text>
         <List>
           <ListItem>
-            <Text style={{ flex: 1.5, fontWeight: "bold" }}>Name</Text>
-            <Text style={{ flex: 1, fontWeight: "bold" }}>Type</Text>
-            <View style={{ flex: 1 }} />
+            <Text style={spellStyle.columnNames}>Name</Text>
+            <Text style={spellStyle.columnNames}>Type</Text>
+            <View style={{ flex: 2 }} />
           </ListItem>
           {
             Object.keys(items).map((item: string, index: number) =>
               <ListItem key={index}>
-                <Text style={{ flex: 1.5 }}>{items[item].name} {items[item].quantity ? `(${items[item].quantity})` : ''} </Text>
-                <Text style={{ flex: 1 }}>{items[item].equipment_category.name}</Text>
-                <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }} >
+                <Text style={spellStyle.spellSub}>{items[item].name} {items[item].quantity ? `(${items[item].quantity})` : ''} </Text>
+                <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
+                <View style={{ flex: 2, justifyContent: "space-around", flexDirection: 'row' }} >
                   {
                     (items[item].equipment_category.index === 'armor' || items[item].equipment_category.index === 'weapon') &&
                     <Button bordered={!equipped.includes(item)} onPress={() => onItemPress(item)}>
@@ -118,11 +137,19 @@ export default function ItemsScreen() {
                     </>
                   }
                 </View>
+                <View style={{ flex: 1 }}>
+                  <Button onPress={() => onDeleteItem(item)}>
+                    <Text>delete</Text>
+                  </Button>
+                </View>
               </ListItem>
             )
           }
         </List>
       </Content>
+      <Fab onPress={() => navigation.navigate(ADD_ITEMS_SCREEN)}>
+        <Icon name='add' />
+      </Fab>
     </Container>
   )
 }

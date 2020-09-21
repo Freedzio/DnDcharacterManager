@@ -20,7 +20,6 @@ import { addProficiencies } from '../redux/proficiencies';
 import { addItems } from '../redux/items';
 import filterList from '../common/functions/filterList';
 import { addFeatures } from '../redux/features';
-import reactotron from '../../ReactotronConfig';
 import { setSpellcastingData } from '../redux/spellcasting';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
@@ -32,6 +31,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const [classData, setClassData] = useState<CharacterClass>();
   const [ready, setReady] = useState<boolean>(false);
   const [featuresToChooseFrom, setFeaturesToChooseFrom] = useState<Array<Feature>>([]);
+  const [chosenListItem, setChosenListItem] = useState<string>('');
 
   const classId = route.params.class
 
@@ -42,7 +42,6 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const store = useSelector((store: StoreProps) => store);
 
   const filteredProficiencies = filterProficiencies(proficiencies);
-  const mappedProficiencies = mapForAccordionSake(filteredProficiencies);
 
   const dispatch = useDispatch();
   const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
@@ -285,13 +284,19 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
             description={`Add your proficiency bonus on ${classData?.saving_throws.map(item => item.name).join(', ')} saving throws`} />
           <Section
             title='Class proficiencies'
-            listedData={mappedProficiencies}
+            listedData={filteredProficiencies}
+            chosenListItem={chosenListItem}
+            listItemCallback={setChosenListItem}
           />
           {
             classData && classData.proficiency_choices.map((setOfChoices: ChoosingOptions, index1: number) =>
               renderPickersForSegment(setOfChoices, index1, chosenProficiencies, setChosenProficiencies, 'Choose class proficiencies')
             )}
-          <Section title='Class features' listedData={mapFeaturesDescription(features)} />
+          <Section title='Class features'
+            listedData={features}
+            chosenListItem={chosenListItem}
+            listItemCallback={setChosenListItem}
+          />
           {
             featuresToChooseFrom.length > 0 && featureData.feature_choices?.map((choice: JustUrl, index: number) =>
               renderPickersForSegment(featuresToChooseFrom.filter(item => item.index === choice.index)[0].choice, index, chosenFeatures, setChosenFeatures, 'Choose class features')
@@ -299,7 +304,12 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           }
           {
             spellcasting &&
-            <Section title='Spellcasting' listedData={mapDescription(spellcasting.info)} />
+            <Section
+              title='Spellcasting'
+              spellcastingData={spellcasting.info}
+              chosenListItem={chosenListItem}
+              listItemCallback={setChosenListItem}
+            />
           }
           {
             startingEquipment &&

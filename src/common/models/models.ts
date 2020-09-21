@@ -118,6 +118,7 @@ export interface Proficiency {
     index: string,
     type: string,
     name: string
+    desc: Array<string>
     classes: Array<JustUrl>
     races: Array<JustUrl>,
     url: string,

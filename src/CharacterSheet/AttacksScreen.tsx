@@ -1,9 +1,11 @@
-import { Container, Content, List, ListItem, Text } from 'native-base';
+import { Container, Content, List, ListItem, Text, View } from 'native-base';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import ScreenHeader from '../common/components/ScreenHeader';
 import getAbilityModifier from '../common/functions/getAbilityModifier';
 import renderPlusOrMinus from '../common/functions/renderPlusOrMinus';
+import { JustUrl } from '../common/models/models';
+import { spellStyle } from '../common/styles/styles';
 import { StoreProps } from '../redux/store';
 
 export default function AttacksScreen() {
@@ -24,9 +26,9 @@ export default function AttacksScreen() {
     let rollModifier = 0;
     if (hasProf) rollModifier += profBonus;
 
-    if(items[item].weapon_range === 'Ranged') return rollModifier + DEX;
+    if (items[item].weapon_range === 'Ranged') return rollModifier + DEX;
     if (items[item].properties.some(prop => prop.index === 'finesse')) return rollModifier + determineHigherMod();
-    return rollModifier + STR    
+    return rollModifier + STR
   }
 
   function determineHigherMod() {
@@ -52,22 +54,34 @@ export default function AttacksScreen() {
         <ScreenHeader title="WEAPON ATTACKS" />
         <List>
           <ListItem>
-            <Text style={{ flex: 1, fontWeight: 'bold' }}>Weapon</Text>
-            <Text style={{ flex: 1, fontWeight: 'bold' }}>Modifier</Text>
-            <Text style={{ flex: 1, fontWeight: 'bold' }}>Damage</Text>
+            <Text style={spellStyle.columnNames}>Weapon</Text>
+            <Text style={spellStyle.columnNames}>Modifier</Text>
+            <Text style={spellStyle.columnNames}>Damage</Text>
+            <Text style={spellStyle.columnNames}>Range</Text>
           </ListItem>
           <ListItem>
-            <Text style={{ flex: 1 }}>Unarmed strikes</Text>
-            <Text style={{ flex: 1 }}>{renderPlusOrMinus(getUnarmedMod(profBonus, getAbilityModifier(abilityScores['STR'].score)))}</Text>
-            <Text style={{ flex: 1 }}>{1 + getAbilityModifier(abilityScores['STR'].score)} Bludgeoning</Text>
+            <Text style={spellStyle.spellMain}>Unarmed strikes</Text>
+            <Text style={spellStyle.spellMain}>{renderPlusOrMinus(getUnarmedMod(profBonus, getAbilityModifier(abilityScores['STR'].score)))}</Text>
+            <Text style={spellStyle.spellMain}>{1 + getAbilityModifier(abilityScores['STR'].score)} Bludgeoning</Text>
+            <Text style={spellStyle.spellMain}>Melee</Text>
           </ListItem>
           {
-            equipped.filter(item => items[item].equipment_category.index === 'weapon').map((item: string) =>
-              <ListItem>
-                <Text style={{ flex: 1 }}>{items[item].name}</Text>
-                <Text style={{ flex: 1 }}>{renderPlusOrMinus(getRollModifier(item))}</Text>
-                <Text style={{ flex: 1 }}>{getDamage(item)}</Text>
-              </ListItem>
+            equipped.filter(item => items[item].equipment_category.index === 'weapon').map((item: string, index: number) =>
+              <View key={index}>
+                <ListItem>
+                  <Text style={spellStyle.spellMain}>{items[item].name}</Text>
+                  <Text style={spellStyle.spellMain}>{renderPlusOrMinus(getRollModifier(item))}</Text>
+                  <Text style={spellStyle.spellMain}>{getDamage(item)}</Text>
+                  <Text style={spellStyle.spellMain}>{items[item].weapon_range === 'Melee' ? items[item].weapon_range : `${items[item].range.normal} / ${items[item].range.long}`}</Text>
+                </ListItem>
+                <ListItem>
+                  {
+                    items[item].properties.map((property: JustUrl, index: number) =>
+                      <Text style={spellStyle.spellSub}>{property.name} </Text>
+                    )
+                  }
+                </ListItem>
+              </View>
             )
           }
         </List>

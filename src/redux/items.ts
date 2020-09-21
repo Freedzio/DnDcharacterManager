@@ -1,6 +1,6 @@
 import { ActionProps } from "./store";
 import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
-import mapArrayToObject from "../common/functions/mapArrayToObject";
+import { mapArrayToObject } from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 import { AdventuringGear, Armor, EqItem, FinalItem, Weapon } from "../common/models/models";
 
@@ -10,7 +10,8 @@ export const ADVENTURING = 'ADVENTURING';
 export const TOOLS = 'TOOLS';
 
 export const ADD_ITEMS = 'ADD_ITEMS';
-export const DELETE_ITEMS = 'DELETE_ITEMS';
+export const ADD_SINGLE_ITEM = 'ADD_SINGLE_ITEM';
+export const DELETE_ITEM = 'DELETE_ITEM';
 export const INCREASE_QUANTITY = 'INCREASE_QUANTITY'
 export const DECREASE_QUANTITY = 'DECREASE_QUANTITY'
 
@@ -35,9 +36,16 @@ export function decreaseQuantity(payload: string) {
   }
 }
 
-export function deleteItems(payload: Array<string>) {
+export function deleteItem(payload: string) {
   return {
-    type: DELETE_ITEMS,
+    type: DELETE_ITEM,
+    payload: payload
+  }
+}
+
+export function addSingleItem(payload: { [key: string]: FinalItem }) {
+  return {
+    type: ADD_SINGLE_ITEM,
     payload: payload
   }
 }
@@ -64,11 +72,14 @@ export default function itemsReducer(state = initialState, action: ActionProps) 
 
       return { ...newState }
 
-    case DELETE_ITEMS:
-      for (let i = 0; i < action.payload.length; i++) {
-        delete newState[action.payload[i]]
+    case ADD_SINGLE_ITEM:
+      return {
+        ...newState,
+        ...action.payload
       }
 
+    case DELETE_ITEM:
+      delete newState[action.payload]
       return { ...newState }
 
     case DECREASE_QUANTITY:

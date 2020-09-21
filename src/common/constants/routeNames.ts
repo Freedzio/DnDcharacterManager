@@ -12,7 +12,9 @@ export const CHOOSE_CLASS_FEATURES = 'ChooseClassFeatures';
 
 export const BASIC_INFO_SCREEN = 'BasicInfoScreen';
 export const SKILLS_SCREEN = 'SkillsScreen';
+export const ITEMS_NAVIGATOR = 'ItemsNavigator';
 export const ITEMS_SCREEN = 'ItemsScreen';
+export const ADD_ITEMS_SCREEN = 'AddItemsScreen';
 export const ATTACKS_SCREEN = 'AttacksScreen';
 export const SPELLS_NAVIGATOR = 'SpellsNavigator'
 export const SPELLS_SCREEN = 'SpellsScreen';

@@ -1,7 +1,7 @@
 import { Proficiency } from "../common/models/models";
 import { ActionProps } from "./store";
 import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
-import mapArrayToObject from "../common/functions/mapArrayToObject";
+import {mapArrayToObjectButNotUniqueIds} from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const ADD_PROFICIENCIES = 'ADD_PROFICIENCIES';
@@ -40,7 +40,7 @@ export default function proficienciesReducer(state = initialState, action: Actio
             return action.payload.proficiencies
 
         case ADD_PROFICIENCIES:
-            const incomingData = mapArrayToObject(action.payload)
+            const incomingData = mapArrayToObjectButNotUniqueIds(action.payload)
 
             newState = {
                 ...state,

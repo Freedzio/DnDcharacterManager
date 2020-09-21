@@ -13,7 +13,6 @@ import { ApiConfig } from '../common/constants/ApiConfig';
 import { StoreProps } from '../redux/store';
 import { addTraits, handleDraconic } from '../redux/traits';
 import Section from './Section';
-import mapTraits from '../common/functions/mapTraits';
 import mapProficiencies from '../common/functions/mapProficiencies';
 import { CHOOSE_CLASS_SCREEN } from '../common/constants/routeNames';
 import { header } from '../common/styles/styles';
@@ -21,8 +20,6 @@ import ScreenHeader from '../common/components/ScreenHeader';
 import { drakes, Drake } from './draconicAncestry';
 import { applySnapshot, takeSnapshot } from '../redux/snapshot';
 import Tile, { tileHeight } from './Tile';
-import mapForAccordionSake from '../common/functions/mapForAccordionSake';
-import { loadOptions } from '@babel/core';
 import { setLoading } from '../redux/loading';
 
 export default function ConfirmRaceScreen({ navigation, route }: any) {
@@ -31,9 +28,10 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
     const [language, setLanguage] = useState<string>('choose');
     const [abilityBonus, setAbilityBonus] = useState<string>('');
     const [proficiency, setProficiency] = useState<string>('choose');
+    const [chosenListItem, setChosenListItem] = useState<string>('');
 
-    const proficiencies = useSelector((store: StoreProps) => mapForAccordionSake(store.proficiencies));
-    const traits = useSelector((store: StoreProps) => mapForAccordionSake(store.traits));
+    const proficiencies = useSelector((store: StoreProps) => store.proficiencies);
+    const traits = useSelector((store: StoreProps) => store.traits);
     const abilityBonuses = useSelector((store: StoreProps) => store.abilityScores);
     const basicInfo = useSelector((store: StoreProps) => store.basicInfo);
     const snapshot = useSelector((store: StoreProps) => store.snapshot);
@@ -44,7 +42,6 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
     const dispatch = useDispatch();
     const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
     const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
-    const dispatchTrait = (traits: Array<Trait>) => dispatch(addTraits(traits));
     const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
     const dispatchHandleDraconic = (title: string) => dispatch(handleDraconic(title));
     const dispatchLanguages = (languages: Array<string>) => dispatch(setLanguages(languages));
@@ -156,22 +153,26 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                         setterCallback={setLanguage}
                         options={tempRaceData?.language_options}
                     />
-                    {traits?.length !== 0 &&
+                    {Object.keys(traits).length > 0 &&
                         <Section
                             title='Racial traits'
                             listedData={traits}
                             dragonborn={tempRaceData?.name === 'Dragonborn'}
                             setterCallback={setDrake}
                             selectedVal={drake}
-                        />
-                    }
-                    {proficiencies?.length !== 0 &&
+                            chosenListItem={chosenListItem}
+                            listItemCallback={setChosenListItem}
+                            />
+                        }
+                    {Object.keys(proficiencies).length > 0 &&
                         <Section
-                            title='Racial proficiencies'
-                            listedData={proficiencies}
-                            options={tempRaceData?.starting_proficiency_options}
-                            setterCallback={setProficiency}
-                            selectedVal={proficiency}
+                        title='Racial proficiencies'
+                        listedData={proficiencies}
+                        options={tempRaceData?.starting_proficiency_options}
+                        setterCallback={setProficiency}
+                        selectedVal={proficiency}
+                        chosenListItem={chosenListItem}
+                        listItemCallback={setChosenListItem}
                         />
                     }
                     <Button block onPress={onNavigatingToNext}>

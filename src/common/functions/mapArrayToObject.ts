@@ -1,6 +1,6 @@
 import uuid from "react-native-uuid"
 
-export default function mapArrayToObject(arr: Array<any>) {
+export  function mapArrayToObject(arr: Array<any>) {
     return Array.from(arr).reduce((obj, item) => {
         const id = uuid.v4();
 
@@ -9,4 +9,15 @@ export default function mapArrayToObject(arr: Array<any>) {
             [id + '_' + item.index]: item
         }
     }, {})
+}
+
+export  function mapArrayToObjectButNotUniqueIds(arr: Array<any>) {
+    return Array.from(arr).reduce((obj, item) => {
+    
+        return obj = {
+            ...obj,
+            [item.index]: item
+        }
+    }, {})
+
 }

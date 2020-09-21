@@ -1,7 +1,7 @@
 import { Trait } from "../common/models/models";
 import { ActionProps } from "./store";
 import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
-import mapArrayToObject from "../common/functions/mapArrayToObject";
+import {mapArrayToObjectButNotUniqueIds} from "../common/functions/mapArrayToObject";
 import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const ADD_TRAITS = 'ADD_TRAITS';
@@ -48,7 +48,7 @@ export default function traitsReducer(state = initialState, action: ActionProps)
 
         case ADD_TRAITS:
             var newState = { ...state };
-            const incomingData = mapArrayToObject(action.payload)
+            const incomingData = mapArrayToObjectButNotUniqueIds(action.payload)
 
             newState = {
                 ...state,

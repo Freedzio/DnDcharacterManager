@@ -16,7 +16,8 @@ export default function ChooseSpellsScreen() {
 
   const [chosenLevel, setChosenLevel] = useState<number>(0);
   const [chosenClass, setChosenClass] = useState<string>(Object.keys(spellcasting)[0] || 'bard')
-  const [spellsToChooseFrom, setSpellsToChooseFrom] = useState<Array<JustUrl>>([])
+  const [spellsToChooseFrom, setSpellsToChooseFrom] = useState<Array<JustUrl>>([]);
+  const [loading, setLoading] = useState<boolean>(false)
 
   const spells = useSelector((store: StoreProps) => store.spells);
   const store = useSelector((store: StoreProps) => store);
@@ -30,7 +31,7 @@ export default function ChooseSpellsScreen() {
     let arr = [];
     for (let i = 0; i < 10; i++) {
       arr.push(
-        <Button bordered={chosenLevel !== i} style={{ flex: 1 }} onPress={() => setChosenLevel(i)}>
+        <Button bordered={chosenLevel !== i} style={{ flex: 1 }} onPress={() => setChosenLevel(i)} key={i}>
           <Text>{i}</Text>
         </Button>
       )
@@ -47,31 +48,31 @@ export default function ChooseSpellsScreen() {
     setSpellsToChooseFrom(spells.results);
   };
 
-  function onSpellPress(spell: string) {
+  async function onSpellPress(spell: string) {
+    setLoading(true)
     if (Object.keys(spells).includes(spell)) {
       dispatchDeleteSpell(spell);
 
       let temp = _.cloneDeep(spells)
       delete temp[spell]
 
-      AsyncStorage.setItem(id, JSON.stringify(temp))
+      await AsyncStorage.setItem(id, JSON.stringify(temp))
     } else {
-      apiWrapper(ApiConfig.spell(spell))
-        .then(spell => {
-          dispatchSpell({
-            ...spell,
-            spellcasting_ability: spellcastingAbilityByClass.filter(item => item.class.toLowerCase() === chosenClass)[0].ability
-          });
+      const spellData = await apiWrapper(ApiConfig.spell(spell))
+      dispatchSpell({
+        ...spellData,
+        spellcasting_ability: spellcastingAbilityByClass.filter(item => item.class.toLowerCase() === chosenClass)[0].ability
+      });
 
-          AsyncStorage.setItem(id, JSON.stringify({
-            ...store,
-            spells: {
-              ...spells,
-              [spell.index]: spell
-            }
-          }))
-        })
+      await AsyncStorage.setItem(id, JSON.stringify({
+        ...store,
+        spells: {
+          ...spells,
+          [spellData.index]: spell
+        }
+      }))
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -87,7 +88,7 @@ export default function ChooseSpellsScreen() {
         </View>
         <View style={{ flexDirection: "row", flexWrap: 'wrap', justifyContent: 'space-around' }}>
           {spellcastingAbilityByClass.map((set: { class: string, ability: string }, index: number) =>
-            <Button bordered={chosenClass !== set.class.toLowerCase()} onPress={() => setChosenClass(set.class.toLowerCase())}>
+            <Button bordered={chosenClass !== set.class.toLowerCase()} onPress={() => setChosenClass(set.class.toLowerCase())} key={index}>
               <Text>{set.class}</Text>
             </Button>
           )}
@@ -97,8 +98,8 @@ export default function ChooseSpellsScreen() {
             spellsToChooseFrom.map((spell: JustUrl, index: number) =>
               <ListItem key={index}>
                 <Text style={{ flex: 3 }}>{spell.name}</Text>
-                <Button bordered={!Object.keys(spells).includes(spell.index as string)} style={{ flex: 1 }} onPress={() => onSpellPress(spell.index as string)}>
-                  <Text>ADD</Text>
+                <Button disabled={loading} bordered={!Object.keys(spells).includes(spell.index as string)} style={{ flex: 1 }} onPress={() => onSpellPress(spell.index as string)}>
+                  <Text>{Object.keys(spells).includes(spell.index as string) ? 'REMOVE' : 'ADD'} </Text>
                 </Button>
               </ListItem>
             )
