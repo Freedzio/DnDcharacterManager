@@ -1,4 +1,4 @@
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Features, Feature, Weapon, AdventuringGear, Armor } from '../common/models/models';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures } from '../common/models/models';
 import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
 import mapForAccordionSake from '../common/functions/mapForAccordionSake';
@@ -21,11 +21,12 @@ import { addItems } from '../redux/items';
 import filterList from '../common/functions/filterList';
 import { addFeatures } from '../redux/features';
 import reactotron from '../../ReactotronConfig';
+import { setSpellcastingData } from '../redux/spellcasting';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
   const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>({} as StartingEquipment);
   const [chosenProficiencies, setChosenProficiencies] = useState<Chooser>({});
-  const [featureData, setFeatureData] = useState<Features>({} as Features);
+  const [featureData, setFeatureData] = useState<LevelFeatures>({} as LevelFeatures);
   const [chosenFeatures, setChosenFeatures] = useState<Chooser>({});
   const [spellcasting, setSpellcasting] = useState<Spellcasting>();
   const [classData, setClassData] = useState<CharacterClass>();
@@ -50,6 +51,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
   const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features))
   const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
+  const dispatchSpellcastingAbility = (ability: string) => dispatch(setSpellcastingData({classId: className.toLowerCase(), spellcasting: {spellcasting_ability: ability}}));
 
   async function getChosenData(chosenData: Chooser, baseUrl: string, dispatcher: (data: any) => void) {
     const values = Object.values(chosenData);
@@ -228,10 +230,13 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
           .then((equipmentData: StartingEquipment) => setStartingEquipment(equipmentData))
 
         getSpellcasting(classData)
-          .then((spellcastingData: any) => setSpellcasting(spellcastingData));
+          .then((spellcastingData: Spellcasting) => {
+            setSpellcasting(spellcastingData);
+            dispatchSpellcastingAbility(spellcastingData.spellcasting_ability.name);
+          });
 
         apiWrapper(ApiConfig.levelFeaturesByClass(classId, 1))
-          .then((data: Features) => {
+          .then((data: LevelFeatures) => {
             setFeatureData(data);
             if (data.feature_choices.length > 0) {
               getChoosingFeatureData(data.feature_choices)

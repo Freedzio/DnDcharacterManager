@@ -207,15 +207,17 @@ export interface LevelFeatures {
     prof_bonus: number
     features: Array<JustUrl>
     feature_choices: Array<JustUrl>
-    spellcasting?: Spellcasting
+    spellcasting?: SpellcastingByLevel
     class_specific: ClassSpecific
     index: string
     class: JustUrl
     url: string
 };
 
-export interface Spellcasting {
+export interface SpellcastingByLevel {
     cantrips_known: number
+    spells_known?: number
+    spellcasting_ability?: string
     spell_slots_level_1: number
     spell_slots_level_2: number
     spell_slots_level_3: number
@@ -246,6 +248,7 @@ export interface Spell {
     range: string
     components: Array<string>
     material: string
+    ability: string
     ritual: boolean
     duration: string
     concentration: boolean
@@ -254,9 +257,21 @@ export interface Spell {
     attack_type: string
     damage: {
         damage_type: JustUrl,
-        damage_at_slot_level: {
-            [slot: string]: string
+        damage_at_character_level: {
+            [key: number]: string
         }
+        damage_at_slot_level: {
+            [key: number]: string
+        }
+    }
+    dc: {
+        dc_type: JustUrl
+        dc_success: string
+    }
+    spellcasting_ability: string
+    area_of_effect: {
+        type: string
+        size: number
     }
     school: JustUrl
     classes: Array<JustUrl>

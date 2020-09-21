@@ -20,7 +20,9 @@ export const ApiConfig = {
     equipmentCategory: (category: string) => `${base}/equipment-categories/${category}`,
     allEquipment: `${base}/equipment`,
     item: (item: string) => `${base}/equipment/${item}`,
+    spell: (spell: string) => `${base}/spells/${spell}`,
     levelFeaturesByClass: (className: string, level: number) => `${base}/classes/${className}/levels/${level}`,
+    spellsByClassAndItsLevel: (className: string, level: number) => `${base}/classes/${className}/levels/${level}/spells`,
     features :`${base}/features`,
     feature: (feature: string) => `${base}/features/${feature}`
 }

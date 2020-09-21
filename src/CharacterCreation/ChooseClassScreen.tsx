@@ -6,7 +6,7 @@ import { Container, Content, Body, List, ListItem, Text } from 'native-base';
 import ScreenHeader from '../common/components/ScreenHeader';
 import LoadingContainer from '../common/components/LoadingContainer';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { CharacterClass, Proficiency, JustUrl, AbilityScores, ChoosingOptions, Feature, LevelFeatures, ClassSpecific, Spellcasting } from '../common/models/models';
+import { CharacterClass, Proficiency, JustUrl, AbilityScores, ChoosingOptions, Feature, LevelFeatures, ClassSpecific, Spellcasting, SpellcastingByLevel } from '../common/models/models';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreProps } from '../redux/store';
 import { applySnapshot, takeSnapshot } from '../redux/snapshot';
@@ -20,7 +20,7 @@ import { setLoading } from '../redux/loading';
 import { addFeatures } from '../redux/features';
 import { increaseMaxHP } from '../redux/maxHP';
 import { setSpecifics } from '../redux/classSpecific';
-import { setSpellcasting } from '../redux/spellcasting';
+import { setSpellcastingData } from '../redux/spellcasting';
 
 export default function ChooseClassScreen({ navigation }: any) {
     const [classes, setClasses] = useState<Array<string>>([]);
@@ -40,7 +40,7 @@ export default function ChooseClassScreen({ navigation }: any) {
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
     const dispatchAbilityProficiencies = (savingThrows: Partial<AbilityScores>) => dispatch(setAbilityProficiencies(savingThrows));
     const dispatchClassSpecifics = (data: ClassSpecific) => dispatch(setSpecifics(data));
-    const dispatchSpellcasting = (spellcasting: { [classId: string]: Spellcasting }) => dispatch(setSpellcasting(spellcasting))
+    const dispatchSpellcasting = (payload: { classId: string, spellcasting: Partial<SpellcastingByLevel> }) => dispatch(setSpellcastingData(payload))
 
     async function getClasses() {
         const data = await apiWrapper(ApiConfig.classes);
@@ -63,7 +63,7 @@ export default function ChooseClassScreen({ navigation }: any) {
         apiWrapper(ApiConfig.levelFeaturesByClass(className, 1))
             .then((data: LevelFeatures) => {
 
-                if (data.spellcasting) dispatchSpellcasting({ [className]: data.spellcasting });
+                if (data.spellcasting) dispatchSpellcasting({ classId: className, spellcasting: data.spellcasting });
                 dispatchClassSpecifics(data.class_specific)
 
                 for (let i = 0; i < data.features.length; i++) {
