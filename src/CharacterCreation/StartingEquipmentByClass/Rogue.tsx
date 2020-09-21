@@ -4,7 +4,7 @@ import ChoiceWrapper from './common/ChoiceWrapper';
 import StyledButton from './common/StyledButton';
 import Or from './common/Or';
 import { useDispatch } from 'react-redux';
-import { EqItem } from '../../common/models/models';
+import { EqItem, FinalItem } from '../../common/models/models';
 import { addItems } from '../../redux/items';
 import apiWrapper from '../../common/functions/apiWrapper';
 import { ApiConfig } from '../../common/constants/ApiConfig';
@@ -16,7 +16,7 @@ export default function Rogue({onNextPress, navigation}: any) {
   const [chosen3, setChosen3] = useState<string>('');
 
   const dispatch = useDispatch();
-  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+  const dispatchItems = (items: Array<FinalItem>) => dispatch(addItems(items));
 
   const choice1 = {
     a: {
@@ -58,7 +58,7 @@ export default function Rogue({onNextPress, navigation}: any) {
   function getChoseNData() {
     getItem(chosen1)
     getItem(chosen2)
-    if (chosen2 === 'shortbow') getItem('arrows')
+    if (chosen2 === 'shortbow') getItem('arrow')
     getItem(chosen3)
   }
 

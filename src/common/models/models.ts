@@ -87,6 +87,8 @@ export interface AdventuringGear extends EqItem {
     contents: Array<{ item_url: string, quantity: number }>
 }
 
+export interface FinalItem extends Weapon, Armor, AdventuringGear {}
+
 export interface Damage {
     damage_dice: string,
     damage_type: JustUrl

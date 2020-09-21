@@ -1,4 +1,4 @@
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures } from '../common/models/models';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures, SpellcastingByLevel } from '../common/models/models';
 import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
 import mapForAccordionSake from '../common/functions/mapForAccordionSake';
@@ -51,7 +51,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
   const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features))
   const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
-  const dispatchSpellcastingAbility = (ability: string) => dispatch(setSpellcastingData({classId: className.toLowerCase(), spellcasting: {spellcasting_ability: ability}}));
+  const dispatchSpellcastingData = (data: Partial<SpellcastingByLevel>) => dispatch(setSpellcastingData({ classId: className.toLowerCase(), spellcasting: data }));
 
   async function getChosenData(chosenData: Chooser, baseUrl: string, dispatcher: (data: any) => void) {
     const values = Object.values(chosenData);
@@ -232,12 +232,14 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
         getSpellcasting(classData)
           .then((spellcastingData: Spellcasting) => {
             setSpellcasting(spellcastingData);
-            dispatchSpellcastingAbility(spellcastingData.spellcasting_ability.name);
+            dispatchSpellcastingData({ spellcasting_ability: spellcastingData.spellcasting_ability.name });
           });
 
         apiWrapper(ApiConfig.levelFeaturesByClass(classId, 1))
           .then((data: LevelFeatures) => {
             setFeatureData(data);
+            if (data.spellcasting) dispatchSpellcastingData({ spells_known: data.spellcasting?.spells_known })
+
             if (data.feature_choices.length > 0) {
               getChoosingFeatureData(data.feature_choices)
             }
