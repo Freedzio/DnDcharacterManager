@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage'
 import { Body, Button, Card, Container, Content, Fab, Icon, List, ListItem, Row, Text, View } from 'native-base'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import ScreenHeader from '../common/components/ScreenHeader'
 import { abilities } from '../common/constants/abilitiesArray'
@@ -12,6 +12,7 @@ import { addSkills, deleteSkills } from '../redux/skills'
 import { StoreProps } from '../redux/store'
 import _ from 'lodash'
 import renderPlusOrMinus from '../common/functions/renderPlusOrMinus'
+import { useFocusEffect } from '@react-navigation/native'
 
 export default function SkillsScreen() {
   const [editing, setEditing] = useState<boolean>(false);
@@ -70,12 +71,25 @@ export default function SkillsScreen() {
     AsyncStorage.setItem(id, JSON.stringify(store))
   }
 
+  async function onFabPress() {
+    if (editing) {
+      AsyncStorage.setItem(id, JSON.stringify(store))
+      setEditing(false)
+    } else setEditing(true)
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      return onFabPress 
+    }, [])
+  )
+
+
   return (
     <Container>
       <Content>
         <ScreenHeader title="SKILLS" subtitle={name} />
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around' }}>
-
           {
             abilities.map((ability: string, index: number) => {
               const modifier = getAbilityModifier(abilityScores[ability].score);
@@ -126,10 +140,10 @@ export default function SkillsScreen() {
                     editing ?
                       <>
                         <View style={{ flex: 1, justifyContent: "space-around" }}>
-                          <Button onPress={() => onSkillPress(skill, 'proficiency', hasProf)} bordered={!hasProf}><Text>{hasProf ? 'delete' : 'add'}</Text></Button>
+                          <Button small onPress={() => onSkillPress(skill, 'proficiency', hasProf)} bordered={!hasProf}><Text>{hasProf ? 'delete' : 'add'}</Text></Button>
                         </View>
                         <View style={{ flex: 1, justifyContent: "space-around" }}>
-                          <Button onPress={() => onSkillPress(skill, 'expertise', hasExpertise)} bordered={!hasExpertise}><Text>{hasExpertise ? 'delete' : 'add'}</Text></Button>
+                          <Button small onPress={() => onSkillPress(skill, 'expertise', hasExpertise)} bordered={!hasExpertise}><Text>{hasExpertise ? 'delete' : 'add'}</Text></Button>
                         </View>
                       </> : <>
                         <Text style={{ flex: 1, fontWeight: hasProf ? "bold" : 'normal' }}>{hasProf ? 'YES' : 'NO'}</Text>
@@ -143,7 +157,7 @@ export default function SkillsScreen() {
           }
         </List>
       </Content>
-      <Fab onPress={() => setEditing(!editing)}>
+      <Fab onPress={onFabPress}>
         <Icon />
       </Fab>
     </Container>

@@ -103,7 +103,7 @@ export default function ItemsScreen({ navigation }: any) {
                 <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
                 {
                   items[item].armor_class &&
-                  <Text style={spellStyle.spellSub}>{items[item].armor_class.base + (items[item].armor_class.dex_bonus ? '+ DEX' : '')} </Text>
+                  <Text style={spellStyle.spellSub}>AC {items[item].armor_class.base + (items[item].armor_class.dex_bonus ? '+ DEX' : '')} </Text>
                 }
                 {
                   items[item].damage &&

@@ -44,6 +44,12 @@ export default function ClassSpecificScreen() {
                     <Tile property='Lay on hands' amount={classes['Paladin'] * 5} />
                   </Col>
                 }
+                {
+                  classResources['Fighter'] &&
+                  <Col>
+                    <Tile property='Second wind' amount={`1d10 + ${classes['Fighter']}`} />
+                  </Col>
+                }
               </Row>
             </View>
           )

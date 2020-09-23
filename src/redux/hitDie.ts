@@ -2,40 +2,34 @@ import { ActionProps } from "./store";
 import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
 import { ADD_CLASS, LEVEL_CLASS } from "./class";
 
-export const SET_HIT_DIE = 'SET_HIT_DIE';
+export const ADD_HIT_DIE = 'ADD_HIT_DIE';
 
-export function setHitDie(payload: number) {
+export function addHitDie(payload: number) {
   return {
-    type: SET_HIT_DIE,
+    type: ADD_HIT_DIE,
     payload: payload
   }
 }
 
-const initialState: { [key: string]: number } = {};
+const initialState: { [key: number]: number } = {
+  6: 0,
+  8: 0,
+  10: 0,
+  12: 0
+};
 
 export default function hitDieReducer(state = initialState, action: ActionProps) {
-  let newState: { [key: string]: number };
-  let className: string;
-  let temp: number;
-
+  let newState: { [key: number]: number } = { ...state }
 
   switch (action.type) {
     case APPLY_CHARACTER:
       return action.payload.hitDies
 
-    case ADD_CLASS:
-      return {
-        ...state,
-        [action.payload]: 1
-      }
+    case ADD_HIT_DIE:
 
-    case LEVEL_CLASS:
-      newState = { ...state };
-      className = action.payload;
-      temp = state[className]
       return {
         ...newState,
-        [className]: temp++
+        [action.payload]: newState[action.payload] + 1
       }
 
     case RESET_STORE:

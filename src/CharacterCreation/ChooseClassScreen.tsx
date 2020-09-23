@@ -10,7 +10,7 @@ import { CharacterClass, Proficiency, JustUrl, AbilityScores, ChoosingOptions, F
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreProps } from '../redux/store';
 import { applySnapshot, takeSnapshot } from '../redux/snapshot';
-import { setHitDie } from '../redux/hitDie';
+import { addHitDie } from '../redux/hitDie';
 import { addProficiencies } from '../redux/proficiencies';
 import { setAbilityProficiencies } from '../redux/abilityScores';
 import mapProficiencies from '../common/functions/mapProficiencies';
@@ -32,7 +32,7 @@ export default function ChooseClassScreen({ navigation }: any) {
     const dispatch = useDispatch();
     const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
     const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
-    const dispatchHitDie = (hitDie: number) => dispatch(setHitDie(hitDie));
+    const dispatchHitDie = (hitDie: number) => dispatch(addHitDie(hitDie));
     const dispatchMaxHP = (maxHP: number) => dispatch(increaseMaxHP(maxHP));
     const dispatchClass = (className: string) => dispatch(addClass(className));
     const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View } from 'native-base';
-import { JustUrl, EqItem } from '../../common/models/models';
+import { JustUrl, EqItem, FinalItem } from '../../common/models/models';
 import getEquipmentList from './common/getEquipmentList';
 import ChoiceWrapper from './common/ChoiceWrapper';
 import StyledButton from './common/StyledButton';
@@ -25,7 +25,7 @@ export default function Fighter({ onNextPress, navigation }: any) {
 
 
   const dispatch = useDispatch();
-  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+  const dispatchItems = (items: Array<FinalItem>) => dispatch(addItems(items));
 
 
   const choice1 = {
@@ -99,7 +99,7 @@ export default function Fighter({ onNextPress, navigation }: any) {
     };
 
    getItem(chosen3)
-   if(chosen3 === 'crossbow-light') getItem('crossbow-bolts')
+   if(chosen3 === 'crossbow-light') getItem('crossbow-bolt')
 
    getItem(chosen4)
   }

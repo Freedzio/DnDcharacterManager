@@ -19,6 +19,7 @@ export default function BasicInfoScreen() {
   const [chosenTrait, setChosenTrait] = useState<string>('');
 
   const abilityScores = useSelector((store: StoreProps) => store.abilityScores);
+  const classes = useSelector((store: StoreProps) => store.classes)
   const basicInfo = useSelector((store: StoreProps) => store.basicInfo);
   const name = useSelector((store: StoreProps) => store.name);
   const maxHP = useSelector((store: StoreProps) => store.maxHP);
@@ -26,6 +27,7 @@ export default function BasicInfoScreen() {
   const features = useSelector((store: StoreProps) => store.features);
   const items = useSelector((store: StoreProps) => store.items);
   const traits = useSelector((store: StoreProps) => store.traits);
+  const hitDies = useSelector((store: StoreProps) => store.hitDies);
 
   function calculateArmorClass() {
     if (Object.keys(features).includes('monk-unarmored-defense') && !equipped.some(item => items[item].equipment_category.index === 'armor')) return 10 + getAbilityModifier(abilityScores['DEX'].score) + getAbilityModifier(abilityScores['WIS'].score);
@@ -39,23 +41,22 @@ export default function BasicInfoScreen() {
 
     if (equipped.some(item => items[item].index === 'shield')) ac += 2;
     if (Object.keys(features).some(feat => feat.includes('fighting-style-defense'))) ac += 1;
-    if (features)
 
-      for (let i = 0; i < equippedArmor.length; i++) {
-        if (Object.keys(features).includes('fighting-style-defense')) ac++;
+    for (let i = 0; i < equippedArmor.length; i++) {
+      if (Object.keys(features).includes('fighting-style-defense')) ac++;
 
-        const item = equippedArmor[i];
+      const item = equippedArmor[i];
 
-        ac += items[item].armor_class.base;
+      ac += items[item].armor_class.base;
 
-        const mod = getAbilityModifier(abilityScores['DEX'].score);
+      const mod = getAbilityModifier(abilityScores['DEX'].score);
 
-        if (items[item].armor_class.dex_bonus && mod > 0) {
-          const maxBonus = items[item].armor_class.max_bonus
-          if (maxBonus === null) ac += mod
-          else ac += (mod > maxBonus ? maxBonus : mod);
-        }
+      if (items[item].armor_class.dex_bonus && mod > 0) {
+        const maxBonus = items[item].armor_class.max_bonus
+        if (maxBonus === null) ac += mod
+        else ac += (mod > maxBonus ? maxBonus : mod);
       }
+    }
 
     return ac
   }
@@ -69,6 +70,13 @@ export default function BasicInfoScreen() {
     <Container>
       <Content>
         <ScreenHeader title="BASIC INFO" subtitle={name} />
+        <View style={{ padding: 10 }}>
+          {
+            Object.keys(classes).map((classId: string, index: number) =>
+              <Text key={index} style={spellStyle.levelHeader}>{`Level ${classes[classId]} ${classId}`} </Text>
+            )
+          }
+        </View>
         <Row>
           <Col>
             <Tile property='Armor class' amount={calculateArmorClass()} />
@@ -87,16 +95,33 @@ export default function BasicInfoScreen() {
           <Text style={styles.sectionTitle}>HP</Text>
           <Row>
             <Col>
-              <Text style={{ textAlign: "center", fontSize: 20, fontWeight: "bold" }}>Current</Text>
-              <Text style={{ textAlign: "center", fontSize: 20 }}>{maxHP}</Text>
+              <Tile property='Current' amount={maxHP} />
             </Col>
             <Col>
-              <Text style={{ textAlign: "center", fontSize: 20, fontWeight: "bold" }}>Max</Text>
-              <Text style={{ textAlign: "center", fontSize: 20 }}>{maxHP}</Text>
+              <Tile property='Max' amount={maxHP} />
             </Col>
+
           </Row>
         </Card>
         <Card>
+          <Card>
+            <Text style={styles.sectionTitle}>Hit dies</Text>
+            {
+              Object.keys(hitDies).filter(die => hitDies[die] > 0).map((die: string, index: number) =>
+                <>
+                  <Text style={spellStyle.spellMain}>{`d${die}`}</Text>
+                  <Row>
+                    <Col>
+                      <Tile property='Current' amount={hitDies[die]} />
+                    </Col>
+                    <Col>
+                      <Tile property='Max' amount={hitDies[die]} />
+                    </Col>
+                  </Row>
+                </>
+              )
+            }
+          </Card>
           <Text style={styles.sectionTitle}>Death rolls</Text>
           <View style={{ padding: 30, paddingTop: 0 }}>
             <View style={{ flexDirection: 'row', marginVertical: 10 }}>
@@ -144,8 +169,8 @@ export default function BasicInfoScreen() {
               )
             }
             {
-              Object.keys(features).map((feat: string, index: number) => 
-              <TouchableOpacity onPress={() => onTraitPress(feat)} key={index}>
+              Object.keys(features).map((feat: string, index: number) =>
+                <TouchableOpacity onPress={() => onTraitPress(feat)} key={index}>
                   <ListItem>
                     <Text style={[spellStyle.spellMain, { textAlign: 'left' }]}>{features[feat].name} </Text>
                   </ListItem>
@@ -153,7 +178,7 @@ export default function BasicInfoScreen() {
                     chosenTrait === feat &&
                     <View>
                       {
-                       features[feat].desc && features[feat].desc.map((desc: string, index: number) =>
+                        features[feat].desc && features[feat].desc.map((desc: string, index: number) =>
                           <Text style={spellStyle.desc}>{desc} </Text>
                         )
                       }
