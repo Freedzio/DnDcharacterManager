@@ -103,7 +103,9 @@ export default function Section({ title, description, listedData, options, drago
                             drakes.map((drake: Drake, index: number) =>
                                 <Picker.Item
                                     value={drake.dragon}
-                                    label={`${drake.dragon} dragon, ${drake.damageType} damage, ${drake.breathWeapon}`} />
+                                    label={`${drake.dragon} dragon, ${drake.damageType} damage, ${drake.breathWeapon}`} 
+                                    key={index}
+                                    />
                             )
                         }
                     </Picker>

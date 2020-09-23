@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text } from 'native-base';
-import { JustUrl, EqItem } from '../../common/models/models';
+import { JustUrl, EqItem, FinalItem } from '../../common/models/models';
 import ChoiceWrapper from './common/ChoiceWrapper';
 import StyledButton from './common/StyledButton';
 import Or from './common/Or';
@@ -26,7 +26,7 @@ export default function Paladin({onNextPress, navigation}: any) {
   const [holySymbols, setHolySymbols] = useState<Array<JustUrl>>([])
 
   const dispatch = useDispatch();
-  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+  const dispatchItems = (items: Array<FinalItem>) => dispatch(addItems(items));
 
   const choice1 = {
     a: {
@@ -85,7 +85,7 @@ export default function Paladin({onNextPress, navigation}: any) {
       getItem(chosenMartial2)
     };
 
-    if (chosen2 === 'simple-weapon') getItem(chosenSimple)
+    if (chosen2 === 'simple-weapons') getItem(chosenSimple)
     else getItem(chosen2)
 
     getItem(chosen3)

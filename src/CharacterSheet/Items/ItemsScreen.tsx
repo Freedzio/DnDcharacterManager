@@ -7,7 +7,9 @@ import { ADD_ITEMS_SCREEN } from '../../common/constants/routeNames';
 import { spellStyle } from '../../common/styles/styles';
 import { equipItem, unequipItem } from '../../redux/equipped';
 import { decreaseQuantity, DECREASE_QUANTITY, deleteItem, DELETE_ITEM, increaseQuantity, INCREASE_QUANTITY } from '../../redux/items';
+import { addMoney } from '../../redux/money';
 import { StoreProps } from '../../redux/store'
+import MoneyDisplayer from './MoneyDisplayer';
 
 export default function ItemsScreen({ navigation }: any) {
   const equipped = useSelector((store: StoreProps) => store.equipped);
@@ -22,6 +24,7 @@ export default function ItemsScreen({ navigation }: any) {
   const dispatchIncrease = (item: string) => dispatch(increaseQuantity(item));
   const dispatchDecrease = (item: string) => dispatch(decreaseQuantity(item));
   const dispatchDeleteItem = (item: string) => dispatch(deleteItem(item));
+  const dispatchAddMoney = (cost: { unit: string, quantity: number }) => dispatch(addMoney(cost));
 
   async function onItemPress(item: string) {
     if (equipped.includes(item)) {
@@ -69,6 +72,16 @@ export default function ItemsScreen({ navigation }: any) {
     }))
   };
 
+  async function sellItem(item: string) {
+    dispatchAddMoney(items[item].cost);
+
+    await onDeleteItem(item);
+
+    await AsyncStorage.setItem(id, JSON.stringify({
+      ...store,
+    }))
+  }
+
   async function onDeleteItem(item: string) {
     dispatchDeleteItem(item);
     dispatchUnequip(item);
@@ -87,9 +100,10 @@ export default function ItemsScreen({ navigation }: any) {
 
   return (
     <Container>
-      <Content padder>
+      <Content>
         <ScreenHeader title="ITEMS" subtitle={name} />
-        <Text style={{ fontSize: 30 }}>Equipped</Text>
+        <MoneyDisplayer />
+        <Text style={[spellStyle.spellMain, { fontSize: 30 }]}>Equipped</Text>
         <List>
           <ListItem>
             <Text style={spellStyle.columnNames}>Name</Text>
@@ -113,7 +127,7 @@ export default function ItemsScreen({ navigation }: any) {
             )
           }
         </List>
-        <Text style={{ fontSize: 30 }}>Backpack</Text>
+        <Text style={[spellStyle.spellMain, { fontSize: 30 }]}>Backpack</Text>
         <List>
           <ListItem>
             <Text style={spellStyle.columnNames}>Name</Text>
@@ -123,6 +137,9 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => items[item].equipment_category.index === 'armor').map((item: string, index: number) =>
               <ListItem key={index}>
+                <Button small onPress={() => sellItem(item)}>
+                  <Text>$</Text>
+                </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name} </Text>
                 <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
                 <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }} >
@@ -141,6 +158,9 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => items[item].equipment_category.index === 'weapon').map((item: string, index: number) =>
               <ListItem key={index}>
+                <Button small onPress={() => sellItem(item)}>
+                  <Text>$</Text>
+                </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name} </Text>
                 <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
                 <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }}>
@@ -159,6 +179,9 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => items[item].gear_category).filter(item => items[item].gear_category.index === 'ammunition').map((item: string, index: number) =>
               <ListItem key={index}>
+                <Button small onPress={() => sellItem(item)}>
+                  <Text>$</Text>
+                </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name + (items[item].quantity ? ` (${items[item].quantity})` : '')} </Text>
                 <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
                 <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }} >
@@ -185,9 +208,31 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => items[item].gear_category).filter(item => items[item].gear_category.index !== 'ammunition').map((item: string, index: number) =>
               <ListItem key={index}>
+                <Button small onPress={() => sellItem(item)}>
+                  <Text>$</Text>
+                </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name + (items[item].quantity ? ` (${items[item].quantity})` : '')} </Text>
                 <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
-                <View style={{ flex:1, justifyContent: "space-around", flexDirection: 'row' }} >
+                <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }} >
+
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button onPress={() => onDeleteItem(item)} style={{ padding: 0 }} small>
+                    <Text>delete</Text>
+                  </Button>
+                </View>
+              </ListItem>
+            )
+          }
+          {
+            Object.keys(items).filter(item => !['weapon', 'armor', 'adventuring-gear'].includes(items[item].equipment_category.index as string)).map((item: string, index: number) =>
+              <ListItem key={index}>
+                <Button small onPress={() => sellItem(item)}>
+                  <Text>$</Text>
+                </Button>
+                <Text style={spellStyle.spellSub}>{items[item].name} </Text>
+                <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
+                <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }} >
 
                 </View>
                 <View style={{ flex: 1 }}>

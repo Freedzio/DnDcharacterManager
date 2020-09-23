@@ -1,4 +1,4 @@
-import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character, Armor, Weapon, AdventuringGear, Spell, ClassSpecific, Spellcasting, SpellcastingByLevel, ClassResources } from '../common/models/models';
+import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character, Armor, Weapon, AdventuringGear, Spell, ClassSpecific, Spellcasting, SpellcastingByLevel, ClassResources, Money } from '../common/models/models';
 import basicInfoReducer, { BasicInfo } from './basicInfo';
 import { createStore, combineReducers } from 'redux';
 import proficienciesReducer from './proficiencies';
@@ -23,6 +23,7 @@ import equippedReducer from './equipped';
 import spellsReducer from './spells';
 import classSpecificReducer from './classSpecific';
 import spellcastingReducer from './spellcasting';
+import moneyReducer from './money';
 
 const rootReducer = combineReducers({
     id: idReducer,
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
     hitDies: hitDieReducer,
     loading: loadingReducer,
     items: itemsReducer,
+    money: moneyReducer,
     equipped: equippedReducer,
     skills: skillsReducer,
     expertises: expertiseReducer,
@@ -81,6 +83,7 @@ export interface StoreProps {
     items: {
         [index: string]: Armor & Weapon & AdventuringGear
     }
+    money: Money
     equipped: Array<string>
     skills: Array<string>
     expertises: Array<string>

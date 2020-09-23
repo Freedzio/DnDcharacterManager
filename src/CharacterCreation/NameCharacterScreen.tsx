@@ -13,7 +13,7 @@ import { HOME_SCREEN } from '../common/constants/routeNames';
 import getAbilityModifier from '../common/functions/getAbilityModifier';
 import apiWrapper from '../common/functions/apiWrapper';
 import { baseForDescriptionSake } from '../common/constants/ApiConfig';
-import {mapArrayToObject} from '../common/functions/mapArrayToObject';
+import { mapArrayToObject } from '../common/functions/mapArrayToObject';
 
 export default function NameCharacterScreen({ navigation }: any) {
   const [name, setName] = useState<string>('');
@@ -128,6 +128,13 @@ export default function NameCharacterScreen({ navigation }: any) {
       items: {
         ...tempItems,
         ...newItems
+      },
+      money: {
+        'cp': 0,
+        'sp': 0,
+        'ep': 0,
+        'gp': 0,
+        'pp': 0
       },
       spells: {},
       spellcasting: store.spellcasting,

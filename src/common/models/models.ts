@@ -308,13 +308,17 @@ export interface Character {
         [key: string]: Feature
     }
     items: {
-        [key: string]: Armor | Weapon | AdventuringGear
+        [key: string]: FinalItem
     }
     skills: Array<string>
     expertise: Array<string>
     equipped: {
         [key: string]: Armor | Weapon
     }
+}
+
+export interface Money {
+    [unit: string]: number
 }
 
 export interface BarbarianSpecific {

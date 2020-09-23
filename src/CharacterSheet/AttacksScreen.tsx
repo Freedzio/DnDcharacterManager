@@ -77,7 +77,7 @@ export default function AttacksScreen() {
                 <ListItem>
                   {
                     items[item].properties.map((property: JustUrl, index: number) =>
-                      <Text style={spellStyle.spellSub}>{property.name} </Text>
+                      <Text style={spellStyle.spellSub} key={index}>{property.name}</Text>
                     )
                   }
                 </ListItem>

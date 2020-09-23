@@ -1,7 +1,6 @@
 import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures, SpellcastingByLevel } from '../common/models/models';
 import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
-import mapForAccordionSake from '../common/functions/mapForAccordionSake';
 import LoadingContainer from '../common/components/LoadingContainer';
 import getArrayOfNames from '../common/functions/getArrayOfNames';
 import { SafeAreaView } from 'react-native-safe-area-context';

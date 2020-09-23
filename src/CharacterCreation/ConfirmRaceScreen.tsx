@@ -99,7 +99,7 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                                     <Tile property="All" amount="+1" />
                                 </Col>
                                 : Object.keys(abilityBonuses).filter((ability: string) => abilityBonuses[ability].score !== 0).map((ability: string, index: number) =>
-                                    <Col key={ability}>
+                                    <Col key={index}>
                                         <Tile property={ability} amount={`+${abilityBonuses[ability].score}`} />
                                     </Col>
                                 )

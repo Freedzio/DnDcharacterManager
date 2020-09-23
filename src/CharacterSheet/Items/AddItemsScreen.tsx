@@ -10,7 +10,9 @@ import { ApiConfig } from '../../common/constants/ApiConfig';
 import apiWrapper from '../../common/functions/apiWrapper';
 import { FinalItem, JustUrl } from '../../common/models/models'
 import { addItems, addSingleItem } from '../../redux/items';
+import { spendMoney } from '../../redux/money';
 import { StoreProps } from '../../redux/store';
+import MoneyDisplayer from './MoneyDisplayer';
 
 export default function AddItemsScreen() {
   const [categories, setCategories] = useState<Array<JustUrl>>([]);
@@ -21,9 +23,10 @@ export default function AddItemsScreen() {
 
   const items = useSelector((store: StoreProps) => store.items);
   const id = useSelector((store: StoreProps) => store.id);
-  const store = useSelector((store: StoreProps) => store)
+  const store = useSelector((store: StoreProps) => store);
 
   const dispatch = useDispatch();
+  const dispatchSpendMoney = (cost: { unit: string, quantity: number }) => dispatch(spendMoney(cost))
   const dispatchItem = (item: { [key: string]: FinalItem }) => dispatch(addSingleItem(item))
 
   useEffect(() => {
@@ -37,10 +40,12 @@ export default function AddItemsScreen() {
       .then(() => setLoading(false))
   }, [chosenCategory]);
 
-  async function addItem(item: string) {
+  async function addItem(item: string, method: 'buy' | 'find') {
     setButtonsLoading(true);
 
     const itemData: FinalItem = await apiWrapper(ApiConfig.item(item));
+    if (method === 'buy') dispatchSpendMoney(itemData.cost);
+
     const itemId = uuid.v4() + '_' + itemData.index
     dispatchItem({ [itemId]: itemData });
 
@@ -58,6 +63,7 @@ export default function AddItemsScreen() {
     <Container>
       <Content>
         <ScreenHeader title="CHOOSE ITEMS" />
+        <MoneyDisplayer />
         <Picker selectedValue={chosenCategory} onValueChange={v => setChosenCategory(v as string)}>
           {
             categories.map((cat: JustUrl, index: number) =>
@@ -70,8 +76,11 @@ export default function AddItemsScreen() {
             {
               itemsToChooseFrom.map((item: JustUrl, index: number) =>
                 <ListItem key={index}>
-                  <Text style={{ flex: 1 }}>{item.name}</Text>
-                  <Button onPress={() => addItem(item.index as string)} disabled={buttonsLoading}>
+                  <Button small onPress={() => addItem(item.index as string, 'buy')} disabled={buttonsLoading}>
+                    <Text>$</Text>
+                  </Button>
+                  <Text style={{ flex: 1, textAlign: 'center' }}>{item.name}</Text>
+                  <Button onPress={() => addItem(item.index as string, 'find')} disabled={buttonsLoading} small>
                     <Text>Add</Text>
                   </Button>
                 </ListItem>

@@ -1,6 +1,5 @@
 import { ActionProps } from "./store";
 import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
-import { ADD_CLASS, LEVEL_CLASS } from "./class";
 
 export const ADD_HIT_DIE = 'ADD_HIT_DIE';
 

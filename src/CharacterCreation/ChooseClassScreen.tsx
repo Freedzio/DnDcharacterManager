@@ -15,12 +15,12 @@ import { addProficiencies } from '../redux/proficiencies';
 import { setAbilityProficiencies } from '../redux/abilityScores';
 import mapProficiencies from '../common/functions/mapProficiencies';
 import { CONFIRM_CLASS_SCREEN } from '../common/constants/routeNames';
-import { addClass } from '../redux/class';
 import { setLoading } from '../redux/loading';
 import { addFeatures } from '../redux/features';
 import { increaseMaxHP } from '../redux/maxHP';
 import { setSpecifics } from '../redux/classSpecific';
 import { setSpellcastingData } from '../redux/spellcasting';
+import { levelClass } from '../redux/class';
 
 export default function ChooseClassScreen({ navigation }: any) {
     const [classes, setClasses] = useState<Array<string>>([]);
@@ -34,7 +34,7 @@ export default function ChooseClassScreen({ navigation }: any) {
     const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
     const dispatchHitDie = (hitDie: number) => dispatch(addHitDie(hitDie));
     const dispatchMaxHP = (maxHP: number) => dispatch(increaseMaxHP(maxHP));
-    const dispatchClass = (className: string) => dispatch(addClass(className));
+    const dispatchClass = (className: string) => dispatch(levelClass(className));
     const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
     const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features));
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));

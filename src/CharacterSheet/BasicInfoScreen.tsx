@@ -108,7 +108,7 @@ export default function BasicInfoScreen() {
             <Text style={styles.sectionTitle}>Hit dies</Text>
             {
               Object.keys(hitDies).filter(die => hitDies[die] > 0).map((die: string, index: number) =>
-                <>
+                <View key={index}>
                   <Text style={spellStyle.spellMain}>{`d${die}`}</Text>
                   <Row>
                     <Col>
@@ -118,7 +118,7 @@ export default function BasicInfoScreen() {
                       <Tile property='Max' amount={hitDies[die]} />
                     </Col>
                   </Row>
-                </>
+                </View>
               )
             }
           </Card>
