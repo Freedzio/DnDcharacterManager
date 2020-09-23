@@ -1,4 +1,4 @@
-import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character, Armor, Weapon, AdventuringGear, Spell, ClassSpecific, Spellcasting, SpellcastingByLevel } from '../common/models/models';
+import { AbilityScores, Proficiency, Trait, EqItem, Feature, Character, Armor, Weapon, AdventuringGear, Spell, ClassSpecific, Spellcasting, SpellcastingByLevel, ClassResources } from '../common/models/models';
 import basicInfoReducer, { BasicInfo } from './basicInfo';
 import { createStore, combineReducers } from 'redux';
 import proficienciesReducer from './proficiencies';
@@ -87,7 +87,7 @@ export interface StoreProps {
     features: {
         [index: string]: Feature
     }
-    classSpecifics: ClassSpecific
+    classSpecifics: ClassResources
     snapshot: StoreProps
 }
 

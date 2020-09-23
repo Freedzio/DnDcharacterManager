@@ -87,7 +87,7 @@ export interface AdventuringGear extends EqItem {
     contents: Array<{ item_url: string, quantity: number }>
 }
 
-export interface FinalItem extends Weapon, Armor, AdventuringGear {}
+export interface FinalItem extends Weapon, Armor, AdventuringGear { }
 
 export interface Damage {
     damage_dice: string,
@@ -381,5 +381,9 @@ export interface WizardSpecific {
 }
 
 export interface ClassSpecific extends BardSpecific, BarbarianSpecific, ClericSpecific, DruidSpecific, FighterSpecific, MonkSpecific, PaladinSpecific, RogueSpecific, RangerSpecific, SorcererSpecific, WarlockSpecific, WizardSpecific { }
+
+export interface ClassResources {
+    [key: string]: ClassSpecific
+}
 
 export interface AbilityBonuses extends AbilityScores { }

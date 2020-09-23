@@ -39,7 +39,7 @@ export default function ChooseClassScreen({ navigation }: any) {
     const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features));
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
     const dispatchAbilityProficiencies = (savingThrows: Partial<AbilityScores>) => dispatch(setAbilityProficiencies(savingThrows));
-    const dispatchClassSpecifics = (data: ClassSpecific) => dispatch(setSpecifics(data));
+    const dispatchClassSpecifics = (data: {[classId: string]: ClassSpecific}) => dispatch(setSpecifics(data));
     const dispatchSpellcasting = (payload: { classId: string, spellcasting: Partial<SpellcastingByLevel> }) => dispatch(setSpellcastingData(payload))
 
     async function getClasses() {
@@ -53,18 +53,19 @@ export default function ChooseClassScreen({ navigation }: any) {
     }
 
     async function onClassPress(className: string) {
+        const classId = className.toLowerCase();
         dispatchTakeSnapshot();
         dispatchLoading(true);
 
-        getClassData(className)
+        getClassData(classId)
             .then(data => injectClassData(data))
-            .then(() => navigation.navigate(CONFIRM_CLASS_SCREEN, { class: className }));
+            .then(() => navigation.navigate(CONFIRM_CLASS_SCREEN, { class: classId }));
 
-        apiWrapper(ApiConfig.levelFeaturesByClass(className, 1))
+        apiWrapper(ApiConfig.levelFeaturesByClass(classId, 1))
             .then((data: LevelFeatures) => {
 
-                if (data.spellcasting) dispatchSpellcasting({ classId: className, spellcasting: data.spellcasting });
-                dispatchClassSpecifics(data.class_specific)
+                if (data.spellcasting) dispatchSpellcasting({ classId: classId, spellcasting: data.spellcasting });
+                dispatchClassSpecifics({[className]: data.class_specific})
 
                 for (let i = 0; i < data.features.length; i++) {
                     apiWrapper(ApiConfig.feature(data.features[i].index as string))
@@ -112,7 +113,7 @@ export default function ChooseClassScreen({ navigation }: any) {
                     <List>
                         {
                             classes.map((className: string, index: number) =>
-                                <TouchableOpacity key={index} onPress={() => onClassPress(className.toLowerCase())}>
+                                <TouchableOpacity key={index} onPress={() => onClassPress(className)}>
                                     <ListItem>
                                         <Text>
                                             {className}

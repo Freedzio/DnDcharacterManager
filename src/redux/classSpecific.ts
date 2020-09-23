@@ -5,7 +5,7 @@ import { ActionProps } from "./store";
 
 export const SET_SPECIFICS = 'SET_SPECIFICS';
 
-export function setSpecifics(payload: ClassSpecific) {
+export function setSpecifics(payload: { [classId: string]: ClassSpecific }) {
   return {
     type: SET_SPECIFICS,
     payload: payload

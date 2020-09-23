@@ -19,4 +19,4 @@ export const ATTACKS_SCREEN = 'AttacksScreen';
 export const SPELLS_NAVIGATOR = 'SpellsNavigator'
 export const SPELLS_SCREEN = 'SpellsScreen';
 export const SPELLS_CHOOSE_SCREEN = 'SpellsChooseScreen';
-export const RESOURCES_SCREEN = 'ResourcesScreen';
+export const CLASS_SPECIFIC_SCREEN = 'ClassSpecificScreen';

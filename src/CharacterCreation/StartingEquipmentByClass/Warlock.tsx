@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text } from 'native-base'
-import { JustUrl, EqItem } from '../../common/models/models';
+import { JustUrl, EqItem, FinalItem } from '../../common/models/models';
 import getEquipmentList from './common/getEquipmentList';
 import ChoiceWrapper from './common/ChoiceWrapper';
 import StyledButton from './common/StyledButton';
@@ -23,7 +23,7 @@ export default function Warlock({ onNextPress, navigation }: any) {
   const [chosenSimple, setChosenSimple] = useState<string>('choose')
 
   const dispatch = useDispatch();
-  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+  const dispatchItems = (items: Array<FinalItem>) => dispatch(addItems(items));
 
   const choice1 = {
     a: {
@@ -66,7 +66,7 @@ export default function Warlock({ onNextPress, navigation }: any) {
     if (chosen1 === 'simple-weapons') getItem(chosenSimple)
     else {
       getItem(chosen1)
-      getItem('crossbow-bolts')
+      getItem('crossbow-bolt')
     }
 
     if (chosen2 === 'arcane-foci') getItem(chosenFocus)

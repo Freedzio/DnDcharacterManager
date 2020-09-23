@@ -135,7 +135,7 @@ export default function BasicInfoScreen() {
                     <View>
                       {
                         traits[trait].desc.map((desc: string, index: number) =>
-                          <Text style={spellStyle.desc}>{desc} </Text>
+                          <Text style={spellStyle.desc} key={index}>{desc}</Text>
                         )
                       }
                     </View>

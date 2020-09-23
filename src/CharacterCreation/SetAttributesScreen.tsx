@@ -144,7 +144,7 @@ export default function SetAttributesScreen({ navigation }: any) {
         </View>
         {
           abilities.map((ability: string, index: number) =>
-            <View style={{ flexDirection: "row", padding: 14 }}>
+            <View style={{ flexDirection: "row", padding: 14 }} key={index}>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontWeight: "bold" }}>{ability} {abilityScores[ability].proficiency ? '*' : ''} </Text>
               </View>
