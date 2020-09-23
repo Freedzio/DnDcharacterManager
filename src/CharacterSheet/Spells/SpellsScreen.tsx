@@ -79,7 +79,7 @@ export default function SpellsScreen({ navigation }: any) {
       <Content>
         <ScreenHeader title="SPELLS" />
         {
-          spellcasting === {} ? <Text style={{ fontSize: 30, textAlign: "center" }}>You cannot cast spells!</Text> :
+          Object.keys(spellcasting).length < 1 ? <Text style={{ fontSize: 30, textAlign: "center" }}>You cannot cast spells!</Text> :
             <List>
               <ListItem>
                 <Text style={spellStyle.columnNames}>Name</Text>

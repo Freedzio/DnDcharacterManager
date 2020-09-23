@@ -98,7 +98,7 @@ export default function ChooseSpellsScreen() {
             spellsToChooseFrom.map((spell: JustUrl, index: number) =>
               <ListItem key={index}>
                 <Text style={{ flex: 3 }}>{spell.name}</Text>
-                <Button disabled={loading} bordered={!Object.keys(spells).includes(spell.index as string)} style={{ flex: 1 }} onPress={() => onSpellPress(spell.index as string)}>
+                <Button disabled={loading} bordered={!Object.keys(spells).includes(spell.index as string)} style={{ flex: 1 }} onPress={() => onSpellPress(spell.index as string)} small>
                   <Text>{Object.keys(spells).includes(spell.index as string) ? 'REMOVE' : 'ADD'} </Text>
                 </Button>
               </ListItem>

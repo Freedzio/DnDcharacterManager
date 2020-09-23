@@ -94,14 +94,21 @@ export default function ItemsScreen({ navigation }: any) {
           <ListItem>
             <Text style={spellStyle.columnNames}>Name</Text>
             <Text style={spellStyle.columnNames}>Type</Text>
-            <View style={{ flex: 2 }} />
+            <View style={{ flex: 1 }} />
           </ListItem>
           {
             equipped.map((item: string, index: number) =>
               <ListItem key={index}>
                 <Text style={spellStyle.spellSub}>{items[item].name}</Text>
                 <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
-                <View style={{ flex: 2 }} />
+                {
+                  items[item].armor_class &&
+                  <Text style={spellStyle.spellSub}>{items[item].armor_class.base + (items[item].armor_class.dex_bonus ? '+ DEX' : '')} </Text>
+                }
+                {
+                  items[item].damage &&
+                  <Text style={spellStyle.spellSub}>{items[item].damage.damage_dice + (items[item].properties.some(p => p.index === 'finesse') ? ' + STR or DEX ' : '+ STR ') + items[item].damage.damage_type.name} </Text>
+                }
               </ListItem>
             )
           }
@@ -114,31 +121,77 @@ export default function ItemsScreen({ navigation }: any) {
             <View style={{ flex: 2 }} />
           </ListItem>
           {
-            Object.keys(items).map((item: string, index: number) =>
+            Object.keys(items).filter(item => items[item].equipment_category.index === 'armor').map((item: string, index: number) =>
               <ListItem key={index}>
-                <Text style={spellStyle.spellSub}>{items[item].name} {items[item].quantity ? `(${items[item].quantity})` : ''} </Text>
+                <Text style={spellStyle.spellSub}>{items[item].name} </Text>
                 <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
-                <View style={{ flex: 2, justifyContent: "space-around", flexDirection: 'row' }} >
-                  {
-                    (items[item].equipment_category.index === 'armor' || items[item].equipment_category.index === 'weapon') &&
-                    <Button bordered={!equipped.includes(item)} onPress={() => onItemPress(item)}>
-                      <Text>{equipped.includes(item) ? 'unequip' : 'equip'}</Text>
-                    </Button>
-                  }
+                <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }} >
+                  <Button bordered={!equipped.includes(item)} onPress={() => onItemPress(item)} small>
+                    <Text>{equipped.includes(item) ? 'unequip' : 'equip'}</Text>
+                  </Button>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button onPress={() => onDeleteItem(item)} style={{ padding: 0 }} small>
+                    <Text>delete</Text>
+                  </Button>
+                </View>
+              </ListItem>
+            )
+          }
+          {
+            Object.keys(items).filter(item => items[item].equipment_category.index === 'weapon').map((item: string, index: number) =>
+              <ListItem key={index}>
+                <Text style={spellStyle.spellSub}>{items[item].name} </Text>
+                <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
+                <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }}>
+                  <Button bordered={!equipped.includes(item)} onPress={() => onItemPress(item)} small>
+                    <Text>{equipped.includes(item) ? 'unequip' : 'equip'}</Text>
+                  </Button>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button onPress={() => onDeleteItem(item)} style={{ padding: 0 }} small>
+                    <Text>delete</Text>
+                  </Button>
+                </View>
+              </ListItem>
+            )
+          }
+          {
+            Object.keys(items).filter(item => items[item].gear_category).filter(item => items[item].gear_category.index === 'ammunition').map((item: string, index: number) =>
+              <ListItem key={index}>
+                <Text style={spellStyle.spellSub}>{items[item].name + (items[item].quantity ? ` (${items[item].quantity})` : '')} </Text>
+                <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
+                <View style={{ flex: 1, justifyContent: "space-around", flexDirection: 'row' }} >
                   {
                     items[item].quantity &&
                     <>
-                      <Button onPress={() => onQuantityChange(DECREASE_QUANTITY, item)}>
+                      <Button onPress={() => onQuantityChange(DECREASE_QUANTITY, item)} small>
                         <Text>-</Text>
                       </Button>
-                      <Button onPress={() => onQuantityChange(INCREASE_QUANTITY, item)}>
+                      <Button onPress={() => onQuantityChange(INCREASE_QUANTITY, item)} small>
                         <Text>+</Text>
                       </Button>
                     </>
                   }
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Button onPress={() => onDeleteItem(item)}>
+                  <Button onPress={() => onDeleteItem(item)} style={{ padding: 0 }} small>
+                    <Text>delete</Text>
+                  </Button>
+                </View>
+              </ListItem>
+            )
+          }
+          {
+            Object.keys(items).filter(item => items[item].gear_category).filter(item => items[item].gear_category.index !== 'ammunition').map((item: string, index: number) =>
+              <ListItem key={index}>
+                <Text style={spellStyle.spellSub}>{items[item].name + (items[item].quantity ? ` (${items[item].quantity})` : '')} </Text>
+                <Text style={spellStyle.spellSub}>{items[item].equipment_category.name}</Text>
+                <View style={{ flex:1, justifyContent: "space-around", flexDirection: 'row' }} >
+
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button onPress={() => onDeleteItem(item)} style={{ padding: 0 }} small>
                     <Text>delete</Text>
                   </Button>
                 </View>
