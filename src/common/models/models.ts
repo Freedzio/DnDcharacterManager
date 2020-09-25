@@ -390,4 +390,9 @@ export interface ClassResources {
     [key: string]: ClassSpecific
 }
 
+export interface Cost {
+    unit: string,
+    quantity: number
+}
+
 export interface AbilityBonuses extends AbilityScores { }

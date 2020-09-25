@@ -2,10 +2,10 @@ import { Col, Row } from 'native-base'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import Tile from '../../CharacterCreation/Tile'
+import { Money } from '../../common/models/models'
 import { StoreProps } from '../../redux/store'
 
-export default function MoneyDisplayer() {
-  const money = useSelector((store: StoreProps) => store.money)
+export default function MoneyDisplayer({money}: Props) {
 
   return (
     <Row>
@@ -26,4 +26,8 @@ export default function MoneyDisplayer() {
       </Col>
     </Row>
   )
+}
+
+interface Props {
+  money: Money
 }

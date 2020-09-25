@@ -1,4 +1,5 @@
 import { APPLY_CHARACTER } from "../common/constants/storeCommons"
+import calculateMoney from "../common/functions/calculateMoney"
 import { Money } from "../common/models/models"
 import { ActionProps, applyCharacter } from "./store"
 
@@ -41,29 +42,7 @@ export default function moneyReducer(state = initialState, action: ActionProps) 
   switch (action.type) {
     case ADD_MONEY:
       if (Object.values(newState).some(amount => amount < 0)) {
-        const totalCopper = newState['cp'] + newState['sp'] * 10 + newState['ep'] * 50 + newState['gp'] * 100 + newState['pp'] * 1000;
-        let cost = 0;
-        if (action.payload.unit === 'cp') cost = action.payload.quantity;
-        if (action.payload.unit === 'sp') cost = action.payload.quantity * 10;
-        if (action.payload.unit === 'ep') cost = action.payload.quantity * 50;
-        if (action.payload.unit === 'gp') cost = action.payload.quantity * 100;
-        if (action.payload.unit === 'pp') cost = action.payload.quantity * 1000;
-
-        const newSum = totalCopper + cost;
-        const newPP = Math.trunc(newSum / 1000);
-        const newGP = Math.trunc((newSum % 1000) / 100);
-        const newEP = Math.trunc(((newSum % 1000) % 100) / 50);
-        const newSP = Math.trunc((((newSum % 1000) % 100) % 50) / 10);
-        const newCP = Math.trunc(((((newSum) % 1000) % 100) % 50) % 10);
-
-        return {
-          'cp': newCP,
-          'sp': newSP,
-          'ep': newEP,
-          'gp': newGP,
-          'pp': newPP,
-        }
-
+        return calculateMoney(newState, action.payload, 'sell')
       }
 
       return {
@@ -72,28 +51,7 @@ export default function moneyReducer(state = initialState, action: ActionProps) 
       }
 
     case SPEND_MONEY:
-      const totalCopper = newState['cp'] + newState['sp'] * 10 + newState['ep'] * 50 + newState['gp'] * 100 + newState['pp'] * 1000;
-      let cost = 0;
-      if (action.payload.unit === 'cp') cost = action.payload.quantity;
-      if (action.payload.unit === 'sp') cost = action.payload.quantity * 10;
-      if (action.payload.unit === 'ep') cost = action.payload.quantity * 50;
-      if (action.payload.unit === 'gp') cost = action.payload.quantity * 100;
-      if (action.payload.unit === 'pp') cost = action.payload.quantity * 1000;
-
-      const newSum = totalCopper - cost;
-      const newPP = Math.trunc(newSum / 1000);
-      const newGP = Math.trunc((newSum % 1000) / 100);
-      const newEP = Math.trunc(((newSum % 1000) % 100) / 50);
-      const newSP = Math.trunc((((newSum % 1000) % 100) % 50) / 10);
-      const newCP = Math.trunc(((((newSum) % 1000) % 100) % 50) % 10);
-
-      return {
-        'cp': newCP,
-        'sp': newSP,
-        'ep': newEP,
-        'gp': newGP,
-        'pp': newPP,
-      }
+      return calculateMoney(newState, action.payload, 'buy')
 
     case APPLY_CHARACTER:
       return action.payload.money

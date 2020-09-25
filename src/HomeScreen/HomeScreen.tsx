@@ -40,7 +40,6 @@ export default function HomeScreen({ navigation }: any) {
 
     async function onCharacterPress(id: string) {
         const data = await AsyncStorage.getItem(id);
-        console.log(data)
         const character = JSON.parse(await data as string);
 
         dispatchCharacter(character)
