@@ -1,28 +1,31 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { Picker } from '@react-native-community/picker';
-import { Button, Container, Content, List, ListItem, Text, View } from 'native-base'
+import { Button, Card, Col, Container, Content, Input, List, ListItem, Row, Text, View } from 'native-base'
 import React, { useEffect, useState } from 'react'
 import { FlatList, VirtualizedList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 import { useDispatch, useSelector } from 'react-redux';
+import { tileHeight } from '../../CharacterCreation/Tile';
 import LoadingContainer from '../../common/components/LoadingContainer';
 import ScreenHeader from '../../common/components/ScreenHeader'
 import { ApiConfig } from '../../common/constants/ApiConfig';
 import apiWrapper from '../../common/functions/apiWrapper';
 import calculateMoney from '../../common/functions/calculateMoney';
-import { FinalItem, JustUrl } from '../../common/models/models'
+import { FinalItem, JustUrl, Money } from '../../common/models/models'
 import { addItems, addSingleItem } from '../../redux/items';
-import { spendMoney } from '../../redux/money';
+import { setMoney, spendMoney } from '../../redux/money';
 import { StoreProps } from '../../redux/store';
-import MoneyDisplayer from './MoneyDisplayer';
+import MoneyDisplayer, { units } from './MoneyDisplayer';
 
 export default function AddItemsScreen() {
   const [categories, setCategories] = useState<Array<JustUrl>>([]);
-  const [chosenCategory, setChosenCategory] = useState<string>('adventuring-gear');
+  const [chosenCategory, setChosenCategory] = useState<string>('armor');
   const [itemsToChooseFrom, setItemsToChooseFrom] = useState<Array<JustUrl>>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [buttonsLoading, setButtonsLoading] = useState<boolean>(false)
+  const [buttonsLoading, setButtonsLoading] = useState<boolean>(false);
+  const [localMoney, setLocalMoney] = useState<Money>({});
+  const [editingMoney, setEditingMoney] = useState<boolean>(false);
 
   const items = useSelector((store: StoreProps) => store.items);
   const money = useSelector((store: StoreProps) => store.money)
@@ -30,7 +33,8 @@ export default function AddItemsScreen() {
   const store = useSelector((store: StoreProps) => store);
 
   const dispatch = useDispatch();
-  const dispatchSpendMoney = (cost: { unit: string, quantity: number }) => dispatch(spendMoney(cost))
+  const dispatchSpendMoney = (cost: { unit: string, quantity: number }) => dispatch(spendMoney(cost));
+  const dispatchMoney = (money: Money) => dispatch(setMoney(money));
   const dispatchItem = (item: { [key: string]: FinalItem }) => dispatch(addSingleItem(item))
 
   useEffect(() => {
@@ -43,6 +47,10 @@ export default function AddItemsScreen() {
       .then(data => setItemsToChooseFrom(data.equipment))
       .then(() => setLoading(false))
   }, [chosenCategory]);
+
+  useEffect(() => {
+    setLocalMoney(money);
+  }, [money])
 
   async function addItem(item: string, method: 'buy' | 'find') {
     console.log(item)
@@ -70,11 +78,59 @@ export default function AddItemsScreen() {
     setButtonsLoading(false);
   }
 
+  async function onEditMoneyTrigger() {
+    if (!editingMoney) setEditingMoney(true);
+    else {
+      AsyncStorage.mergeItem(id, JSON.stringify({
+        money: localMoney
+      }));
+      dispatchMoney(localMoney);
+      setEditingMoney(false);
+    }
+  }
+
+  function onMoneyEdit(unit: string, amount: string) {
+    let v = isNaN(parseInt(amount)) ? 0 : parseInt(amount);
+
+    setLocalMoney({
+      ...localMoney,
+      [unit]: v
+    })
+  };
+
   return (
     <Container>
       <Content>
         <ScreenHeader title="CHOOSE ITEMS" />
-        <MoneyDisplayer money={money} />
+        {
+          editingMoney ?
+            <Row>
+              {
+                units.map((unit: string, index: number) =>
+                  <Col key={index}>
+                    <Card style={{ padding: 10, height: tileHeight, justifyContent: "space-around" }}>
+                      <Text style={{ textAlign: "center" }}>{unit.toUpperCase()}</Text>
+                      <Input
+                        keyboardType='decimal-pad'
+                        style={
+                          {
+                            textAlign: "center",
+                            borderWidth: 1
+                          }
+                        }
+                        value={localMoney[unit].toString()} 
+                        onChangeText={v => onMoneyEdit(unit, v as string)}
+                        />
+                    </Card>
+                  </Col>
+                )
+              }
+            </Row> :
+            <MoneyDisplayer money={localMoney} />
+        }
+        <Button block onPress={onEditMoneyTrigger}>
+          <Text>{editingMoney ? 'save $$$' : 'edit $$$'} </Text>
+        </Button>
         <Picker selectedValue={chosenCategory} onValueChange={v => setChosenCategory(v as string)}>
           {
             categories.filter(cat => cat.index !== 'adventuring-gear').map((cat: JustUrl, index: number) =>
@@ -84,7 +140,8 @@ export default function AddItemsScreen() {
         </Picker>
         <LoadingContainer ready={!loading}>
           <SafeAreaView>
-            <VirtualizedList
+
+            {/* <VirtualizedList
               data={itemsToChooseFrom}
               initialNumToRender={4}
               getItemCount={itemsToChooseFrom => itemsToChooseFrom.length}
@@ -101,9 +158,9 @@ export default function AddItemsScreen() {
                   </Button>
                 </View >
               }
-            />
+            /> */}
 
-            {/* <List>
+            <List>
               {
                 itemsToChooseFrom.map((item: JustUrl, index: number) =>
                   <ListItem key={index}>
@@ -117,7 +174,7 @@ export default function AddItemsScreen() {
                   </ListItem>
                 )
               }
-            </List> */}
+            </List>
           </SafeAreaView>
         </LoadingContainer>
       </Content>
