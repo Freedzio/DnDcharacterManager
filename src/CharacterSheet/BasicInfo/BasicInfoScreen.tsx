@@ -29,6 +29,7 @@ export default function BasicInfoScreen({ navigation }: any) {
   const items = useSelector((store: StoreProps) => store.items);
   const traits = useSelector((store: StoreProps) => store.traits);
   const hitDies = useSelector((store: StoreProps) => store.hitDies);
+  const classSpecific = useSelector((store: StoreProps) => store.classSpecifics)
 
   function calculateArmorClass() {
     if (Object.keys(features).includes('monk-unarmored-defense') && !equipped.some(item => items[item].equipment_category.index === 'armor')) return 10 + getAbilityModifier(abilityScores['DEX'].score) + getAbilityModifier(abilityScores['WIS'].score);
@@ -67,6 +68,12 @@ export default function BasicInfoScreen({ navigation }: any) {
     else setChosenTrait(trait)
   }
 
+  function getMovement() {
+    const baseMov = basicInfo.speed;
+
+    return baseMov + (Object.keys(features).toString().includes('unarmored-movement') ? classSpecific['Monk'].unarmored_movement : 0)
+  }
+
   return (
     <Container>
       <Content>
@@ -86,7 +93,7 @@ export default function BasicInfoScreen({ navigation }: any) {
             <Tile property='Initiative' amount={getAbilityModifier(abilityScores['DEX'].score)} />
           </Col>
           <Col>
-            <Tile property="Speed" amount={basicInfo.speed} />
+            <Tile property="Speed" amount={getMovement()} />
           </Col>
           <Col>
             <Tile property="Passive perception" amount={10 + getAbilityModifier(abilityScores['WIS'].score)} />

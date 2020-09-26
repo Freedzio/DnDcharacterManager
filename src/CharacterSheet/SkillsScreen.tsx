@@ -13,6 +13,7 @@ import { StoreProps } from '../redux/store'
 import _ from 'lodash'
 import renderPlusOrMinus from '../common/functions/renderPlusOrMinus'
 import { useFocusEffect } from '@react-navigation/native'
+import { spellStyle } from '../common/styles/styles'
 
 export default function SkillsScreen() {
   const [editing, setEditing] = useState<boolean>(false);
@@ -25,6 +26,7 @@ export default function SkillsScreen() {
   const id = useSelector((store: StoreProps) => store.id);
   const store = useSelector((store: StoreProps) => store);
   const features = useSelector((store: StoreProps) => store.features);
+  const proficiencies = useSelector((store:StoreProps) => store.proficiencies);
 
   const dispatch = useDispatch();
   const dispatchSkills = (skills: Array<string>) => dispatch(addSkills(skills));
@@ -156,6 +158,16 @@ export default function SkillsScreen() {
                 </ListItem>
               )
             })
+          }
+        </List>
+        <Text style={[spellStyle.spellMain, {fontSize: 20, marginVertical: 20}]}>Other proficiencies</Text>
+        <List>
+          {
+            Object.keys(proficiencies).map((prof: string, index: number) => 
+            <ListItem key={index}>
+              <Text style={spellStyle.spellSub}>{proficiencies[prof].name}</Text>
+            </ListItem>
+            )
           }
         </List>
       </Content>
