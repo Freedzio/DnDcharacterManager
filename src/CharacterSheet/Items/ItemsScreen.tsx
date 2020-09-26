@@ -82,15 +82,15 @@ export default function ItemsScreen({ navigation }: any) {
 
     if (method === 'sell') {
       dispatchAddMoney(items[item].cost);
-      newMoney = calculateMoney({...money}, items[item].cost, 'sell');
+      newMoney = calculateMoney({ ...money }, items[item].cost, 'sell');
     }
 
-    let newItems = {...items};
+    let newItems = { ...items };
     delete newItems[item];
 
     await AsyncStorage.setItem(id, JSON.stringify({
       ...store,
-      items: {...newItems},
+      items: { ...newItems },
       equipped: store.equipped.filter(eq => eq !== item),
       money: newMoney
     }))
@@ -119,7 +119,7 @@ export default function ItemsScreen({ navigation }: any) {
                 }
                 {
                   items[item].damage &&
-                  <Text style={spellStyle.spellSub}>{items[item].damage.damage_dice + (items[item].properties.some(p => p.index === 'finesse') ? ' + STR or DEX ' : '+ STR ') + items[item].damage.damage_type.name} </Text>
+                  <Text style={spellStyle.spellSub}>{items[item].damage.damage_dice + (items[item].properties.some(p => p.index === 'finesse') ? ' + STR or DEX ' : (items[item].weapon_range === 'Ranged' ? ' + DEX ' : '+ STR ')) + items[item].damage.damage_type.name} </Text>
                 }
               </ListItem>
             )

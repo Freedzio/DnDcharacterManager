@@ -165,35 +165,6 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
     )
   }
 
-  function mapDescription(arr: Array<{ name: string, desc: Array<string> }>) {
-    let newArr = [];
-    for (let i = 0; i < arr.length; i++) {
-      newArr.push({
-        title: arr[i].name,
-        content: arr[i].desc.join(' ')
-      })
-    }
-    return newArr
-  };
-
-  function mapFeaturesDescription(features: { [index: string]: Feature }) {
-    let arr: Array<{ title: string, content: string }> = [];
-
-    const keys = Object.keys(features);
-
-    for (let i = 0; i < keys.length; i++) {
-      const key = keys[i];
-      const obj = {
-        title: features[key].name,
-        content: features[key].desc.join(' ')
-      }
-
-      arr.push(obj);
-    }
-
-    return arr;
-  }
-
   useEffect(() => {
     navigation.addListener('beforeRemove', () => {
       dispatchLoading(false);

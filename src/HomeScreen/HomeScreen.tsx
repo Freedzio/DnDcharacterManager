@@ -13,6 +13,7 @@ import { useFocusEffect } from '@react-navigation/native';
 export default function HomeScreen({ navigation }: any) {
     const [allCharacters, setAllCharacters] = useState<Array<string>>([]);
     const [fabActive, setFabActive] = useState<boolean>(false);
+    const [charToDelete, setCharToDelete] = useState<string>('');
 
     const loading = useSelector((store: StoreProps) => store.loading)
 
@@ -27,8 +28,8 @@ export default function HomeScreen({ navigation }: any) {
         setAllCharacters(await data)
     };
 
-    async function clearStorage() {
-        await AsyncStorage.clear()
+    async function deleteCharacter(id: string) {
+        await AsyncStorage.removeItem(id);
 
         getAllCharacters();
     }
@@ -45,10 +46,6 @@ export default function HomeScreen({ navigation }: any) {
         dispatchCharacter(character)
 
         navigation.navigate(SHEET_SCREEN)
-    }
-
-    function toggleFab() {
-        setFabActive(!fabActive)
     }
 
     useFocusEffect(
@@ -69,13 +66,29 @@ export default function HomeScreen({ navigation }: any) {
                         {
                             allCharacters.map((character: string, index: number) =>
                                 <TouchableOpacity key={index} onPress={() => onCharacterPress(character)}>
-                                    <Card >
-                                        <CardItem>
-                                            <Body>
-                                                <Text>
-                                                    {character.split('_')[1]}
-                                                </Text>
-                                            </Body>
+                                    <Card>
+                                        <CardItem style={{ justifyContent: "space-between" }}>
+                                            <Text>{character.split('_')[1]}</Text>
+                                            <View style={{ flexDirection: 'row' }}>
+                                                {
+                                                    charToDelete === character ?
+                                                        <>
+                                                            <Text style={{ textAlignVertical: "center", marginHorizontal: 10 }}>Are you sure?</Text>
+                                                            <View style={{ flexDirection: 'row' }}>
+                                                                <Button danger style={{marginHorizontal: 3}} onPress={() => deleteCharacter(character)}>
+                                                                    <Text>yes</Text>
+                                                                </Button>
+                                                                <Button success style={{marginHorizontal: 3}} onPress={() => setCharToDelete('')}>
+                                                                    <Text>no</Text>
+                                                                </Button>
+                                                            </View>
+                                                        </>
+                                                        :
+                                                        <Button danger onPress={() => setCharToDelete(character)}>
+                                                            <Text>X</Text>
+                                                        </Button>
+                                                }
+                                            </View>
                                         </CardItem>
                                     </Card>
                                 </TouchableOpacity>
@@ -86,13 +99,11 @@ export default function HomeScreen({ navigation }: any) {
                     </View>
                 </LoadingContainer>
             </Content>
-            <Fab active={fabActive} onPress={toggleFab} direction='up'>
-                <Icon type='Ionicons' name='alarm' />
+            <Fab active={fabActive} onPress={() => setFabActive(!fabActive)} direction='up'>
+                <Icon type='Ionicons' name='egg' />
                 <Button onPress={startCreation}>
-                    <Icon name='beaker' />
-                </Button>
-                <Button style={{ backgroundColor: 'red' }} onPress={clearStorage} >
-                </Button>
+                    <Icon name='add' />
+                </Button>               
             </Fab>
         </Container>
     )

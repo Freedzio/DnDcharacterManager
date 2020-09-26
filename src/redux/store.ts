@@ -24,6 +24,7 @@ import spellsReducer from './spells';
 import classSpecificReducer from './classSpecific';
 import spellcastingReducer from './spellcasting';
 import moneyReducer from './money';
+import triggerReducer from './trigger';
 
 const rootReducer = combineReducers({
     id: idReducer,
@@ -47,7 +48,8 @@ const rootReducer = combineReducers({
     spells: spellsReducer,
     spellcasting: spellcastingReducer,
     classSpecifics: classSpecificReducer,
-    snapshot: snapshotReducer
+    snapshot: snapshotReducer,
+    trigger: triggerReducer
 });
 
 const store = createStore(rootReducer, reactotron.createEnhancer());
@@ -92,6 +94,7 @@ export interface StoreProps {
     }
     classSpecifics: ClassResources
     snapshot: StoreProps
+    trigger: boolean
 }
 
 export interface ActionProps {

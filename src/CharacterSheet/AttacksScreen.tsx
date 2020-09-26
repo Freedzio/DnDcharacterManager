@@ -14,6 +14,8 @@ export default function AttacksScreen() {
   const proficiencies = useSelector((store: StoreProps) => store.proficiencies);
   const equipped = useSelector((store: StoreProps) => store.equipped);
   const items = useSelector((store: StoreProps) => store.items);
+  const features = useSelector((store: StoreProps) => store.features);
+  const classSpecifics = useSelector((store: StoreProps) => store.classSpecifics);
 
   function getRollModifier(item: string) {
     const splittedID = item.split('_');
@@ -26,8 +28,9 @@ export default function AttacksScreen() {
     let rollModifier = 0;
     if (hasProf) rollModifier += profBonus;
 
-    if (items[item].weapon_range === 'Ranged') return rollModifier + DEX;
+    if (isMartialApplicable()) return rollModifier + determineHigherMod();
     if (items[item].properties.some(prop => prop.index === 'finesse')) return rollModifier + determineHigherMod();
+    if (items[item].weapon_range === 'Ranged') return rollModifier + DEX;
     return rollModifier + STR
   }
 
@@ -38,14 +41,29 @@ export default function AttacksScreen() {
   }
 
   function getDamage(item: string) {
+    const dmgRoll = items[item].damage;
 
-    const dmgRoll = items[item].damage
-
+    if (isMartialApplicable()) return `${dmgRoll.damage_dice} + ${determineHigherMod()} ${dmgRoll.damage_type.name}`
     return `${dmgRoll.damage_dice} + ${items[item].properties.some(prop => prop.index === 'finesse') ? determineHigherMod() : getAbilityModifier(abilityScores['STR'].score)} ${dmgRoll.damage_type.name}`
   }
 
-  function getUnarmedMod(a: number, b: number) {
-    return a + b;
+  function isMartialApplicable() {
+    return (
+      Object.keys(features).includes('martial-arts') &&
+      !equipped.filter(eq => items[eq].equipment_category.index === 'weapon').some(eq => items[eq].weapon_range === 'Ranged') &&
+      !equipped.filter(eq => items[eq].equipment_category.index === 'weapon').some(eq => !items[eq].properties.some(x => x.index !== 'monk')) &&
+      !equipped.some(eq => items[eq].equipment_category.index === 'armor')
+    )
+  }
+
+  function getUnarmedMod() {
+    if (isMartialApplicable()) return determineHigherMod() + profBonus
+    else return getAbilityModifier(abilityScores['STR'].score) + profBonus
+  }
+
+  function getUnarmedDamage() {
+    if (isMartialApplicable()) return `${1 + determineHigherMod()} or ${classSpecifics['Monk'].martial_arts.dice_count}d${classSpecifics['Monk'].martial_arts.dice_value}`
+    else return 1 + profBonus + getAbilityModifier(abilityScores['STR'].score)
   }
 
   return (
@@ -61,8 +79,8 @@ export default function AttacksScreen() {
           </ListItem>
           <ListItem>
             <Text style={spellStyle.spellMain}>Unarmed strikes</Text>
-            <Text style={spellStyle.spellMain}>{renderPlusOrMinus(getUnarmedMod(profBonus, getAbilityModifier(abilityScores['STR'].score)))}</Text>
-            <Text style={spellStyle.spellMain}>{1 + getAbilityModifier(abilityScores['STR'].score)} Bludgeoning</Text>
+            <Text style={spellStyle.spellMain}>{renderPlusOrMinus(getUnarmedMod())}</Text>
+            <Text style={spellStyle.spellMain}>{getUnarmedDamage()} Bludgeoning</Text>
             <Text style={spellStyle.spellMain}>Melee</Text>
           </ListItem>
           {

@@ -1,5 +1,6 @@
 import { ActionProps } from "./store";
 import { APPLY_CHARACTER, RESET_STORE } from "../common/constants/storeCommons";
+import { APPLY_SNAPSHOT } from "./snapshot";
 
 export const ADD_HIT_DIE = 'ADD_HIT_DIE';
 
@@ -23,6 +24,9 @@ export default function hitDieReducer(state = initialState, action: ActionProps)
   switch (action.type) {
     case APPLY_CHARACTER:
       return action.payload.hitDies
+
+      case APPLY_SNAPSHOT:
+        return action.payload.hitDies
 
     case ADD_HIT_DIE:
 

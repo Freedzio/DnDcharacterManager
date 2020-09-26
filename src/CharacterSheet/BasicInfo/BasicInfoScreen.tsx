@@ -1,15 +1,16 @@
-import { Card, CheckBox, Col, Container, Content, List, ListItem, Row, Text, View } from 'native-base'
+import { Card, CheckBox, Col, Container, Content, Fab, Icon, List, ListItem, Row, Text, View } from 'native-base'
 import React, { useState } from 'react'
 import { StyleSheet } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
-import Tile from '../CharacterCreation/Tile'
-import ScreenHeader from '../common/components/ScreenHeader'
-import getAbilityModifier from '../common/functions/getAbilityModifier'
-import { spellStyle } from '../common/styles/styles'
-import store, { StoreProps } from '../redux/store'
+import Tile from '../../CharacterCreation/Tile'
+import ScreenHeader from '../../common/components/ScreenHeader'
+import { LEVEL_UP_SCREEN } from '../../common/constants/routeNames'
+import getAbilityModifier from '../../common/functions/getAbilityModifier'
+import { spellStyle } from '../../common/styles/styles'
+import store, { StoreProps } from '../../redux/store'
 
-export default function BasicInfoScreen() {
+export default function BasicInfoScreen({ navigation }: any) {
   const [success1, setSuccess1] = useState<boolean>(false);
   const [success2, setSuccess2] = useState<boolean>(false);
   const [success3, setSuccess3] = useState<boolean>(false);
@@ -190,6 +191,9 @@ export default function BasicInfoScreen() {
           </List>
         </Card>
       </Content>
+      <Fab onPress={() => navigation.navigate(LEVEL_UP_SCREEN)}>
+        <Icon name='add' />
+      </Fab>
     </Container>
   )
 }

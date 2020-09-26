@@ -11,8 +11,6 @@ import filterList from '../common/functions/filterList';
 import { AbilityScores } from '../common/models/models';
 import { setAbilityScore } from '../redux/abilityScores';
 import { NAME_CHARACTER_SCREEN } from '../common/constants/routeNames';
-import { increaseMaxHP } from '../redux/maxHP';
-import getAbilityModifier from '../common/functions/getAbilityModifier';
 import { abilities } from '../common/constants/abilitiesArray';
 
 export default function SetAttributesScreen({ navigation }: any) {

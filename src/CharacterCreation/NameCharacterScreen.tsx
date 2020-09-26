@@ -14,6 +14,7 @@ import getAbilityModifier from '../common/functions/getAbilityModifier';
 import apiWrapper from '../common/functions/apiWrapper';
 import { baseForDescriptionSake } from '../common/constants/ApiConfig';
 import { mapArrayToObject } from '../common/functions/mapArrayToObject';
+import LoadingContainer from '../common/components/LoadingContainer';
 
 export default function NameCharacterScreen({ navigation }: any) {
   const [name, setName] = useState<string>('');
@@ -23,6 +24,7 @@ export default function NameCharacterScreen({ navigation }: any) {
   const proficiencies = useSelector((store: StoreProps) => store.proficiencies);
   const features = useSelector((store: StoreProps) => store.features);
   const traits = useSelector((store: StoreProps) => store.traits);
+  const loading = useSelector((store: StoreProps) => store.loading)
 
   const dispatch = useDispatch();
   const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
@@ -38,6 +40,10 @@ export default function NameCharacterScreen({ navigation }: any) {
 
     return () => navigation.removeListener('beforeRemove')
   }, []);
+
+  useEffect(() => {
+    dispatchLoading(false);
+  }, [])
 
   function filterProficiencies(criteria: string) {
     const proficienciesKeys = Object.keys(proficiencies).concat(Object.keys(features)).concat(Object.keys(traits));
@@ -72,6 +78,8 @@ export default function NameCharacterScreen({ navigation }: any) {
   }
 
   async function onFinish() {
+    dispatchLoading(true);
+
     const id = uuid.v4();
 
     dispatchName(name);
@@ -141,10 +149,9 @@ export default function NameCharacterScreen({ navigation }: any) {
       classSpecifics: store.classSpecifics,
       maxHP: store.maxHP + (CON < 0 ? 0 : CON)
     };
-    dispatchLoading(true);
 
     await AsyncStorage.setItem(storageID, JSON.stringify(obj));
-
+    
     dispatchResetStore();
 
     navigation.push(HOME_SCREEN);
@@ -154,10 +161,13 @@ export default function NameCharacterScreen({ navigation }: any) {
     <Container>
       <Content>
         <ScreenHeader title='FINALLY' subtitle='name your character' />
-        <Input value={name} onChangeText={setName} style={{ marginVertical: 40, borderColor: 'lightgray', borderWidth: 1 }} />
-        <Button block onPress={onFinish}>
-          <Text>Finish</Text>
-        </Button>
+        <LoadingContainer ready={!loading}>
+
+          <Input value={name} onChangeText={setName} style={{ marginVertical: 40, borderColor: 'lightgray', borderWidth: 1 }} />
+          <Button block onPress={onFinish}>
+            <Text>Finish</Text>
+          </Button>
+        </LoadingContainer>
       </Content>
     </Container>
   )

@@ -33,6 +33,7 @@ export default function SpellsScreen({ navigation }: any) {
   const classes = useSelector((store: StoreProps) => store.classes);
   const abilityScores = useSelector((store: StoreProps) => store.abilityScores)
   const profBonus = useSelector((store: StoreProps) => store.basicInfo.proficiencyBonus);
+  const trigger = useSelector((store: StoreProps) => store.trigger)
 
   function getCantripDamage(spell: Spell) {
     let values = Object.values(classes);
@@ -72,7 +73,7 @@ export default function SpellsScreen({ navigation }: any) {
       setSpellSlots(temp)
     }
 
-  }, [spellcasting]);
+  }, [trigger]);
 
   return (
     <Container>

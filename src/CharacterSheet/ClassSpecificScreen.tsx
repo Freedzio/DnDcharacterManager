@@ -26,7 +26,7 @@ export default function ClassSpecificScreen() {
               <Text style={[spellStyle.columnNames, { fontSize: 20 }]}>{className}</Text>
               <Row style={{ flexWrap: 'wrap' }}>
                 {
-                  Object.entries(classResources[className]).map((res: [string, number | { dice_count: number, dice_value: number }], index: number) =>
+                  Object.entries(classResources[className]).filter(res => res[0] !== 'creating_spell_slots').map((res: [string, number | { dice_count: number, dice_value: number }], index: number) =>
                     <Col key={index}>
                       <Tile property={parseResName(res[0] as string)} amount={typeof res[1] === "number" ? res[1] : `${res[1].dice_count}d${res[1].dice_value}`} />
                     </Col>

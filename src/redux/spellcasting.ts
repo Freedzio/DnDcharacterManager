@@ -24,7 +24,6 @@ export default function spellcastingReducer(state = initialState, action: Action
     case APPLY_SNAPSHOT:
       return action.payload.spellcasting;
 
-
     case RESET_STORE:
       return initialState
 

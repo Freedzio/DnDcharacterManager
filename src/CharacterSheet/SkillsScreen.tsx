@@ -24,6 +24,7 @@ export default function SkillsScreen() {
   const basicInfo = useSelector((store: StoreProps) => store.basicInfo);
   const id = useSelector((store: StoreProps) => store.id);
   const store = useSelector((store: StoreProps) => store);
+  const features = useSelector((store: StoreProps) => store.features);
 
   const dispatch = useDispatch();
   const dispatchSkills = (skills: Array<string>) => dispatch(addSkills(skills));
@@ -44,6 +45,7 @@ export default function SkillsScreen() {
     let bonus = 0;
     if (expertises.includes(skill)) bonus = basicInfo.proficiencyBonus * 2
     else if (skills.includes(skill)) bonus = basicInfo.proficiencyBonus
+    else if (Object.keys(features).includes('jack-of-all-trades')) bonus = Math.floor(basicInfo.proficiencyBonus / 2)
 
     return renderPlusOrMinus(baseModifier + bonus)
   }
@@ -80,7 +82,7 @@ export default function SkillsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      return onFabPress 
+      return onFabPress
     }, [])
   )
 

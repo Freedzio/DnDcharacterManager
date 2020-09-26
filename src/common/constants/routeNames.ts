@@ -10,7 +10,9 @@ export const SET_ATTRIBUTES_SCREEN = 'SetAttributesScreen';
 export const NAME_CHARACTER_SCREEN = 'NameCharacterScreen';
 export const CHOOSE_CLASS_FEATURES = 'ChooseClassFeatures';
 
+export const BASIC_INFO_NAVIGATOR = 'BasicInfoNavigator';
 export const BASIC_INFO_SCREEN = 'BasicInfoScreen';
+export const LEVEL_UP_SCREEN = 'LevelUpScreen';
 export const SKILLS_SCREEN = 'SkillsScreen';
 export const ITEMS_NAVIGATOR = 'ItemsNavigator';
 export const ITEMS_SCREEN = 'ItemsScreen';
