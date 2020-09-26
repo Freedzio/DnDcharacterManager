@@ -10,6 +10,7 @@ import getAbilityModifier from '../../common/functions/getAbilityModifier'
 import renderPlusOrMinus from '../../common/functions/renderPlusOrMinus'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { spellStyle } from '../../common/styles/styles'
+import { levelClass } from '../../redux/class'
 
 const initialState = {
   '0': 0,
@@ -25,7 +26,6 @@ const initialState = {
 }
 
 export default function SpellsScreen({ navigation }: any) {
-  const [spellSlots, setSpellSlots] = useState<{ [key: string]: number }>(initialState);
   const [chosenSpell, setChosenSpell] = useState<string>('');
 
   const spellcasting = useSelector((store: StoreProps) => store.spellcasting);
@@ -33,7 +33,6 @@ export default function SpellsScreen({ navigation }: any) {
   const classes = useSelector((store: StoreProps) => store.classes);
   const abilityScores = useSelector((store: StoreProps) => store.abilityScores)
   const profBonus = useSelector((store: StoreProps) => store.basicInfo.proficiencyBonus);
-  const trigger = useSelector((store: StoreProps) => store.trigger)
 
   function getCantripDamage(spell: Spell) {
     let values = Object.values(classes);
@@ -51,29 +50,28 @@ export default function SpellsScreen({ navigation }: any) {
     else setChosenSpell(spell);
   }
 
-  useEffect(() => {
-    let temp = { ...spellSlots }
+  function getLevelSlots(level: number) {
+    let identifier: string;
+    let counter = 0;
 
-    const keys = Object.keys(spellcasting);
+    if (level === 0) identifier = 'cantrips_known';
+    else identifier = `spell_slots_level_${level}`;
 
-    for (let i = 0; i < keys.length; i++) {
-      const classId = keys[i];
-      let slotsForClass = _.cloneDeep(spellcasting[classId])
-      delete slotsForClass.spells_known;
-      delete slotsForClass.spellcasting_ability;
-      const slotsByLevel = Object.values(slotsForClass)
+    const classes = Object.keys(spellcasting);
+
+    for (let i = 0; i < classes.length; i++) {
+      const slotsByLevel = Object.entries(spellcasting[classes[i]]);
 
       for (let j = 0; j < slotsByLevel.length; j++) {
-        temp = {
-          ...temp,
-          [j]: temp[j] + slotsByLevel[j]
+        if (slotsByLevel[j][0] === identifier) {
+          counter += slotsByLevel[j][1]
+          break;
         }
       }
-
-      setSpellSlots(temp)
     }
 
-  }, [trigger]);
+    return counter
+  }
 
   return (
     <Container>
@@ -97,10 +95,10 @@ export default function SpellsScreen({ navigation }: any) {
                 <Text style={spellStyle.columnNames}>On save</Text>
               </ListItem>
               {
-                Object.keys(spellSlots).map((level: string, index: number) =>
+                Object.keys(initialState).map((level: string, index: number) =>
                   <View key={index}>
                     <ListItem>
-                      <Text style={spellStyle.levelHeader}>{level === '0' ? `Cantrips (${spellSlots[level]} known)` : `Level ${level} spells (${spellSlots[level]} slots)`} </Text>
+                      <Text style={spellStyle.levelHeader}>{level === '0' ? `Cantrips (${getLevelSlots(parseInt(level))} known)` : `Level ${level} spells (${getLevelSlots(parseInt(level))} slots)`} </Text>
                     </ListItem>
                     {
                       Object.keys(spells).filter(spell => spells[spell].level === parseInt(level)).map((spell: string, index: number) =>
