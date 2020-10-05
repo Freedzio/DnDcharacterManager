@@ -1,14 +1,14 @@
 import { JustUrl, Proficiency } from "../models/models";
-import apiWrapper from "./apiWrapper";
-import { ApiConfig } from "../constants/ApiConfig";
 import resolveDescription from "./resolveDescription";
 
-export default async function mapProficiencies(proficiencies: Array<JustUrl>) {
+export default function mapProficiencies(proficiencies: Array<JustUrl>) {
+    const proficienciesJSON: Proficiency[] = require('../../database/Proficiencies.json')
+
     let arr: Array<Proficiency> = [];
 
     for (let i = 0; i < proficiencies.length; i++) {
-        let data = await apiWrapper(ApiConfig.proficiency(proficiencies[i].url.replace('/api/proficiencies/', '')));
-        if (!data.desc) data = {...data, desc: resolveDescription(data)}
+        let data = proficienciesJSON.filter(item => item.name === proficiencies[i].name)[0]
+        if (!data.desc) data = { ...data, desc: resolveDescription(data) }
 
         arr.push(data)
     }

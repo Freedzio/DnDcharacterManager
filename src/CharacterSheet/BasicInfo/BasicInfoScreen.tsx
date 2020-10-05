@@ -5,7 +5,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import Tile from '../../CharacterCreation/Tile'
 import ScreenHeader from '../../common/components/ScreenHeader'
-import { LEVEL_UP_SCREEN } from '../../common/constants/routeNames'
+import { CONFIRM_LEVEL_UP_SCREEN, LEVEL_UP_SCREEN } from '../../common/constants/routeNames'
 import getAbilityModifier from '../../common/functions/getAbilityModifier'
 import { spellStyle } from '../../common/styles/styles'
 import store, { StoreProps } from '../../redux/store'
@@ -80,7 +80,7 @@ export default function BasicInfoScreen({ navigation }: any) {
         <ScreenHeader title="BASIC INFO" subtitle={name} />
         <View style={{ padding: 10 }}>
           {
-            Object.keys(classes).map((classId: string, index: number) =>
+            Object.keys(classes).sort((a, b) => classes[a] - classes[b]).reverse().map((classId: string, index: number) =>
               <Text key={index} style={spellStyle.levelHeader}>{`Level ${classes[classId]} ${classId}`} </Text>
             )
           }
@@ -198,7 +198,7 @@ export default function BasicInfoScreen({ navigation }: any) {
           </List>
         </Card>
       </Content>
-      <Fab onPress={() => navigation.navigate(LEVEL_UP_SCREEN)}>
+      <Fab onPress={() => navigation.navigate(CONFIRM_LEVEL_UP_SCREEN)}>
         <Icon name='add' />
       </Fab>
     </Container>

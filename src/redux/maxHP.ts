@@ -27,7 +27,6 @@ export default function maxHPReducer(state = initialState, action: ActionProps) 
       return initialState
 
     case INCREASE_MAX_HP:
-      console.log(action.payload)
       temp = state;
       return temp + action.payload
 

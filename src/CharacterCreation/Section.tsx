@@ -82,7 +82,7 @@ export default function Section({ title, description, listedData, options, drago
                     >
                         <Picker.Item label={`--Choose ${title.toLowerCase()}--`} value='choose' />
                         {
-                            options.from.map((item: JustUrl, index: number) =>
+                            options.from && options.from.map((item: JustUrl, index: number) =>
                                 <Picker.Item label={item.name} value={item.name} key={index} />
                             )
                         }
@@ -103,9 +103,9 @@ export default function Section({ title, description, listedData, options, drago
                             drakes.map((drake: Drake, index: number) =>
                                 <Picker.Item
                                     value={drake.dragon}
-                                    label={`${drake.dragon} dragon, ${drake.damageType} damage, ${drake.breathWeapon}`} 
+                                    label={`${drake.dragon} dragon, ${drake.damageType} damage, ${drake.breathWeapon}`}
                                     key={index}
-                                    />
+                                />
                             )
                         }
                     </Picker>

@@ -25,11 +25,13 @@ import classSpecificReducer from './classSpecific';
 import spellcastingReducer from './spellcasting';
 import moneyReducer from './money';
 import triggerReducer from './trigger';
+import subraceReducer from './subrace';
 
 const rootReducer = combineReducers({
     id: idReducer,
     name: nameReducer,
     race: raceReducer,
+    subrace: subraceReducer,
     basicInfo: basicInfoReducer,
     maxHP: maxHPReducer,
     classes: classReducer,

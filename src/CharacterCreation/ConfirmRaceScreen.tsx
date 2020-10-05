@@ -21,10 +21,13 @@ import { drakes, Drake } from './draconicAncestry';
 import { applySnapshot, takeSnapshot } from '../redux/snapshot';
 import Tile, { tileHeight } from './Tile';
 import { setLoading } from '../redux/loading';
+import reactotron from '../../ReactotronConfig';
 
 export default function ConfirmRaceScreen({ navigation, route }: any) {
-    const [drake, setDrake] = useState<string>(drakes[0].dragon);
+    const races: Race[] = require('../database/Races.json');
+
     const [tempRaceData, setTempRaceData] = useState<Race>()
+    const [drake, setDrake] = useState<string>(drakes[0].dragon);
     const [language, setLanguage] = useState<string>('choose');
     const [abilityBonus, setAbilityBonus] = useState<string>('');
     const [proficiency, setProficiency] = useState<string>('choose');
@@ -37,6 +40,7 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
     const snapshot = useSelector((store: StoreProps) => store.snapshot);
     const loading = useSelector((store: StoreProps) => store.loading);
     const race = useSelector((store: StoreProps) => store.race);
+    const subrace = useSelector((store: StoreProps) => store.subrace);
     const store = useSelector((store: StoreProps) => store);
 
     const dispatch = useDispatch();
@@ -47,10 +51,6 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
     const dispatchLanguages = (languages: Array<string>) => dispatch(setLanguages(languages));
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
     const dispatchAbilityBonuses = (abilityBonuses: Partial<AbilityScores>) => dispatch(setAbilityScore(abilityBonuses));
-
-    async function getRaceData() {
-        return await apiWrapper(`${ApiConfig.race(race.toLowerCase())}`);
-    };
 
     async function onNavigatingToNext() {
         dispatchLoading(true);
@@ -74,98 +74,97 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
     }
 
     useEffect(() => {
+        console.log(race)
+        setTempRaceData(races.filter(item => item.name === race)[0]);
+    }, [race])
+
+    useEffect(() => {
         navigation.addListener('beforeRemove', (e: any) => {
             dispatchSnapshot();
-            dispatchLoading(false);
+            dispatchLoading(false);``
 
             return () => navigation.removeListener('beforeRemove')
         })
     }, [])
 
-    useEffect(() => {
-        getRaceData()
-            .then(data => setTempRaceData(data)).then(() => dispatchLoading(false))
-    }, [])
-
     return (
         <Container>
             <Content padder>
-                <LoadingContainer ready={!loading}>
-                    <ScreenHeader title='YOU CHOSE' subtitle={race} />
-                    <Row>
-                        {
-                            race.toLowerCase() === 'human' ?
-                                <Col>
-                                    <Tile property="All" amount="+1" />
-                                </Col>
-                                : Object.keys(abilityBonuses).filter((ability: string) => abilityBonuses[ability].score !== 0).map((ability: string, index: number) =>
-                                    <Col key={index}>
-                                        <Tile property={ability} amount={`+${abilityBonuses[ability].score}`} />
-                                    </Col>
-                                )
-                        }
-                        {
-                            tempRaceData?.ability_bonus_options &&
+                <ScreenHeader title='YOU CHOSE' subtitle={subrace === '' ? race : subrace} />
+                <Row>
+                    {
+                        race.toLowerCase() === 'human' ?
                             <Col>
-                                <Card style={{ height: tileHeight }}>
-                                    <View style={{ flex: 1, justifyContent: "space-between" }}>
-                                        <View>
-                                            <Picker style={{ width: '100%' }} selectedValue={abilityBonus} onValueChange={v => setAbilityBonus(v as string)}>
-                                                <Picker.Item value='' label='------' />
-                                                {
-                                                    tempRaceData?.ability_bonus_options.from.map((ability: JustUrl, index: number) =>
-                                                        <Picker.Item key={index} value={ability.name} label={ability.name} />
-                                                    )}
-                                            </Picker>
-                                        </View>
-                                        <View style={{ flex: 1 }}>
-                                            <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-                                                {abilityBonus !== '' && '+' + tempRaceData.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </Card>
+                                <Tile property="All" amount="+1" />
                             </Col>
-                        }
+                            : Object.keys(abilityBonuses).filter((ability: string) => abilityBonuses[ability].score !== 0).map((ability: string, index: number) =>
+                                <Col key={index}>
+                                    <Tile property={ability} amount={`+${abilityBonuses[ability].score}`} />
+                                </Col>
+                            )
+                    }
+                    {
+                        tempRaceData?.ability_bonus_options.from &&
                         <Col>
-                            <Tile property='Speed' amount={basicInfo.speed} />
+                            <Card style={{ height: tileHeight }}>
+                                <View style={{ flex: 1, justifyContent: "space-between" }}>
+                                    <View>
+                                        <Picker style={{ width: '100%' }} selectedValue={abilityBonus} onValueChange={v => setAbilityBonus(v as string)}>
+                                            <Picker.Item value='' label='------' />
+                                            {
+                                                tempRaceData?.ability_bonus_options.from.map((ability: JustUrl, index: number) =>
+                                                    <Picker.Item key={index} value={ability.name} label={ability.name} />
+                                                )}
+                                        </Picker>
+                                    </View>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{ fontWeight: "bold", textAlign: "center" }}>
+                                            {abilityBonus !== '' && '+' + tempRaceData.ability_bonus_options.from.filter(item => item.name === abilityBonus)[0].bonus}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </Card>
                         </Col>
-                        <Col>
-                            <Tile property="Size" amount={basicInfo.size} />
-                        </Col>
-                    </Row>
+                    }
+                    <Col>
+                        <Tile property='Speed' amount={basicInfo.speed} />
+                    </Col>
+                    <Col>
+                        <Tile property="Size" amount={basicInfo.size} />
+                    </Col>
+                </Row>
+                <Section
+                    title='Alignment'
+                    description={tempRaceData?.alignment}
+                />
+                <Section
+                    title='Age'
+                    description={tempRaceData?.age}
+                />
+                <Section
+                    title='Size'
+                    description={tempRaceData?.size_description}
+                />
+                <Section
+                    title='Languages'
+                    description={tempRaceData?.language_desc}
+                    selectedVal={language}
+                    setterCallback={setLanguage}
+                    options={tempRaceData?.language_options}
+                />
+                {Object.keys(traits).length > 0 &&
                     <Section
-                        title='Alignment'
-                        description={tempRaceData?.alignment}
+                        title='Racial traits'
+                        listedData={traits}
+                        dragonborn={tempRaceData?.name === 'Dragonborn'}
+                        setterCallback={setDrake}
+                        selectedVal={drake}
+                        chosenListItem={chosenListItem}
+                        listItemCallback={setChosenListItem}
                     />
+                }
+                {Object.keys(proficiencies).length > 0 &&
                     <Section
-                        title='Age'
-                        description={tempRaceData?.age}
-                    />
-                    <Section
-                        title='Size'
-                        description={tempRaceData?.size_description}
-                    />
-                    <Section
-                        title='Languages'
-                        description={tempRaceData?.language_desc}
-                        selectedVal={language}
-                        setterCallback={setLanguage}
-                        options={tempRaceData?.language_options}
-                    />
-                    {Object.keys(traits).length > 0 &&
-                        <Section
-                            title='Racial traits'
-                            listedData={traits}
-                            dragonborn={tempRaceData?.name === 'Dragonborn'}
-                            setterCallback={setDrake}
-                            selectedVal={drake}
-                            chosenListItem={chosenListItem}
-                            listItemCallback={setChosenListItem}
-                            />
-                        }
-                    {Object.keys(proficiencies).length > 0 &&
-                        <Section
                         title='Racial proficiencies'
                         listedData={proficiencies}
                         options={tempRaceData?.starting_proficiency_options}
@@ -173,14 +172,13 @@ export default function ConfirmRaceScreen({ navigation, route }: any) {
                         selectedVal={proficiency}
                         chosenListItem={chosenListItem}
                         listItemCallback={setChosenListItem}
-                        />
-                    }
-                    <Button block onPress={onNavigatingToNext}>
-                        <Text>
-                            NEXT
+                    />
+                }
+                <Button block onPress={onNavigatingToNext}>
+                    <Text>
+                        NEXT
                         </Text>
-                    </Button>
-                </LoadingContainer>
+                </Button>
             </Content>
         </Container>
     )

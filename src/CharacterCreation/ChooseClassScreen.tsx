@@ -6,7 +6,7 @@ import { Container, Content, Body, List, ListItem, Text } from 'native-base';
 import ScreenHeader from '../common/components/ScreenHeader';
 import LoadingContainer from '../common/components/LoadingContainer';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { CharacterClass, Proficiency, JustUrl, AbilityScores, ChoosingOptions, Feature, LevelFeatures, ClassSpecific, Spellcasting, SpellcastingByLevel } from '../common/models/models';
+import { CharacterClass, Proficiency, AbilityScores, Feature, LevelFeatures, ClassSpecific, Spellcasting, SpellcastingByLevel } from '../common/models/models';
 import { useDispatch, useSelector } from 'react-redux';
 import { StoreProps } from '../redux/store';
 import { applySnapshot, takeSnapshot } from '../redux/snapshot';
@@ -23,7 +23,9 @@ import { setSpellcastingData } from '../redux/spellcasting';
 import { levelClass } from '../redux/class';
 
 export default function ChooseClassScreen({ navigation }: any) {
-    const [classes, setClasses] = useState<Array<string>>([]);
+    const classes: CharacterClass[] = require('../database/Classes.json');
+    const levels: LevelFeatures[] = require('../database/Levels.json');
+    const features: Feature[] = require('../database/Features.json')
 
     const store = useSelector((store: StoreProps) => store);
     const loading = useSelector((store: StoreProps) => store.loading);
@@ -35,47 +37,32 @@ export default function ChooseClassScreen({ navigation }: any) {
     const dispatchHitDie = (hitDie: number) => dispatch(addHitDie(hitDie));
     const dispatchMaxHP = (maxHP: number) => dispatch(increaseMaxHP(maxHP));
     const dispatchClass = (className: string) => dispatch(levelClass(className));
-    const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
     const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features));
     const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
     const dispatchAbilityProficiencies = (savingThrows: Partial<AbilityScores>) => dispatch(setAbilityProficiencies(savingThrows));
-    const dispatchClassSpecifics = (data: {[classId: string]: ClassSpecific}) => dispatch(setSpecifics(data));
+    const dispatchClassSpecifics = (data: { [classId: string]: ClassSpecific }) => dispatch(setSpecifics(data));
     const dispatchSpellcasting = (payload: { classId: string, spellcasting: Partial<SpellcastingByLevel> }) => dispatch(setSpellcastingData(payload))
-
-    async function getClasses() {
-        const data = await apiWrapper(ApiConfig.classes);
-        return await data
-    }
-
-    async function getClassData(className: string) {
-        const data = await apiWrapper(ApiConfig.class(className))
-        return await data
-    }
 
     async function onClassPress(className: string) {
         const classId = className.toLowerCase();
         dispatchTakeSnapshot();
-        dispatchLoading(true);
 
-        getClassData(classId)
-            .then(data => injectClassData(data))
-            .then(() => navigation.navigate(CONFIRM_CLASS_SCREEN, { class: classId }));
+        injectClassData(classes.filter(item => item.name === className)[0])
 
-        apiWrapper(ApiConfig.levelFeaturesByClass(classId, 1))
-            .then((data: LevelFeatures) => {
+        const levelOneData = levels.filter(item => item.index === `${classId}-1`)[0];
 
-                if (data.spellcasting) dispatchSpellcasting({ classId: classId, spellcasting: data.spellcasting });
-                dispatchClassSpecifics({[className]: data.class_specific})
+        if (levelOneData.spellcasting) dispatchSpellcasting({ classId: classId, spellcasting: levelOneData.spellcasting });
+        dispatchClassSpecifics({ [className]: levelOneData.class_specific })
 
-                for (let i = 0; i < data.features.length; i++) {
-                    apiWrapper(ApiConfig.feature(data.features[i].index as string))
-                        .then(data => dispatchFeatures([data]))
-                }
-            })
+        for (let i = 0; i < levelOneData.features.length; i++) {
+            dispatchFeatures([features.filter(item => item.index === levelOneData.features[i].index)[0]])
+        }
+
+        navigation.navigate(CONFIRM_CLASS_SCREEN, { class: classId })
     }
 
     function injectClassData(classData: CharacterClass) {
-        mapProficiencies(classData.proficiencies).then(data => dispatchProficiencies(data))
+        dispatchProficiencies(mapProficiencies(classData.proficiencies))
         dispatchClass(classData.name)
         dispatchHitDie(classData.hit_die);
         dispatchMaxHP(classData.hit_die);
@@ -96,10 +83,6 @@ export default function ChooseClassScreen({ navigation }: any) {
     }
 
     useEffect(() => {
-        getClasses().then(data => setClasses(getArrayOfNames(data.results))).then(() => dispatchLoading(false))
-    }, [])
-
-    useEffect(() => {
         navigation.addListener('beforeRemove', () => {
             dispatchSnapshot();
         })
@@ -109,21 +92,19 @@ export default function ChooseClassScreen({ navigation }: any) {
         <Container>
             <Content>
                 <ScreenHeader title='CHOOSE CLASS' />
-                <LoadingContainer ready={!loading} >
-                    <List>
-                        {
-                            classes.map((className: string, index: number) =>
-                                <TouchableOpacity key={index} onPress={() => onClassPress(className)}>
-                                    <ListItem>
-                                        <Text>
-                                            {className}
-                                        </Text>
-                                    </ListItem>
-                                </TouchableOpacity>
-                            )
-                        }
-                    </List>
-                </LoadingContainer>
+                <List>
+                    {
+                        classes.map((charClass: CharacterClass, index: number) =>
+                            <TouchableOpacity key={index} onPress={() => onClassPress(charClass.name)}>
+                                <ListItem>
+                                    <Text>
+                                        {charClass.name}
+                                    </Text>
+                                </ListItem>
+                            </TouchableOpacity>
+                        )
+                    }
+                </List>
             </Content>
         </Container>
     )

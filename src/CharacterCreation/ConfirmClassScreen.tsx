@@ -1,4 +1,4 @@
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures, SpellcastingByLevel } from '../common/models/models';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures, SpellcastingByLevel, FinalItem } from '../common/models/models';
 import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
 import LoadingContainer from '../common/components/LoadingContainer';
@@ -20,15 +20,23 @@ import { addItems } from '../redux/items';
 import filterList from '../common/functions/filterList';
 import { addFeatures } from '../redux/features';
 import { setSpellcastingData } from '../redux/spellcasting';
+import reactotron from 'reactotron-react-native';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
+  const classes: CharacterClass[] = require('../database/Classes.json');
+  const startingEq: StartingEquipment[] = require('../database/StartingEquipment.json');
+  const spellcastingJSON: Spellcasting[] = require('../database/Spellcasting.json');
+  const levels: LevelFeatures[] = require('../database/Levels.json');
+  const featuresJSON: Feature[] = require('../database/Features.json');
+  const itemsJSON: FinalItem[] = require('../database/Equipment.json');
+  const proficienciesJSON: Proficiency[] = require('../database/Proficiencies.json')
+
   const [startingEquipment, setStartingEquipment] = useState<StartingEquipment>({} as StartingEquipment);
   const [chosenProficiencies, setChosenProficiencies] = useState<Chooser>({});
   const [featureData, setFeatureData] = useState<LevelFeatures>({} as LevelFeatures);
   const [chosenFeatures, setChosenFeatures] = useState<Chooser>({});
   const [spellcasting, setSpellcasting] = useState<Spellcasting>();
   const [classData, setClassData] = useState<CharacterClass>();
-  const [ready, setReady] = useState<boolean>(false);
   const [featuresToChooseFrom, setFeaturesToChooseFrom] = useState<Array<Feature>>([]);
   const [chosenListItem, setChosenListItem] = useState<string>('');
 
@@ -45,32 +53,37 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   const dispatch = useDispatch();
   const dispatchSnapshot = () => dispatch(applySnapshot(snapshot));
   const dispatchTakeSnapshot = () => dispatch(takeSnapshot(store));
-  const dispatchItems = (items: Array<Armor & Weapon & AdventuringGear>) => dispatch(addItems(items));
+  const dispatchItems = (items: Array<FinalItem>) => dispatch(addItems(items));
   const dispatchLoading = (loading: boolean) => dispatch(setLoading(loading));
   const dispatchFeatures = (features: Array<Feature>) => dispatch(addFeatures(features))
   const dispatchProficiencies = (proficiencies: Array<Proficiency>) => dispatch(addProficiencies(proficiencies));
   const dispatchSpellcastingData = (data: Partial<SpellcastingByLevel>) => dispatch(setSpellcastingData({ classId: className.toLowerCase(), spellcasting: data }));
 
-  async function getChosenData(chosenData: Chooser, baseUrl: string, dispatcher: (data: any) => void) {
+  function getChosenData(chosenData: Chooser, traitOrProficiency: 'feature' | 'proficiency', dispatcher: (data: any) => void) {
     const values = Object.values(chosenData);
     let arr = [];
     for (let i = 0; i < values.length; i++) {
       if (values[i] !== 'choose') {
-        const data = await apiWrapper(`${baseUrl}/${values[i]}`);
-        arr.push(await data)
+        let data;
+        if (traitOrProficiency === 'feature') {
+          data = featuresJSON.filter(item => item.index === values[i])[0];
+        } else {
+          data = proficienciesJSON.filter(item => item.index === values[i])[0];
+        }
+        arr.push(data)
       }
     }
 
     dispatcher(arr);
   };
 
-  async function getItemsData() {
+  function getItemsData() {
     let arr = [];
     for (let i = 0; i < startingEquipment?.starting_equipment.length; i++) {
       const entry = startingEquipment?.starting_equipment[i];
 
-      const data = await apiWrapper(ApiConfig.item(entry?.equipment.index as string));
-      arr.push(await data);
+      const data = itemsJSON.filter(item => item.index === entry?.equipment.index)[0];
+      arr.push(data);
     }
 
     dispatchItems(arr);
@@ -80,8 +93,8 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
     dispatchTakeSnapshot();
 
     getItemsData();
-    getChosenData(chosenProficiencies, ApiConfig.proficiencies, dispatchProficiencies);
-    getChosenData(chosenFeatures, ApiConfig.features, dispatchFeatures);
+    getChosenData(chosenProficiencies, 'proficiency', dispatchProficiencies);
+    getChosenData(chosenFeatures, 'feature', dispatchFeatures);
   }
 
   function filterProficiencies(proficiencies: { [key: string]: Proficiency }) {
@@ -92,27 +105,16 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
       const key = keys[i];
       const item = proficiencies[key]
 
-      if (getArrayOfNames(item.classes).includes(className)) {
-        temp = {
-          ...temp,
-          [key]: item
+      if (item.classes) {
+        if (getArrayOfNames(item.classes).includes(className)) {
+          temp = {
+            ...temp,
+            [key]: item
+          }
         }
       }
     }
     return temp
-  }
-
-  async function getClassData(id: string) {
-    return await apiWrapper(ApiConfig.class(id));
-  }
-
-  async function getSpellcasting(data: CharacterClass) {
-    if (!data.spellcasting) return;
-    return await apiWrapper(ApiConfig.spellcastingClass(data.index))
-  }
-
-  async function getStartingEquipment(id: string) {
-    return await apiWrapper(ApiConfig.startingEquipment(id))
   }
 
   async function onChooserChange(key: string, value: string, chooserObject: Chooser, setter: (v: any) => void) {
@@ -175,54 +177,51 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   }, []);
 
   useEffect(() => {
-    getClassData(classId)
-      .then((classData: CharacterClass) => {
-        setClassData(classData);
+    const tempClassData = classes.filter(item => item.index === classId)[0]
 
-        let obj = {};
-        for (let i = 0; i < classData.proficiency_choices.length; i++) {
-          for (let j = 0; j < classData.proficiency_choices[i].choose; j++) {
-            const a = i.toString();
-            const b = j.toString();
-            const key = a + b;
+    setClassData(tempClassData);
 
-            obj = {
-              ...obj,
-              [key as string]: 'choose'
-            }
-          }
+    let obj = {};
+    for (let i = 0; i < tempClassData.proficiency_choices.length; i++) {
+      for (let j = 0; j < tempClassData.proficiency_choices[i].choose; j++) {
+        const a = i.toString();
+        const b = j.toString();
+        const key = a + b;
+
+        obj = {
+          ...obj,
+          [key as string]: 'choose'
         }
+      }
+    }
 
-        setChosenProficiencies(obj);
+    setChosenProficiencies(obj);
 
-        getStartingEquipment(classData.index)
-          .then((equipmentData: StartingEquipment) => setStartingEquipment(equipmentData))
+    setStartingEquipment(startingEq.filter(item => item.class.index === classId)[0]);
 
-        getSpellcasting(classData)
-          .then((spellcastingData: Spellcasting) => {
-            setSpellcasting(spellcastingData);
-            dispatchSpellcastingData({ spellcasting_ability: spellcastingData.spellcasting_ability.name });
-          });
+    if (tempClassData.spellcasting) {
+      const spellcastingData = spellcastingJSON.filter(item => item.index === classId)[0];
+      setSpellcasting(spellcastingData);
+      dispatchSpellcastingData({ spellcasting_ability: spellcastingData.spellcasting_ability.name });
+    }
 
-        apiWrapper(ApiConfig.levelFeaturesByClass(classId, 1))
-          .then((data: LevelFeatures) => {
-            setFeatureData(data);
-            if (data.spellcasting) dispatchSpellcastingData({ spells_known: data.spellcasting?.spells_known })
+    const tempFeatureData = levels.filter(item => item.index === `${classId}-1`)[0]
 
-            if (data.feature_choices.length > 0) {
-              getChoosingFeatureData(data.feature_choices)
-            }
-          }).then(() => setChosenFeatures(obj));
-      })
-      .then(() => setReady(true));
+    setFeatureData(tempFeatureData);
+    if (tempFeatureData.spellcasting) dispatchSpellcastingData({ spells_known: tempFeatureData.spellcasting?.spells_known })
+
+    if (tempFeatureData.feature_choices.length > 0) {
+      getChoosingFeatureData(tempFeatureData.feature_choices)
+    }
+
   }, []);
 
-  async function getChoosingFeatureData(featureChoices: Array<JustUrl>) {
+  function getChoosingFeatureData(featureChoices: Array<JustUrl>) {
     let obj = {};
     let arr = [];
 
     for (let i = 0; i < featureChoices.length; i++) {
-      const data: Feature = await apiWrapper(ApiConfig.feature(featureChoices[i].index as string))
+      const data: Feature = featuresJSON.filter(item => item.index === featureChoices[i].index)[0]
       arr.push(data);
 
       const howMany = data.choice.choose;
@@ -244,80 +243,78 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
   return (
     <Container>
       <Content>
-        <LoadingContainer ready={ready}>
-          <ScreenHeader title='YOU CHOSE' subtitle={className} />
+        <ScreenHeader title='YOU CHOSE' subtitle={className} />
+        <Section
+          title={`Hit die: d${classData?.hit_die}`}
+        />
+        <Section
+          title='Saving throws'
+          description={`Add your proficiency bonus on ${classData?.saving_throws.map(item => item.name).join(', ')} saving throws`} />
+        <Section
+          title='Class proficiencies'
+          listedData={filteredProficiencies}
+          chosenListItem={chosenListItem}
+          listItemCallback={setChosenListItem}
+        />
+        {
+          classData && classData.proficiency_choices.map((setOfChoices: ChoosingOptions, index1: number) =>
+            renderPickersForSegment(setOfChoices, index1, chosenProficiencies, setChosenProficiencies, 'Choose class proficiencies')
+          )}
+        <Section title='Class features'
+          listedData={features}
+          chosenListItem={chosenListItem}
+          listItemCallback={setChosenListItem}
+        />
+        {
+          featuresToChooseFrom.length > 0 && featureData.feature_choices?.map((choice: JustUrl, index: number) =>
+            renderPickersForSegment(featuresToChooseFrom.filter(item => item.index === choice.index)[0].choice, index, chosenFeatures, setChosenFeatures, 'Choose class features')
+          )
+        }
+        {
+          spellcasting &&
           <Section
-            title={`Hit die: d${classData?.hit_die}`}
-          />
-          <Section
-            title='Saving throws'
-            description={`Add your proficiency bonus on ${classData?.saving_throws.map(item => item.name).join(', ')} saving throws`} />
-          <Section
-            title='Class proficiencies'
-            listedData={filteredProficiencies}
+            title='Spellcasting'
+            spellcastingData={spellcasting.info}
             chosenListItem={chosenListItem}
             listItemCallback={setChosenListItem}
           />
-          {
-            classData && classData.proficiency_choices.map((setOfChoices: ChoosingOptions, index1: number) =>
-              renderPickersForSegment(setOfChoices, index1, chosenProficiencies, setChosenProficiencies, 'Choose class proficiencies')
-            )}
-          <Section title='Class features'
-            listedData={features}
-            chosenListItem={chosenListItem}
-            listItemCallback={setChosenListItem}
-          />
-          {
-            featuresToChooseFrom.length > 0 && featureData.feature_choices?.map((choice: JustUrl, index: number) =>
-              renderPickersForSegment(featuresToChooseFrom.filter(item => item.index === choice.index)[0].choice, index, chosenFeatures, setChosenFeatures, 'Choose class features')
-            )
-          }
-          {
-            spellcasting &&
-            <Section
-              title='Spellcasting'
-              spellcastingData={spellcasting.info}
-              chosenListItem={chosenListItem}
-              listItemCallback={setChosenListItem}
-            />
-          }
-          {
-            startingEquipment &&
-            <>
-              {
-                startingEquipment.starting_equipment?.length > 0 &&
-                <Card>
-                  <CardItem>
-                    <Body>
-                      <View>
-                        <Text>Starting equipment</Text>
-                      </View>
-                      <View>
-                        <List>
-                          {
-                            startingEquipment.starting_equipment.map((eq: EquipmentEntrySimple, index: number) =>
-                              <ListItem key={index}>
-                                <Text>{eq.equipment.name} - {eq.quantity}</Text>
-                              </ListItem>
-                            )
-                          }
-                        </List>
-                      </View>
-                    </Body>
-                  </CardItem>
-                </Card>
-              }
+        }
+        {
+          startingEquipment &&
+          <>
+            {
+              startingEquipment.starting_equipment?.length > 0 &&
               <Card>
                 <CardItem>
-                  <Text style={{ fontSize: 20, marginVertical: 15, marginLeft: 8 }}>
-                    Choose starting equipment
-                  </Text>
+                  <Body>
+                    <View>
+                      <Text>Starting equipment</Text>
+                    </View>
+                    <View>
+                      <List>
+                        {
+                          startingEquipment.starting_equipment.map((eq: EquipmentEntrySimple, index: number) =>
+                            <ListItem key={index}>
+                              <Text>{eq.equipment.name} - {eq.quantity}</Text>
+                            </ListItem>
+                          )
+                        }
+                      </List>
+                    </View>
+                  </Body>
                 </CardItem>
-                <EquipmentOptionsSwitcher className={classId} onNextPress={goNext} navigation={navigation} />
               </Card>
-            </>
-          }
-        </LoadingContainer>
+            }
+            <Card>
+              <CardItem>
+                <Text style={{ fontSize: 20, marginVertical: 15, marginLeft: 8 }}>
+                  Choose starting equipment
+                  </Text>
+              </CardItem>
+              <EquipmentOptionsSwitcher className={classId} onNextPress={goNext} navigation={navigation} />
+            </Card>
+          </>
+        }
       </Content>
     </Container>
 

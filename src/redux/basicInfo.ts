@@ -29,23 +29,21 @@ export function resetBasicInfo() {
 const initalState = {
     speed: 0,
     alignment: '',
-    age: 0,
+    age: '',
     size: '',
-    proficiencyBonus: 0
+    proficiencyBonus: 0,
+    languagesDesc: ''
 }
 
 export default function basicInfoReducer(state = initalState, action: ActionProps) {
     switch (action.type) {
         case APPLY_CHARACTER:
             return action.payload.basicInfo
-            
+
         case APPLY_SNAPSHOT:
             return action.payload.basicInfo
 
         case SET_BASIC_INFO:
-            return action.payload
-
-        case UPDATE_BASIC_INFO:
             return {
                 ...state,
                 ...action.payload
@@ -63,7 +61,8 @@ export default function basicInfoReducer(state = initalState, action: ActionProp
 export interface BasicInfo {
     speed: number,
     alignment?: string,
-    age?: number,
+    age?: string,
     size: string,
-    proficiencyBonus: number
+    proficiencyBonus: number,
+    languagesDesc: string
 }
