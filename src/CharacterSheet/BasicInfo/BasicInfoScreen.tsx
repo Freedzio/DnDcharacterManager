@@ -198,7 +198,7 @@ export default function BasicInfoScreen({ navigation }: any) {
           </List>
         </Card>
       </Content>
-      <Fab onPress={() => navigation.navigate(CONFIRM_LEVEL_UP_SCREEN)}>
+      <Fab onPress={() => navigation.navigate(LEVEL_UP_SCREEN)}>
         <Icon name='add' />
       </Fab>
     </Container>

@@ -14,6 +14,8 @@ import { ApiConfig } from '../../common/constants/ApiConfig';
 import GoNextButton from './common/GoNextButton';
 
 export default function Fighter({ onNextPress, navigation }: any) {
+  const items: FinalItem[] = require('../../database/Equipment.json');
+
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -73,13 +75,11 @@ export default function Fighter({ onNextPress, navigation }: any) {
   }
 
   useEffect(() => {
-    getEquipmentList('martial-weapons')
-      .then(data => setMartialWeapons(data))
+    setMartialWeapons(items.filter(item => item.weapon_category === 'Martial'))
   }, []);
 
-
   function getItem(item: string) {
-    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+    if (item !== '' && item !== 'choose') dispatchItems(items.filter(eq => eq.index === item))
   }
 
   function getChosenData() {
@@ -98,10 +98,10 @@ export default function Fighter({ onNextPress, navigation }: any) {
       getItem(chosenMartial2)
     };
 
-   getItem(chosen3)
-   if(chosen3 === 'crossbow-light') getItem('crossbow-bolt')
+    getItem(chosen3)
+    if (chosen3 === 'crossbow-light') getItem('crossbow-bolt')
 
-   getItem(chosen4)
+    getItem(chosen4)
   }
 
   function goNext() {

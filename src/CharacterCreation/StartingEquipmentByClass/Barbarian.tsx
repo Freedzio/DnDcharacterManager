@@ -2,17 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { CardItem, Button, View, Text } from 'native-base'
 import StyledButton from './common/StyledButton';
 import Or from './common/Or';
-import { JustUrl, EqItem } from '../../common/models/models';
+import { JustUrl, EqItem, FinalItem } from '../../common/models/models';
 import EqPicker from './common/EqPicker';
 import ChoiceWrapper from './common/ChoiceWrapper';
-import getEquipmentList from './common/getEquipmentList';
 import GoNextButton from './common/GoNextButton';
-import apiWrapper from '../../common/functions/apiWrapper';
-import { ApiConfig } from '../../common/constants/ApiConfig';
 import { useDispatch } from 'react-redux';
 import { addItems } from '../../redux/items';
 
 export default function Barbarian({ onNextPress, navigation }: any) {
+  const items: FinalItem[] = require('../../database/Equipment.json');
+
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosenMartial, setChosenMartial] = useState<string>('choose');
@@ -21,7 +20,7 @@ export default function Barbarian({ onNextPress, navigation }: any) {
   const [simpleWeapons, setSimpleWeapons] = useState<Array<JustUrl>>([]);
 
   const dispatch = useDispatch();
-  const dispatchItems = (items: Array<EqItem>) => dispatch(addItems(items));
+  const dispatchItems = (items: Array<FinalItem>) => dispatch(addItems(items));
 
   const choice1 = {
     a: {
@@ -46,15 +45,13 @@ export default function Barbarian({ onNextPress, navigation }: any) {
   };
 
   useEffect(() => {
-    getEquipmentList('martial-melee-weapons')
-      .then(data => setMartialMeleeWeapons(data));
+    setMartialMeleeWeapons(items.filter(item => item.equipment_category.index === 'weapon' && item.weapon_category === 'Martial'))
 
-    getEquipmentList('simple-weapons')
-      .then(data => setSimpleWeapons(data));
+    setSimpleWeapons(items.filter(item => item.weapon_category === 'Simple'))
   }, []);
 
   function getItem(item: string) {
-    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+    if (item !== '' && item !== 'choose') dispatchItems(items.filter(eq => eq.index === item))
   }
 
   function getChosenData() {

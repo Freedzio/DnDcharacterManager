@@ -13,6 +13,8 @@ import { useDispatch } from 'react-redux';
 import { addItems } from '../../redux/items';
 
 export default function Bard({ onNextPress, navigation }: any) {
+  const items: FinalItem[] = require('../../database/Equipment.json');
+
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -62,11 +64,9 @@ export default function Bard({ onNextPress, navigation }: any) {
   }
 
   useEffect(() => {
-    getEquipmentList('simple-weapons')
-      .then(data => setSimpleWeapons(data));
+   setSimpleWeapons(items.filter(item => item.weapon_category === 'Simple'))
 
-    getEquipmentList('musical-instruments')
-      .then(data => setInstruments(data))
+   setInstruments(items.filter(item => item.tool_category === 'Musical Instrument'))
   }, []);
 
   function getChosenData() {
@@ -80,7 +80,7 @@ export default function Bard({ onNextPress, navigation }: any) {
   }
 
   function getItem(item: string) {
-    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+    if (item !== '' && item !== 'choose') dispatchItems(items.filter(eq => eq.index === item))
   }
 
   function goNext() {

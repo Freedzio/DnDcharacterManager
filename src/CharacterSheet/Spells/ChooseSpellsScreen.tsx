@@ -12,6 +12,8 @@ import _ from 'lodash'
 import { spellcastingAbilityByClass } from './spellcastingAbilityByClass';
 
 export default function ChooseSpellsScreen() {
+  const spellsJSON: Spell[] = require('../../database/Spells.json')
+
   const spellcasting = useSelector((store: StoreProps) => store.spellcasting);
 
   const [chosenLevel, setChosenLevel] = useState<number>(0);
@@ -40,12 +42,12 @@ export default function ChooseSpellsScreen() {
   }
 
   async function getSpellsByTheirLevelForClass(className: string, level: number) {
-    return await apiWrapper(ApiConfig.spellsByClassAndItsLevel(className, level));
+    return spellsJSON.filter(spell => spell.level === level && spell.classes.some(item => item.index === className));
   }
 
   async function getAllSpellsData(level: number, className: string) {
-    const spells = await getSpellsByTheirLevelForClass(className, level);
-    setSpellsToChooseFrom(spells.results);
+    const results = await getSpellsByTheirLevelForClass(className, level);
+    setSpellsToChooseFrom(results);
   };
 
   async function onSpellPress(spell: string) {
@@ -58,7 +60,7 @@ export default function ChooseSpellsScreen() {
 
       await AsyncStorage.setItem(id, JSON.stringify(temp))
     } else {
-      const spellData = await apiWrapper(ApiConfig.spell(spell))
+      const spellData = spellsJSON.filter(item => item.index === spell)[0]
       dispatchSpell({
         ...spellData,
         spellcasting_ability: spellcastingAbilityByClass.filter(item => item.class.toLowerCase() === chosenClass)[0].ability

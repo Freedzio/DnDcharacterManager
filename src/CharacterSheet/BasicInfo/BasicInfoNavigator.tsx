@@ -11,7 +11,7 @@ export default function BasicIngoNavigator() {
   return (
     <Stack.Navigator initialRouteName={BASIC_INFO_SCREEN} screenOptions={{header: () => null}}>
       <Stack.Screen name={BASIC_INFO_SCREEN} component={BasicInfoScreen} />
-      {/* <Stack.Screen name={LEVEL_UP_SCREEN} component={LevelUpScreen} /> */}
+      <Stack.Screen name={LEVEL_UP_SCREEN} component={LevelUpScreen} />
       <Stack.Screen name={CONFIRM_LEVEL_UP_SCREEN} component={ConfirmLevelUpScreen} />
     </Stack.Navigator>
   )

@@ -19,7 +19,9 @@ import { StoreProps } from '../../redux/store';
 import MoneyDisplayer, { units } from './MoneyDisplayer';
 
 export default function AddItemsScreen() {
-  const [categories, setCategories] = useState<Array<JustUrl>>([]);
+  const itemsJSON: FinalItem[] = require('../../database/Equipment.json');
+  const categories: Category[] = require('../../database/Equipment-Categories.json')
+
   const [chosenCategory, setChosenCategory] = useState<string>('armor');
   const [itemsToChooseFrom, setItemsToChooseFrom] = useState<Array<JustUrl>>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -38,14 +40,9 @@ export default function AddItemsScreen() {
   const dispatchItem = (item: { [key: string]: FinalItem }) => dispatch(addSingleItem(item))
 
   useEffect(() => {
-    apiWrapper(ApiConfig.equipmentCategories).then(data => setCategories(data.results))
-  }, []);
-
-  useEffect(() => {
     setLoading(true);
-    apiWrapper(ApiConfig.equipmentCategory(chosenCategory))
-      .then(data => setItemsToChooseFrom(data.equipment))
-      .then(() => setLoading(false))
+    setItemsToChooseFrom(categories.filter(cat => cat.index === chosenCategory)[0].equipment)
+    setLoading(false)
   }, [chosenCategory]);
 
   useEffect(() => {
@@ -53,12 +50,11 @@ export default function AddItemsScreen() {
   }, [money])
 
   async function addItem(item: string, method: 'buy' | 'find') {
-    console.log(item)
     setButtonsLoading(true);
 
     let newMoney = { ...money };
 
-    const itemData: FinalItem = await apiWrapper(ApiConfig.item(item));
+    const itemData: FinalItem = itemsJSON.filter(eq => eq.index === item)[0];
     if (method === 'buy') {
       dispatchSpendMoney(itemData.cost);
       newMoney = calculateMoney({ ...money }, itemData.cost, 'buy');
@@ -118,9 +114,9 @@ export default function AddItemsScreen() {
                             borderWidth: 1
                           }
                         }
-                        value={localMoney[unit].toString()} 
+                        value={localMoney[unit].toString()}
                         onChangeText={v => onMoneyEdit(unit, v as string)}
-                        />
+                      />
                     </Card>
                   </Col>
                 )
@@ -180,4 +176,8 @@ export default function AddItemsScreen() {
       </Content>
     </Container>
   )
+}
+
+interface Category extends JustUrl {
+  equipment: JustUrl[]
 }

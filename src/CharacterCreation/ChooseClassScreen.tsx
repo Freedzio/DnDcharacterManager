@@ -28,7 +28,6 @@ export default function ChooseClassScreen({ navigation }: any) {
     const features: Feature[] = require('../database/Features.json')
 
     const store = useSelector((store: StoreProps) => store);
-    const loading = useSelector((store: StoreProps) => store.loading);
     const snapshot = useSelector((store: StoreProps) => store.snapshot);
 
     const dispatch = useDispatch();

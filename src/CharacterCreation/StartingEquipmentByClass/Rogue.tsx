@@ -10,7 +10,9 @@ import apiWrapper from '../../common/functions/apiWrapper';
 import { ApiConfig } from '../../common/constants/ApiConfig';
 import GoNextButton from './common/GoNextButton';
 
-export default function Rogue({onNextPress, navigation}: any) {
+export default function Rogue({ onNextPress, navigation }: any) {
+  const items: FinalItem[] = require('../../database/Equipment.json');
+
   const [chosen1, setChosen1] = useState<string>('');
   const [chosen2, setChosen2] = useState<string>('');
   const [chosen3, setChosen3] = useState<string>('');
@@ -63,7 +65,7 @@ export default function Rogue({onNextPress, navigation}: any) {
   }
 
   function getItem(item: string) {
-    if (item !== '' && item !== 'choose') apiWrapper(ApiConfig.item(item)).then(data => dispatchItems([data]))
+    if (item !== '' && item !== 'choose') dispatchItems(items.filter(eq => eq.index === item))
   }
 
   function goNext() {

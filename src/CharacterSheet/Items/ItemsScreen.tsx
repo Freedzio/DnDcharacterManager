@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 import { Button, Container, Content, Fab, Icon, List, ListItem, Text, View } from 'native-base'
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import ScreenHeader from '../../common/components/ScreenHeader';
 import { ADD_ITEMS_SCREEN } from '../../common/constants/routeNames';
@@ -13,6 +13,8 @@ import { StoreProps } from '../../redux/store'
 import MoneyDisplayer from './MoneyDisplayer';
 
 export default function ItemsScreen({ navigation }: any) {
+  const [buttonsDisabled, setButtonsDisabled] = useState<boolean>(false)
+
   const equipped = useSelector((store: StoreProps) => store.equipped);
   const name = useSelector((store: StoreProps) => store.name);
   const items = useSelector((store: StoreProps) => store.items)
@@ -75,6 +77,7 @@ export default function ItemsScreen({ navigation }: any) {
   };
 
   async function onDeleteItem(item: string, method: 'sell' | 'delete') {
+    setButtonsDisabled(true)
     dispatchDeleteItem(item);
     dispatchUnequip(item);
 
@@ -93,7 +96,7 @@ export default function ItemsScreen({ navigation }: any) {
       items: { ...newItems },
       equipped: store.equipped.filter(eq => eq !== item),
       money: newMoney
-    }))
+    })).then(() => setButtonsDisabled(false))
   }
 
   return (
@@ -146,7 +149,7 @@ export default function ItemsScreen({ navigation }: any) {
                   </Button>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small>
+                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small disabled={buttonsDisabled}>
                     <Text>delete</Text>
                   </Button>
                 </View>
@@ -156,7 +159,7 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => items[item].equipment_category.index === 'weapon').map((item: string, index: number) =>
               <ListItem key={index}>
-                <Button small onPress={() => onDeleteItem(item, 'sell')}>
+                <Button small onPress={() => onDeleteItem(item, 'sell')} disabled={buttonsDisabled}>
                   <Text>$</Text>
                 </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name} </Text>
@@ -167,7 +170,7 @@ export default function ItemsScreen({ navigation }: any) {
                   </Button>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small>
+                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small disabled={buttonsDisabled}>
                     <Text>delete</Text>
                   </Button>
                 </View>
@@ -177,7 +180,7 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => items[item].gear_category).filter(item => items[item].gear_category.index === 'ammunition').map((item: string, index: number) =>
               <ListItem key={index}>
-                <Button small onPress={() => onDeleteItem(item, 'sell')}>
+                <Button small onPress={() => onDeleteItem(item, 'sell')} disabled={buttonsDisabled}>
                   <Text>$</Text>
                 </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name + (items[item].quantity ? ` (${items[item].quantity})` : '')} </Text>
@@ -196,7 +199,7 @@ export default function ItemsScreen({ navigation }: any) {
                   }
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small>
+                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small disabled={buttonsDisabled}>
                     <Text>delete</Text>
                   </Button>
                 </View>
@@ -206,7 +209,7 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => items[item].gear_category).filter(item => items[item].gear_category.index !== 'ammunition').map((item: string, index: number) =>
               <ListItem key={index}>
-                <Button small onPress={() => onDeleteItem(item, 'sell')}>
+                <Button small onPress={() => onDeleteItem(item, 'sell')} disabled={buttonsDisabled}>
                   <Text>$</Text>
                 </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name + (items[item].quantity ? ` (${items[item].quantity})` : '')} </Text>
@@ -215,7 +218,7 @@ export default function ItemsScreen({ navigation }: any) {
 
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small>
+                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small disabled={buttonsDisabled}>
                     <Text>delete</Text>
                   </Button>
                 </View>
@@ -225,7 +228,7 @@ export default function ItemsScreen({ navigation }: any) {
           {
             Object.keys(items).filter(item => !['weapon', 'armor', 'adventuring-gear'].includes(items[item].equipment_category.index as string)).map((item: string, index: number) =>
               <ListItem key={index}>
-                <Button small onPress={() => onDeleteItem(item, 'sell')}>
+                <Button small onPress={() => onDeleteItem(item, 'sell')} disabled={buttonsDisabled}>
                   <Text>$</Text>
                 </Button>
                 <Text style={spellStyle.spellSub}>{items[item].name} </Text>
@@ -234,7 +237,7 @@ export default function ItemsScreen({ navigation }: any) {
 
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small>
+                  <Button onPress={() => onDeleteItem(item, 'delete')} style={{ padding: 0 }} small disabled={buttonsDisabled}>
                     <Text>delete</Text>
                   </Button>
                 </View>

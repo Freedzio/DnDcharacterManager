@@ -15,8 +15,11 @@ import apiWrapper from '../common/functions/apiWrapper';
 import { baseForDescriptionSake } from '../common/constants/ApiConfig';
 import { mapArrayToObject } from '../common/functions/mapArrayToObject';
 import LoadingContainer from '../common/components/LoadingContainer';
+import { FinalItem } from '../common/models/models';
 
 export default function NameCharacterScreen({ navigation }: any) {
+  const items: FinalItem[] = require('../database/Equipment.json');
+
   const [name, setName] = useState<string>('');
 
   const snapshot = useSelector((store: StoreProps) => store.snapshot);
@@ -91,7 +94,7 @@ export default function NameCharacterScreen({ navigation }: any) {
     const filteredTraits = filterOutSkills(traits)
     const CON = getAbilityModifier(store.abilityScores['CON'].score);
 
-    let packContents = [];
+    let packContents: any = [];
     const pack = Object.keys(store.items).filter(item => item.includes('pack'));
 
     let newItems = {}
@@ -108,9 +111,9 @@ export default function NameCharacterScreen({ navigation }: any) {
       let arr = [];
 
       for (let i = 0; i < packContents.length; i++) {
-        const item = await apiWrapper(baseForDescriptionSake + packContents[i].item_url);
+        const item = items.filter(item => item.index === packContents[i].item_url.replace('/api/equipment/', ''))[0]
 
-        arr.push(await item)
+        arr.push(item)
       }
 
       newItems = mapArrayToObject(arr)
@@ -123,6 +126,7 @@ export default function NameCharacterScreen({ navigation }: any) {
       name: name,
       classes: store.classes,
       race: store.race,
+      subrace: store.subrace,
       hitDies: store.hitDies,
       abilityScores: store.abilityScores,
       basicInfo: store.basicInfo,
@@ -151,7 +155,7 @@ export default function NameCharacterScreen({ navigation }: any) {
     };
 
     await AsyncStorage.setItem(storageID, JSON.stringify(obj));
-    
+
     dispatchResetStore();
 
     navigation.push(HOME_SCREEN);
