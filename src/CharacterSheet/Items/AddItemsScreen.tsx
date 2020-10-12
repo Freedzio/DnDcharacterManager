@@ -2,16 +2,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { Picker } from '@react-native-community/picker';
 import { Button, Card, Col, Container, Content, Input, List, ListItem, Row, Text, View } from 'native-base'
 import React, { useEffect, useState } from 'react'
-import { FlatList, VirtualizedList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import uuid from 'react-native-uuid';
 import { useDispatch, useSelector } from 'react-redux';
 import { tileHeight } from '../../CharacterCreation/Tile';
 import LoadingContainer from '../../common/components/LoadingContainer';
 import ScreenHeader from '../../common/components/ScreenHeader'
-import { ApiConfig } from '../../common/constants/ApiConfig';
-import apiWrapper from '../../common/functions/apiWrapper';
 import calculateMoney from '../../common/functions/calculateMoney';
+import { preventNaN } from '../../common/functions/preventNaN';
 import { FinalItem, JustUrl, Money } from '../../common/models/models'
 import { addItems, addSingleItem } from '../../redux/items';
 import { setMoney, spendMoney } from '../../redux/money';
@@ -32,7 +30,6 @@ export default function AddItemsScreen() {
   const items = useSelector((store: StoreProps) => store.items);
   const money = useSelector((store: StoreProps) => store.money)
   const id = useSelector((store: StoreProps) => store.id);
-  const store = useSelector((store: StoreProps) => store);
 
   const dispatch = useDispatch();
   const dispatchSpendMoney = (cost: { unit: string, quantity: number }) => dispatch(spendMoney(cost));
@@ -86,7 +83,7 @@ export default function AddItemsScreen() {
   }
 
   function onMoneyEdit(unit: string, amount: string) {
-    let v = isNaN(parseInt(amount)) ? 0 : parseInt(amount);
+    let v = preventNaN(amount);
 
     setLocalMoney({
       ...localMoney,

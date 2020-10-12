@@ -1,13 +1,8 @@
-import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures, SpellcastingByLevel, FinalItem } from '../common/models/models';
+import { CharacterClass, Proficiency, ChoosingOptions, JustUrl, Spellcasting, StartingEquipment, EquipmentEntrySimple, EqItem, Feature, Weapon, AdventuringGear, Armor, LevelFeatures, SpellcastingByLevel, FinalItem, Chooser } from '../common/models/models';
 import { Container, Content, Card, CardItem, Text, View, List, ListItem, Body } from 'native-base';
 import EquipmentOptionsSwitcher from './StartingEquipmentByClass/EquipmentOptionsSwitcher';
-import LoadingContainer from '../common/components/LoadingContainer';
 import getArrayOfNames from '../common/functions/getArrayOfNames';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import ScreenHeader from '../common/components/ScreenHeader';
-import { ApiConfig } from '../common/constants/ApiConfig';
-import { Picker } from '@react-native-community/picker';
-import apiWrapper from '../common/functions/apiWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
 import { applySnapshot, takeSnapshot } from '../redux/snapshot';
@@ -17,10 +12,10 @@ import Section from './Section';
 import _ from 'lodash'
 import { addProficiencies } from '../redux/proficiencies';
 import { addItems } from '../redux/items';
-import filterList from '../common/functions/filterList';
 import { addFeatures } from '../redux/features';
 import { setSpellcastingData } from '../redux/spellcasting';
-import reactotron from 'reactotron-react-native';
+import { renderPickersForSegment } from '../common/functions/renderPickersForSegment';
+import { createObjectForChoosing } from '../common/functions/createObjectForChoosing';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
   const classes: CharacterClass[] = require('../database/Classes.json');
@@ -115,57 +110,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
       }
     }
     return temp
-  }
-
-  async function onChooserChange(key: string, value: string, chooserObject: Chooser, setter: (v: any) => void) {
-    const obj = {
-      ...chooserObject,
-      [key]: value
-    }
-
-    setter(obj)
-  }
-
-  function renderPickersForSegment(setOfChoices: ChoosingOptions, index1: number, chooserObject: Chooser, setter: (v: any) => void, title: string) {
-    const howMany = setOfChoices.choose;
-
-    let arr = [];
-
-    for (let index2 = 0; index2 < howMany; index2++) {
-      const key = index1.toString() + index2.toString();
-
-      arr.push(
-        <Picker
-          style={{ width: 360 }}
-          selectedValue={chooserObject[key]}
-          onValueChange={v => onChooserChange(key, v as string, chooserObject, setter)}>
-          <Picker.Item value='chose' label='--Choose--' />
-          {
-            setOfChoices.from.filter(item => filterList(item.index, chooserObject, key)).map((item: JustUrl) =>
-              <Picker.Item label={item.name} value={item.index as string} />
-            )
-          }
-        </Picker>
-      )
-    }
-
-    return (
-      <Card>
-        <CardItem>
-          <View>
-            <View>
-              <Text>
-                {title}
-              </Text>
-            </View>
-            <SafeAreaView>
-              {arr}
-            </SafeAreaView>
-          </View>
-        </CardItem>
-      </Card>
-    )
-  }
+  }   
 
   useEffect(() => {
     navigation.addListener('beforeRemove', () => {
@@ -181,19 +126,7 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
 
     setClassData(tempClassData);
 
-    let obj = {};
-    for (let i = 0; i < tempClassData.proficiency_choices.length; i++) {
-      for (let j = 0; j < tempClassData.proficiency_choices[i].choose; j++) {
-        const a = i.toString();
-        const b = j.toString();
-        const key = a + b;
-
-        obj = {
-          ...obj,
-          [key as string]: 'choose'
-        }
-      }
-    }
+    const obj = createObjectForChoosing(tempClassData.proficiency_choices)
 
     setChosenProficiencies(obj);
 
@@ -319,8 +252,4 @@ export default function ConfirmClassScreen({ navigation, route }: any) {
     </Container>
 
   )
-}
-
-interface Chooser {
-  [key: string]: string
 }

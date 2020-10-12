@@ -400,3 +400,14 @@ export interface Cost {
 }
 
 export interface AbilityBonuses extends AbilityScores { }
+
+export interface Chooser {
+    [key: string]: string
+}
+
+export interface Multiclassing {
+    index: string,
+    name: string,
+    proficiencies: JustUrl[],
+    proficiency_choices: ChooseFromCategory
+}
