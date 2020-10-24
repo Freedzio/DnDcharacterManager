@@ -26,6 +26,7 @@ import spellcastingReducer from './spellcasting';
 import moneyReducer from './money';
 import triggerReducer from './trigger';
 import subraceReducer from './subrace';
+import subclassReducer from './subclass';
 
 const rootReducer = combineReducers({
     id: idReducer,
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
     basicInfo: basicInfoReducer,
     maxHP: maxHPReducer,
     classes: classReducer,
+    subclasses: subclassReducer,
     abilityScores: abilityScoresReducer,
     languages: languagesReducer,
     proficiencies: proficienciesReducer,
@@ -65,6 +67,7 @@ export interface StoreProps {
     subrace: string,
     maxHP: number,
     classes: { [key: string]: number },
+    subclasses: { [key: string]: string },
     abilityScores: AbilityScores,
     basicInfo: BasicInfo,
     languages: Array<string>,

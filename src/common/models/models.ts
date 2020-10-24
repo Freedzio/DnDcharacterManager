@@ -409,5 +409,5 @@ export interface Multiclassing {
     index: string,
     name: string,
     proficiencies: JustUrl[],
-    proficiency_choices: ChooseFromCategory
+    proficiency_choices: ChoosingOptions[]
 }

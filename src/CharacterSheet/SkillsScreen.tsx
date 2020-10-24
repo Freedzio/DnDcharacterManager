@@ -99,7 +99,7 @@ export default function SkillsScreen() {
               const modifier = getAbilityModifier(abilityScores[ability].score);
               return (
                 <Card style={{ width: getDimensions().width / 3 - 10, height: 90 }} key={index}>
-                  <Text style={{ fontWeight: 'bold', textAlign: "center", fontSize: 20 }}>{ability}</Text>
+                  <Text style={{ fontWeight: 'bold', textAlign: "center", fontSize: 20 }}>{ability}{abilityScores[ability].proficiency ? '*' : ''}</Text>
                   <Text style={{ textAlign: "center", fontSize: 30 }}>{abilityScores[ability].score}</Text>
                   <Text style={{ textAlign: 'center', fontSize: 20 }}>{renderPlusOrMinus(modifier)}</Text>
                 </Card>

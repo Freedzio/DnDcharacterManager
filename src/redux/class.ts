@@ -21,7 +21,7 @@ export function levelClass(payload: string) {
 const initialState: { [key: string]: number } = {};
 
 export default function classReducer(state = initialState, action: ActionProps) {
-    let newState: { [key: string]: number } = {...state};
+    let newState = {...state};
     let className: string = action.payload;
     let temp = newState[className] ? newState[className] : 0
 

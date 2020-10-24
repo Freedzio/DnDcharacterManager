@@ -16,6 +16,7 @@ import { addFeatures } from '../redux/features';
 import { setSpellcastingData } from '../redux/spellcasting';
 import { renderPickersForSegment } from '../common/functions/renderPickersForSegment';
 import { createObjectForChoosing } from '../common/functions/createObjectForChoosing';
+import { setAllAbilityScores } from '../redux/abilityScores';
 
 export default function ConfirmClassScreen({ navigation, route }: any) {
   const classes: CharacterClass[] = require('../database/Classes.json');

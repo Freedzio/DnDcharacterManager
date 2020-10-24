@@ -11,8 +11,6 @@ import { addName } from '../redux/name';
 import AsyncStorage from '@react-native-community/async-storage';
 import { HOME_SCREEN } from '../common/constants/routeNames';
 import getAbilityModifier from '../common/functions/getAbilityModifier';
-import apiWrapper from '../common/functions/apiWrapper';
-import { baseForDescriptionSake } from '../common/constants/ApiConfig';
 import { mapArrayToObject } from '../common/functions/mapArrayToObject';
 import LoadingContainer from '../common/components/LoadingContainer';
 import { FinalItem } from '../common/models/models';
@@ -125,6 +123,7 @@ export default function NameCharacterScreen({ navigation }: any) {
       id: storageID,
       name: name,
       classes: store.classes,
+      subclasses: {},
       race: store.race,
       subrace: store.subrace,
       hitDies: store.hitDies,

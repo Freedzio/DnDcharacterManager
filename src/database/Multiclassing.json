@@ -123,7 +123,7 @@
       },
       {
         "choose": 1,
-        "type": "proficiencies",
+        "type": "instruments",
         "from": [
           {
             "index": "bagpipes",
