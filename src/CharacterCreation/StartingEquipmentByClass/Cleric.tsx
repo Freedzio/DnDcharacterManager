@@ -111,14 +111,14 @@ export default function Cleric({ onNextPress, navigation }: any) {
       <ChoiceWrapper>
         <StyledButton title={choice1.a.name} onButtonPress={() => setChosen1(choice1.a.index)} bordered={chosen1 !== choice1.a.index} />
         <Or />
-        <StyledButton title={choice1.b.name} onButtonPress={() => setChosen1(choice1.b.index)} bordered={chosen1 !== choice1.b.index} disabled={!proficiencies.includes('warhammers')} />
+        <StyledButton title={choice1.b.name} onButtonPress={() => setChosen1(choice1.b.index)} bordered={chosen1 !== choice1.b.index} />
       </ChoiceWrapper>
       <ChoiceWrapper>
         <StyledButton title={choice2.a.name} onButtonPress={() => setChosen2(choice2.a.index)} bordered={chosen2 !== choice2.a.index} />
         <Or />
         <StyledButton title={choice2.b.name} onButtonPress={() => setChosen2(choice2.b.index)} bordered={chosen2 !== choice2.b.index} />
         <Or />
-        <StyledButton title={choice2.c.name} onButtonPress={() => setChosen2(choice2.c.index)} bordered={chosen2 !== choice2.c.index} disabled={!proficiencies.includes('chain-mail')} />
+        <StyledButton title={choice2.c.name} onButtonPress={() => setChosen2(choice2.c.index)} bordered={chosen2 !== choice2.c.index} />
       </ChoiceWrapper>
       <ChoiceWrapper>
         <StyledButton title={choice3.a.name} onButtonPress={() => setChosen3(choice3.a.index)} bordered={chosen3 !== choice3.a.index} />
